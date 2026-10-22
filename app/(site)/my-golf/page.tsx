@@ -88,42 +88,51 @@ export default function MyGolfPage() {
 
       <section className="mt-12">
         <Heading>My coaches</Heading>
-        <div className="mt-5 grid gap-5 sm:grid-cols-2">
-        {([
-          ["Past", false],
-          ["Active", true],
-        ] as const).map(([label, active]) => {
-          const list = sampleCoachesWorkedWith.filter((c) => c.active === active);
-          if (list.length === 0) return null;
-          return (
-            <div key={label}>
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/50">{label}</p>
-              <div className="mt-2 grid gap-4">
-                {list.map((c) => (
-                  <Link
-                    key={c.slug}
-                    href={`/coaches/${c.slug}`}
-                    className={`glass flex items-center gap-4 rounded-2xl p-4 hover:!border-lime/70 ${
-                      active ? "" : "opacity-55 grayscale"
-                    }`}
-                  >
-                    <CoachPhoto slug={c.slug} name={c.name} photo={c.photo} className="h-16 w-16 shrink-0" />
-                    <div className="min-w-0">
-                      <p className="font-bold">{c.name}</p>
-                      <p className="text-sm text-white/70">
-                        {c.title ? `${c.title}, ` : ""}
-                        {c.suburb}
-                      </p>
-                      <p className={`mt-1 text-sm font-semibold ${active ? "text-lime" : "text-white/70"}`}>
-                        {c.lessons} lessons &middot; Rebook
-                      </p>
-                    </div>
-                  </Link>
-                ))}
+        <div className="mt-5 flex gap-3">
+          {([
+            ["Past", false],
+            ["Active", true],
+          ] as const).map(([label, active]) => {
+            const list = sampleCoachesWorkedWith.filter((c) => c.active === active);
+            if (list.length === 0) return null;
+            return (
+              <div key={label} className={active ? "basis-3/4" : "basis-1/4"}>
+                <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/50">{label}</p>
+                <div className="mt-2 grid gap-3">
+                  {list.map((c) => (
+                    <Link
+                      key={c.slug}
+                      href={`/coaches/${c.slug}`}
+                      className={`glass rounded-2xl hover:!border-lime/70 ${
+                        active
+                          ? "flex items-center gap-3 p-3 sm:gap-4 sm:p-4"
+                          : "flex flex-col items-center gap-2 p-3 text-center opacity-55 grayscale"
+                      }`}
+                    >
+                      <CoachPhoto
+                        slug={c.slug}
+                        name={c.name}
+                        photo={c.photo}
+                        className={active ? "h-14 w-14 shrink-0 sm:h-16 sm:w-16" : "h-12 w-12 shrink-0 sm:h-16 sm:w-16"}
+                      />
+                      <div className="min-w-0">
+                        <p className={`font-bold ${active ? "" : "truncate text-sm"}`}>{c.name}</p>
+                        {active && (
+                          <p className="text-sm text-white/70">
+                            {c.title ? `${c.title}, ` : ""}
+                            {c.suburb}
+                          </p>
+                        )}
+                        <p className={`mt-1 text-xs font-semibold sm:text-sm ${active ? "text-lime" : "text-white/70"}`}>
+                          {c.lessons} lessons{active ? " \u00b7 Rebook" : ""}
+                        </p>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
         </div>
       </section>
 

@@ -12,6 +12,9 @@ export default function Footer() {
           <Link href="/learn" className="hover:text-lime">
             Learn
           </Link>
+          <Link href="/for-coaches" className="hover:text-lime">
+            For coaches
+          </Link>
         </nav>
       </div>
     </footer>

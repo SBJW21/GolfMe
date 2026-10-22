@@ -18,7 +18,7 @@ export default function AppointmentSlider({ items }: { items: Appointment[] }) {
     const prev = first?.previousElementSibling as HTMLElement | null;
     if (el && first) {
       // Show about half of the most recent past lesson, then the upcoming ones.
-      el.scrollLeft = prev ? prev.offsetLeft + prev.offsetWidth / 2 - 16 : first.offsetLeft - 16;
+      el.scrollLeft = prev ? prev.offsetLeft + prev.offsetWidth / 2 : first.offsetLeft - 16;
     }
   }, []);
 
@@ -51,7 +51,7 @@ export default function AppointmentSlider({ items }: { items: Appointment[] }) {
           <article
             key={a.id}
             data-upcoming={a.past ? undefined : ""}
-            className={`glass relative w-[33%] shrink-0 overflow-hidden rounded-2xl p-3 sm:w-[260px] sm:p-5 ${
+            className={`glass relative w-[calc((100vw_-_94px)/2.5)] shrink-0 overflow-hidden rounded-2xl p-3 sm:w-[260px] sm:p-5 ${
               a.past ? "opacity-55 grayscale" : "!border-lime/50"
             }`}
           >

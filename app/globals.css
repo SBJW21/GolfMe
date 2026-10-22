@@ -89,3 +89,12 @@ body {
   outline: 2px solid var(--lime);
   outline-offset: 2px;
 }
+
+@keyframes step-fill {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+.step-bar {
+  animation: step-fill 3.5s linear forwards;
+}

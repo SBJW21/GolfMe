@@ -32,3 +32,7 @@ If the database has no published coaches, the site shows SAMPLE DATA from `lib/d
 
 Connect this GitHub repo to Netlify. Every push to the main branch publishes automatically.
 Add the variables from `.env.example` in Netlify under Site configuration > Environment variables.
+
+## Photos
+
+Sample coach photos in `public/coaches/` are free-licence Pexels images used as placeholders. Replace them with each coach's own photo before launch.

@@ -8,6 +8,7 @@ import type { Coach, FocusArea, Slot, Video } from "./types";
 export const sampleCoaches: Coach[] = [
   {
     slug: "sample-coach-one",
+    photo: "/coaches/sample-coach-one.jpg",
     name: "Alex Morgan",
     suburb: "Manly",
     priceCents: 9500,
@@ -35,6 +36,7 @@ export const sampleCoaches: Coach[] = [
   },
   {
     slug: "sample-coach-three",
+    photo: "/coaches/sample-coach-three.jpg",
     name: "Sam Taylor",
     suburb: "Parramatta",
     priceCents: 7500,

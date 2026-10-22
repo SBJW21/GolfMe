@@ -1,5 +1,6 @@
 import Link from "next/link";
 import CoachCard from "@/components/CoachCard";
+import HowItWorks from "@/components/HowItWorks";
 import SampleNotice from "@/components/SampleNotice";
 import { focusAreas, suburbsOf } from "@/lib/data";
 import { loadCoaches } from "@/lib/repo";
@@ -84,36 +85,11 @@ export default async function Home() {
         </p>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 pt-12">
-        <h2 className="font-display mb-5 text-[clamp(1.7rem,5vw,2.3rem)]">
-          Start with what you want to fix
-        </h2>
-        <div className="flex flex-wrap gap-2.5">
-          {focusAreas.map((f) => (
-            <Link
-              key={f}
-              href={`/coaches?focus=${encodeURIComponent(f)}`}
-              className="rounded-full border border-white/25 px-4 py-2 text-sm font-semibold hover:border-lime hover:bg-lime hover:text-black"
-            >
-              {f}
-            </Link>
-          ))}
-        </div>
-      </section>
-
       <section className="mx-auto max-w-6xl px-4 py-12">
         <h2 className="font-display mb-6 text-[clamp(1.7rem,5vw,2.3rem)]">
           How it works
         </h2>
-        <div className="grid gap-4 md:grid-cols-3">
-          {steps.map((s, i) => (
-            <div key={s.title} className="glass rounded-2xl p-5">
-              <p className="font-display text-4xl text-lime">{i + 1}</p>
-              <h3 className="mt-2 text-lg font-bold">{s.title}</h3>
-              <p className="mt-1 text-sm text-white/80">{s.text}</p>
-            </div>
-          ))}
-        </div>
+        <HowItWorks steps={steps} />
       </section>
 
       <section className="mx-auto max-w-6xl px-4 pb-16">

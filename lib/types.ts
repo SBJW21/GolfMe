@@ -30,6 +30,8 @@ export type Coach = {
   focus: FocusArea[];
   headline: string;
   bio: string;
+  /** Path or URL of the coach's photo. Falls back to a holding image. */
+  photo?: string;
   gender?: CoachGender;
   levels?: string[];
   reviews: Review[];

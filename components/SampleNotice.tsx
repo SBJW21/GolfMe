@@ -1,8 +1,8 @@
 export default function SampleNotice({ show }: { show: boolean }) {
   if (!show) return null;
   return (
-    <p className="rounded-lg border border-lime/40 bg-lime/10 px-3 py-2 text-sm text-lime">
-      Sample coaches, reviews and prices are shown while the platform is being built.
+    <p className="text-xs uppercase tracking-[0.16em] text-white/45">
+      Sample coaches, reviews and prices shown while the platform is being built
     </p>
   );
 }

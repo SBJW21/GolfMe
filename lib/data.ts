@@ -16,8 +16,8 @@ export const sampleCoaches: Coach[] = [
     headline: "Fix your slice and add distance off the tee",
     bio: "Sample profile. Alex works with golfers who are tired of losing the ball right. Lessons start with a short video review of your swing and finish with two or three drills to practise before the next session.",
     reviews: [
-      { id: "r1", author: "Sample golfer", rating: 5, date: "2026-09-12", text: "Sample review. Clear advice and I could see the difference within the hour." },
-      { id: "r2", author: "Sample golfer", rating: 4, date: "2026-08-30", text: "Sample review. Good drills to take away and practise." },
+      { id: "r1", author: "Sample golfer", rating: 5, date: "2026-09-12", text: "Clear advice and I could see the difference within the hour." },
+      { id: "r2", author: "Sample golfer", rating: 4, date: "2026-08-30", text: "Good drills to take away and practise." },
     ],
   },
   {
@@ -30,7 +30,7 @@ export const sampleCoaches: Coach[] = [
     headline: "Short game that saves you strokes",
     bio: "Sample profile. Jordan focuses on the short game, where most golfers lose the most shots. Expect plenty of time on the practice green and a simple routine you can repeat under pressure.",
     reviews: [
-      { id: "r3", author: "Sample golfer", rating: 5, date: "2026-09-20", text: "Sample review. My bunker play went from a worry to a strength." },
+      { id: "r3", author: "Sample golfer", rating: 5, date: "2026-09-20", text: "My bunker play went from a worry to a strength." },
     ],
   },
   {
@@ -43,8 +43,8 @@ export const sampleCoaches: Coach[] = [
     headline: "Beginner friendly lessons with no jargon",
     bio: "Sample profile. Sam works with beginners and returning golfers. The aim is to get you hitting the ball solidly and feeling comfortable on the course.",
     reviews: [
-      { id: "r4", author: "Sample golfer", rating: 5, date: "2026-10-02", text: "Sample review. Patient and easy to understand." },
-      { id: "r5", author: "Sample golfer", rating: 5, date: "2026-09-04", text: "Sample review. Great for a complete beginner." },
+      { id: "r4", author: "Sample golfer", rating: 5, date: "2026-10-02", text: "Patient and easy to understand." },
+      { id: "r5", author: "Sample golfer", rating: 5, date: "2026-09-04", text: "Great for a complete beginner." },
     ],
   },
   {
@@ -57,7 +57,7 @@ export const sampleCoaches: Coach[] = [
     headline: "Control your ball flight with a reliable draw",
     bio: "Sample profile. Chris coaches low handicap golfers who want more control. Lessons use launch data to build a repeatable shot shape.",
     reviews: [
-      { id: "r6", author: "Sample golfer", rating: 5, date: "2026-09-27", text: "Sample review. Detailed and data driven." },
+      { id: "r6", author: "Sample golfer", rating: 5, date: "2026-09-27", text: "Detailed and data driven." },
     ],
   },
   {
@@ -70,8 +70,8 @@ export const sampleCoaches: Coach[] = [
     headline: "Lower scores through smarter decisions",
     bio: "Sample profile. Riley helps golfers play to their strengths, with on-course sessions that cover club selection, targets and putting routines.",
     reviews: [
-      { id: "r7", author: "Sample golfer", rating: 4, date: "2026-08-18", text: "Sample review. Changed how I think about each hole." },
-      { id: "r8", author: "Sample golfer", rating: 5, date: "2026-07-29", text: "Sample review. Practical and friendly." },
+      { id: "r7", author: "Sample golfer", rating: 4, date: "2026-08-18", text: "Changed how I think about each hole." },
+      { id: "r8", author: "Sample golfer", rating: 5, date: "2026-07-29", text: "Practical and friendly." },
     ],
   },
   {

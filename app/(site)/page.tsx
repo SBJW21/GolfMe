@@ -2,7 +2,8 @@ import Link from "next/link";
 import CoachCard from "@/components/CoachCard";
 import HowItWorks from "@/components/HowItWorks";
 import SampleNotice from "@/components/SampleNotice";
-import { focusAreas, suburbsOf } from "@/lib/data";
+import { areas, OTHER_AREA_ID } from "@/lib/areas";
+import { focusAreas } from "@/lib/data";
 import { loadCoaches } from "@/lib/repo";
 
 export const revalidate = 60;
@@ -24,7 +25,6 @@ const steps = [
 
 export default async function Home() {
   const { coaches, isSample } = await loadCoaches();
-  const suburbs = suburbsOf(coaches);
   return (
     <main>
       <section
@@ -61,17 +61,18 @@ export default async function Home() {
             ))}
           </select>
           <select
-            name="suburb"
-            aria-label="Suburb"
+            name="area"
+            aria-label="Area"
             className="field-input"
             defaultValue=""
           >
             <option value="">Anywhere in Sydney</option>
-            {suburbs.map((s) => (
-              <option key={s} value={s}>
-                {s}
+            {areas.map((a) => (
+              <option key={a.id} value={a.id}>
+                {a.label}
               </option>
             ))}
+            <option value={OTHER_AREA_ID}>Other Sydney areas</option>
           </select>
           <button type="submit" className="btn">
             Find a coach

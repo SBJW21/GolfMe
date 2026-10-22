@@ -118,10 +118,6 @@ export function focusSentence(focus: FocusArea[]) {
   return `${phrases.slice(0, -1).join(", ")} and ${phrases[phrases.length - 1]}`;
 }
 
-export function suburbsOf(list: Coach[]) {
-  return Array.from(new Set(list.map((c) => c.suburb))).sort();
-}
-
 export function averageRating(coach: Coach) {
   if (coach.reviews.length === 0) return null;
   const total = coach.reviews.reduce((sum, r) => sum + r.rating, 0);

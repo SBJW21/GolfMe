@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import CoachCard from "@/components/CoachCard";
 import SampleNotice from "@/components/SampleNotice";
-import { averageRating, focusAreas, suburbsOf } from "@/lib/data";
+import { areas, OTHER_AREA_ID, suburbInArea } from "@/lib/areas";
+import { averageRating, focusAreas } from "@/lib/data";
 import { loadCoaches } from "@/lib/repo";
 import type { FocusArea } from "@/lib/types";
 
@@ -25,16 +26,15 @@ function first(value: string | string[] | undefined) {
 
 export default async function CoachesPage(props: PageProps<"/coaches">) {
   const sp = await props.searchParams;
-  const suburb = first(sp.suburb) ?? "";
+  const area = first(sp.area) ?? "";
   const focus = first(sp.focus) ?? "";
   const max = Number(first(sp.max) ?? 0) || 0;
   const sort = first(sp.sort) ?? "rating";
   const { coaches, isSample } = await loadCoaches();
-  const allSuburbs = suburbsOf(coaches);
 
   let results = coaches.filter(
     (c) =>
-      (!suburb || c.suburb === suburb) &&
+      (!area || suburbInArea(c.suburb, area)) &&
       (!focus || c.focus.includes(focus as FocusArea)) &&
       (!max || c.priceCents <= max),
   );
@@ -53,14 +53,15 @@ export default async function CoachesPage(props: PageProps<"/coaches">) {
 
       <form method="GET" className="glass mt-6 grid gap-3 rounded-2xl p-4 sm:grid-cols-2 lg:grid-cols-5">
         <label className="text-sm font-semibold">
-          Suburb
-          <select name="suburb" defaultValue={suburb} className="field-input mt-1">
-            <option value="">All suburbs</option>
-            {allSuburbs.map((s) => (
-              <option key={s} value={s}>
-                {s}
+          Area
+          <select name="area" defaultValue={area} className="field-input mt-1">
+            <option value="">Anywhere in Sydney</option>
+            {areas.map((a) => (
+              <option key={a.id} value={a.id}>
+                {a.label}
               </option>
             ))}
+            <option value={OTHER_AREA_ID}>Other Sydney areas</option>
           </select>
         </label>
         <label className="text-sm font-semibold">

@@ -22,6 +22,10 @@ export default async function LearnPage() {
         routines to lower your score. Pick what you want to fix and work on it between
         lessons.
       </p>
+      <p className="mt-4 max-w-xl rounded-xl border border-white/15 px-4 py-3 text-sm text-white/80">
+        <span className="font-bold text-lime">Student access.</span> Learn videos unlock
+        once you have booked 3 or more lessons. Log in to watch.
+      </p>
 
       {videos.length === 0 ? (
         videoCategories.map((cat) => (
@@ -29,7 +33,7 @@ export default async function LearnPage() {
             <h2 className="font-display text-[clamp(1.7rem,5vw,2.3rem)]">{cat}</h2>
             <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {[1, 2, 3].map((n) => (
-                <VideoPlaceholder key={n} title={`${cat}: video ${n}`} meta="Video coming soon" />
+                <VideoPlaceholder key={n} title={`${cat}: video ${n}`} meta="Log in to access" label="Log in to access" locked />
               ))}
             </div>
           </section>

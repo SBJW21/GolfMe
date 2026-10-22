@@ -28,6 +28,10 @@ const sections: Section[] = [
         a: "Coaches across Sydney, from the northern beaches to the south and west. Choose your area on the map and we will show coaches nearby.",
       },
       {
+        q: "How do I get the $10 new member credit?",
+        a: "New members get $10 Golf Me credit when they join through the ScoreCard or an invite link. It is added after you log your first round, works with any coach and expires after 6 months. Full terms are on the new member credit page.",
+      },
+      {
         q: "Does it cost anything to use?",
         a: "Searching and comparing coaches is free. You only pay for the lessons you book.",
       },

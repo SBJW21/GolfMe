@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import CourseMap from "./CourseMap";
+import { courses as allCourses } from "@/lib/courses";
 import Flame from "./Flame";
 import { defaultPars, defaultStrokeIndex, holePoints, milestoneProgress, milestones, sampleCourses, sampleFriends, sampleRounds, streakInfo, todayIso, type Round } from "@/lib/rounds";
 
@@ -82,7 +84,7 @@ export default function RoundsTracker() {
   async function invite() {
     try {
       if (navigator.share) {
-        await navigator.share({ title: "Golf Me", text: "Log your rounds with me on Golf Me", url: link });
+        await navigator.share({ title: "Golf Me", text: "Join me on Golf Me. Log your rounds and get $10 Golf Me credit", url: link });
         return;
       }
       await navigator.clipboard.writeText(link);
@@ -214,11 +216,12 @@ export default function RoundsTracker() {
       {/* Round results */}
       <section>
         <h2 className="font-display text-[clamp(1.7rem,5vw,2.3rem)]">Round results</h2>
-        <div className="mt-4 grid gap-3 lg:grid-cols-2">
+        <div className="relative mt-4">
+        <div className="grid max-h-[24rem] gap-3 overflow-y-auto pb-10 lg:max-h-none lg:grid-cols-2 lg:pb-0">
           {[...rounds]
             .filter((r) => r.friendScores && Object.keys(r.friendScores).length > 0)
             .sort((a, b) => (a.date < b.date ? 1 : -1))
-            .slice(0, 4)
+            .slice(0, 8)
             .map((r) => {
               const board = [{ name: "You", score: r.score }, ...Object.entries(r.friendScores ?? {}).map(([name, score]) => ({ name, score }))].sort((a, b) => a.score - b.score);
               return (
@@ -243,6 +246,8 @@ export default function RoundsTracker() {
               );
             })}
         </div>
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-black to-transparent lg:hidden" aria-hidden="true" />
+        </div>
       </section>
 
       {/* Log a round */}
@@ -253,11 +258,16 @@ export default function RoundsTracker() {
             Course
             <input list="courses" value={course} onChange={(e) => setCourse(e.target.value)} placeholder="Start typing" className="field-input mt-1" required />
             <datalist id="courses">
-              {sampleCourses.map((c) => (
+              {[...new Set([...sampleCourses, ...allCourses.map((c) => c.name)])].map((c) => (
                 <option key={c} value={c} />
               ))}
             </datalist>
           </label>
+          {course && (
+            <div className="sm:col-span-2 sm:-mt-1">
+              <CourseMap name={course} />
+            </div>
+          )}
           <label className="text-sm font-semibold">
             Date
             <input type="date" value={date} max={todayIso()} onChange={(e) => setDate(e.target.value)} className="field-input mt-1" required />
@@ -274,21 +284,23 @@ export default function RoundsTracker() {
               </button>
             ))}
           </div>
+          <div className="grid grid-cols-2 gap-3 sm:col-span-2">
           {mode === "total" ? (
+              <label className="text-sm font-semibold">
+                Your score
+                <input inputMode="numeric" value={score} onChange={(e) => setScore(e.target.value.replace(/\D/g, ""))} className="field-input mt-1" required />
+              </label>
+            ) : (
+              <label className="text-sm font-semibold">
+                Your handicap
+                <input inputMode="decimal" value={hcp} onChange={(e) => setHcp(e.target.value.replace(/[^0-9.]/g, ""))} className="field-input mt-1" />
+              </label>
+            )}
             <label className="text-sm font-semibold">
-              Your score
-              <input inputMode="numeric" value={score} onChange={(e) => setScore(e.target.value.replace(/\D/g, ""))} className="field-input mt-1" required />
+              Total putts
+              <input inputMode="numeric" value={putts} onChange={(e) => setPutts(e.target.value.replace(/\D/g, ""))} placeholder="Optional" className="field-input mt-1" />
             </label>
-          ) : (
-            <label className="text-sm font-semibold">
-              Your handicap
-              <input inputMode="decimal" value={hcp} onChange={(e) => setHcp(e.target.value.replace(/[^0-9.]/g, ""))} className="field-input mt-1" />
-            </label>
-          )}
-          <label className="text-sm font-semibold">
-            Total putts
-            <input inputMode="numeric" value={putts} onChange={(e) => setPutts(e.target.value.replace(/\D/g, ""))} placeholder="Optional" className="field-input mt-1" />
-          </label>
+          </div>
           {mode === "total" && (
             <label className="text-sm font-semibold">
               Course par
@@ -374,27 +386,29 @@ export default function RoundsTracker() {
       <section>
         <h2 className="font-display text-[clamp(1.7rem,5vw,2.3rem)]">Course tracker</h2>
         <p className="mt-1 text-white/75">{courses.length} courses played. Tick off more.</p>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-3 grid gap-2 sm:grid-cols-2 sm:gap-3 lg:grid-cols-3">
           {courses.map(([name, c]) => (
-            <div key={name} className="glass rounded-2xl p-4">
-              <p className="font-bold">{name}</p>
-              <div className="mt-2 flex gap-1" aria-label={`${c.played} rounds`}>
-                {Array.from({ length: Math.min(c.played, 8) }, (_, i) => (
-                  <span key={i} className="h-2.5 w-2.5 rounded-full bg-lime" />
-                ))}
+            <div key={name} className="glass flex items-center justify-between gap-3 rounded-xl px-3 py-2.5">
+              <p className="min-w-0 flex-1 text-sm font-bold">{name}</p>
+              <div className="shrink-0 text-right">
+                <div className="flex justify-end gap-1" aria-label={`${c.played} rounds`}>
+                  {Array.from({ length: Math.min(c.played, 8) }, (_, i) => (
+                    <span key={i} className="h-2 w-2 rounded-full bg-lime" />
+                  ))}
+                </div>
+                <p className="mt-1 text-xs text-white/75">
+                  {c.played} {c.played === 1 ? "round" : "rounds"} &middot; Best {c.best}
+                </p>
               </div>
-              <p className="mt-2 text-sm text-white/75">
-                {c.played} {c.played === 1 ? "round" : "rounds"} &middot; Best {c.best}
-              </p>
             </div>
           ))}
           {sampleCourses
             .filter((n) => !courses.some(([c]) => c === n))
             .slice(0, 3)
             .map((n) => (
-              <div key={n} className="rounded-2xl border border-dashed border-white/20 p-4 text-white/45">
-                <p className="font-bold">{n}</p>
-                <p className="mt-2 text-sm">Not played yet</p>
+              <div key={n} className="flex items-center justify-between gap-3 rounded-xl border border-dashed border-white/20 px-3 py-2.5 text-white/45">
+                <p className="min-w-0 flex-1 text-sm font-bold">{n}</p>
+                <p className="shrink-0 text-xs">Not played yet</p>
               </div>
             ))}
         </div>
@@ -424,9 +438,13 @@ export default function RoundsTracker() {
             ))}
           </ol>
           <div className="glass rounded-2xl p-5">
-            <p className="font-bold">Invite your playing partners</p>
+            <p className="font-bold">Invite your friends to play. They get $10 Golf Me credit.</p>
             <p className="mt-1 text-sm text-white/75">
-              Friends who join can log their own scorecard for the same round and join your leaderboard.
+              Friends who join get $10 credit towards their first lesson, can log their own scorecard for the same round and join your leaderboard.
+            </p>
+            <p className="mt-2 text-xs text-white/60">
+              $10 credit for new members, released after their first logged round.{" "}
+              <a href="/new-member-credit" className="underline">Terms apply</a>
             </p>
             <p className="mt-3 break-all rounded-lg border border-white/15 px-3 py-2 text-sm text-white/80">{link}</p>
             <div className="mt-3 flex flex-wrap gap-2">
@@ -435,7 +453,7 @@ export default function RoundsTracker() {
               </button>
               <a
                 className="rounded-full border border-white/30 px-4 py-2 text-sm font-semibold"
-                href={`sms:?&body=${encodeURIComponent("Log your golf rounds with me on Golf Me: " + link)}`}
+                href={`sms:?&body=${encodeURIComponent("Join me on Golf Me and get $10 credit towards a lesson: " + link)}`}
               >
                 Text
               </a>

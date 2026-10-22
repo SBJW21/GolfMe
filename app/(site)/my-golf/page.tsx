@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import AppointmentSlider from "@/components/AppointmentSlider";
 import CoachPhoto from "@/components/CoachPhoto";
+import MyReviews from "@/components/MyReviews";
 import Flame from "@/components/Flame";
 import { milestoneProgress, sampleRounds, streakInfo } from "@/lib/rounds";
 import VideoPlaceholder from "@/components/VideoPlaceholder";
@@ -24,6 +25,7 @@ function Heading({ children }: { children: React.ReactNode }) {
 
 export default function MyGolfPage() {
   const s = sampleStudent;
+  const coach = sampleCoachesWorkedWith.find((c) => c.active);
   const streak = streakInfo(sampleRounds());
   const prog = milestoneProgress(streak.current);
   const stats = [
@@ -40,7 +42,7 @@ export default function MyGolfPage() {
       </p>
       <h1 className="font-display mt-1 text-[clamp(2.2rem,7vw,3.4rem)]">My Golf</h1>
 
-      <section className="mt-6 grid gap-4 lg:grid-cols-[1.2fr_1fr]">
+      <section className="mt-6 grid gap-4 lg:grid-cols-[1.25fr_0.9fr_1fr]">
         <div className="glass rounded-2xl p-5">
           <div className="flex items-center gap-4">
             <span className="font-display flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-lime text-2xl text-black">
@@ -53,10 +55,8 @@ export default function MyGolfPage() {
           </div>
           <dl className="mt-5 grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
             {[
-              ["Email", s.email],
-              ["Phone", s.phone],
-              ["Location", s.suburb],
               ["Handicap", s.handicap],
+              ["Location", s.suburb],
             ].map(([k, v]) => (
               <div key={k}>
                 <dt className="text-xs uppercase tracking-[0.14em] text-white/50">{k}</dt>
@@ -72,6 +72,24 @@ export default function MyGolfPage() {
             Edit details
           </span>
         </div>
+
+        {coach && (
+          <Link
+            href={`/coaches/${coach.slug}`}
+            className="glass flex flex-col items-center justify-center gap-3 rounded-2xl p-5 text-center hover:!border-lime/70"
+          >
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/50">My coach</p>
+            <CoachPhoto slug={coach.slug} name={coach.name} photo={coach.photo} className="h-28 w-28 shrink-0 sm:h-32 sm:w-32" />
+            <div>
+              <p className="text-xl font-bold">{coach.name}</p>
+              <p className="text-sm text-white/70">
+                {coach.title ? `${coach.title}, ` : ""}
+                {coach.suburb}
+              </p>
+              <p className="mt-2 text-sm font-semibold text-lime">{coach.lessons} lessons &middot; Rebook</p>
+            </div>
+          </Link>
+        )}
 
         <div className="grid grid-cols-2 gap-4">
           {stats.map((x) => (
@@ -130,61 +148,14 @@ export default function MyGolfPage() {
       </section>
 
       <section className="mt-12">
-        <Heading>My coaches</Heading>
-        <div className="mt-5 flex items-stretch gap-3">
-          {([
-            ["Past", false],
-            ["Active", true],
-          ] as const).map(([label, active]) => {
-            const list = sampleCoachesWorkedWith.filter((c) => c.active === active);
-            if (list.length === 0) return null;
-            return (
-              <div key={label} className={`flex flex-col ${active ? "basis-3/4" : "basis-1/4"}`}>
-                <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/50">{label}</p>
-                <div className="mt-2 grid flex-1 gap-3">
-                  {list.map((c) => (
-                    <Link
-                      key={c.slug}
-                      href={`/coaches/${c.slug}`}
-                      className={`glass h-full rounded-2xl hover:!border-lime/70 ${
-                        active
-                          ? "flex items-center gap-3 p-3 sm:gap-4 sm:p-4"
-                          : "flex flex-col items-center justify-center gap-2 p-3 text-center opacity-55 grayscale"
-                      }`}
-                    >
-                      <CoachPhoto
-                        slug={c.slug}
-                        name={c.name}
-                        photo={c.photo}
-                        className={active ? "h-14 w-14 shrink-0 sm:h-16 sm:w-16" : "h-12 w-12 shrink-0 sm:h-16 sm:w-16"}
-                      />
-                      <div className="min-w-0">
-                        <p className={`font-bold ${active ? "" : "truncate text-sm"}`}>{c.name}</p>
-                        {active && (
-                          <p className="text-sm text-white/70">
-                            {c.title ? `${c.title}, ` : ""}
-                            {c.suburb}
-                          </p>
-                        )}
-                        <p className={`mt-1 text-xs font-semibold sm:text-sm ${active ? "text-lime" : "text-white/70"}`}>
-                          {c.lessons} lessons{active ? " \u00b7 Rebook" : ""}
-                        </p>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      <section className="mt-12">
         <Heading>My videos</Heading>
         <p className="mt-1 text-sm text-white/70">
           Videos you&apos;ve saved or your coach has shared or uploaded.
         </p>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-4">
+          <MyReviews />
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {sampleMyVideos.map((v) => (
             <VideoPlaceholder
               key={v.id}

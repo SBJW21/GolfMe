@@ -7,7 +7,7 @@ import { SITE_URL, suburbPages } from "@/lib/suburbs";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const { coaches } = await loadCoaches();
   const now = new Date();
-  const fixed = ["", "/coaches", "/golf-lessons", "/courses", "/blog", "/faq", "/for-coaches", "/learn"].map((p) => ({
+  const fixed = ["", "/coaches", "/golf-lessons", "/courses", "/blog", "/faq", "/new-member-credit", "/for-coaches", "/learn"].map((p) => ({
     url: `${SITE_URL}${p}`,
     lastModified: now,
     changeFrequency: "weekly" as const,

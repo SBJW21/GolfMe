@@ -1,35 +1,20 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-
-type Pt = { x: number; y: number }; // 0..1 of the video frame
-type Tool = "line" | "circle" | "angle" | "pen";
-type Stroke = {
-  id: number;
-  view: number;
-  tool: Tool;
-  pts: Pt[];
-  color: string;
-  atMs: number | null; // time in the recording when drawn. null = drawn before recording
-  removedMs: number | null;
-};
-type Ev = { ms: number; view: number; kind: "seek" | "play" | "pause" | "rate"; v: number };
+import { saveReview } from "@/lib/reviewStore";
+import { drawShape, prepCanvas, type Ev, type Pt, type Stroke, type Tool } from "@/lib/swingDraw";
 
 const COLORS = ["#c6ff3d", "#ffffff", "#ff4d4d", "#4db8ff"];
 const SPEEDS = [0.25, 0.5, 1];
 
 const clock = () => performance.now();
-
-function angleAt(a: Pt, b: Pt, c: Pt, w: number, h: number) {
-  const v1 = { x: (a.x - b.x) * w, y: (a.y - b.y) * h };
-  const v2 = { x: (c.x - b.x) * w, y: (c.y - b.y) * h };
-  const dot = v1.x * v2.x + v1.y * v2.y;
-  const m = Math.hypot(v1.x, v1.y) * Math.hypot(v2.x, v2.y);
-  return m ? (Math.acos(Math.max(-1, Math.min(1, dot / m))) * 180) / Math.PI : 0;
-}
+const stamp = () => Date.now();
 
 export default function SwingStudio() {
   const [srcs, setSrcs] = useState<(string | null)[]>([null, null]);
+  const [files, setFiles] = useState<(File | null)[]>([null, null]);
+  const [saved, setSaved] = useState<string | null>(null);
+  const audioBlob = useRef<Blob | null>(null);
   const [tool, setTool] = useState<Tool>("line");
   const [color, setColor] = useState(COLORS[0]);
   const [speed, setSpeed] = useState(1);
@@ -55,7 +40,9 @@ export default function SwingStudio() {
   const audioEl = useRef<HTMLAudioElement | null>(null);
   const timers = useRef<number[]>([]);
 
-  const views = srcs[1] ? 2 : srcs[0] ? 1 : 0;
+  const views = srcs.filter(Boolean).length;
+  const isImage = (v: number) => !!files[v]?.type.startsWith("image/");
+  const hasVideo = srcs.some((x, i) => x && !isImage(i));
   const nowMs = () => clock() - recStart.current;
   const recording = phase === "recording";
 
@@ -65,6 +52,7 @@ export default function SwingStudio() {
 
   function load(view: number, file: File | undefined) {
     if (!file) return;
+    setFiles((f) => f.map((x, i) => (i === view ? file : x)));
     setSrcs((s) => {
       if (s[view]) URL.revokeObjectURL(s[view] as string);
       const n = [...s];
@@ -90,70 +78,10 @@ export default function SwingStudio() {
     for (let v = 0; v < 2; v++) {
       const c = cans.current[v];
       if (!c) continue;
-      const w = c.clientWidth;
-      const h = c.clientHeight;
-      const dpr = window.devicePixelRatio || 1;
-      if (c.width !== w * dpr || c.height !== h * dpr) {
-        c.width = w * dpr;
-        c.height = h * dpr;
-      }
-      const g = c.getContext("2d");
-      if (!g) continue;
-      g.setTransform(dpr, 0, 0, dpr, 0, 0);
-      g.clearRect(0, 0, w, h);
-      g.lineWidth = 3;
-      g.lineCap = "round";
-      g.lineJoin = "round";
-      g.font = "700 16px sans-serif";
-      const draw = (tool: Tool, pts: Pt[], col: string) => {
-        g.strokeStyle = col;
-        g.fillStyle = col;
-        const P = pts.map((p) => ({ x: p.x * w, y: p.y * h }));
-        if (tool === "line" && P.length >= 2) {
-          g.beginPath();
-          g.moveTo(P[0].x, P[0].y);
-          g.lineTo(P[1].x, P[1].y);
-          g.stroke();
-        } else if (tool === "circle" && P.length >= 2) {
-          g.beginPath();
-          g.arc(P[0].x, P[0].y, Math.hypot(P[1].x - P[0].x, P[1].y - P[0].y), 0, Math.PI * 2);
-          g.stroke();
-        } else if (tool === "pen" && P.length > 1) {
-          g.beginPath();
-          g.moveTo(P[0].x, P[0].y);
-          P.slice(1).forEach((p) => g.lineTo(p.x, p.y));
-          g.stroke();
-        } else if (tool === "angle") {
-          P.forEach((p) => {
-            g.beginPath();
-            g.arc(p.x, p.y, 4, 0, Math.PI * 2);
-            g.fill();
-          });
-          if (P.length >= 2) {
-            g.beginPath();
-            g.moveTo(P[0].x, P[0].y);
-            g.lineTo(P[1].x, P[1].y);
-            if (P.length === 3) g.lineTo(P[2].x, P[2].y);
-            g.stroke();
-          }
-          if (P.length === 3) {
-            const deg = angleAt(pts[0], pts[1], pts[2], w, h);
-            const a1 = Math.atan2(P[0].y - P[1].y, P[0].x - P[1].x);
-            const a2 = Math.atan2(P[2].y - P[1].y, P[2].x - P[1].x);
-            let d = a2 - a1;
-            while (d > Math.PI) d -= 2 * Math.PI;
-            while (d < -Math.PI) d += 2 * Math.PI;
-            g.beginPath();
-            g.arc(P[1].x, P[1].y, 24, a1, a1 + d, d < 0);
-            g.stroke();
-            g.strokeStyle = "#000";
-            g.lineWidth = 4;
-            g.strokeText(`${Math.round(deg)}°`, P[1].x + 14, P[1].y - 14);
-            g.lineWidth = 3;
-            g.fillText(`${Math.round(deg)}°`, P[1].x + 14, P[1].y - 14);
-          }
-        }
-      };
+      const prep = prepCanvas(c);
+      if (!prep) continue;
+      const { g, w, h } = prep;
+      const draw = (tool: Tool, pts: Pt[], col: string) => drawShape(g, w, h, tool, pts, col);
       strokes.filter((s) => s.view === v && visible(s)).forEach((s) => draw(s.tool, s.pts, s.color));
       if (pending?.view === v) draw("angle", pending.pts, color);
       if (drag?.view === v) draw(tool, drag.pts, color);
@@ -162,7 +90,7 @@ export default function SwingStudio() {
 
   // Keep time/duration in state for the scrubber
   useEffect(() => {
-    const v = vids.current[0];
+    const v = vids.current[0] ?? vids.current[1];
     if (!v) return;
     const upd = () => {
       setTime(v.currentTime);
@@ -175,6 +103,26 @@ export default function SwingStudio() {
       v.removeEventListener("loadedmetadata", upd);
     };
   }, [srcs]);
+
+  async function saveToMyGolf() {
+    const media = files
+      .map((f, i) => (srcs[i] && f ? { kind: (f.type.startsWith("image/") ? "image" : "video") as "image" | "video", blob: f as Blob, name: f.name } : null))
+      .filter((m): m is NonNullable<typeof m> => !!m);
+    if (!media.length) return;
+    const now = stamp();
+    const id = String(now);
+    const label = new Date().toLocaleDateString("en-AU", { day: "numeric", month: "short" });
+    await saveReview({
+      id,
+      title: `Swing review from Matt, ${label}`,
+      createdAt: now,
+      media,
+      strokes,
+      events: events.current,
+      audio: audioBlob.current,
+    });
+    setSaved(id);
+  }
 
   function allVids(fn: (v: HTMLVideoElement, i: number) => void) {
     vids.current.forEach((v, i) => v && fn(v, i));
@@ -283,7 +231,9 @@ export default function SwingStudio() {
         mr.ondataavailable = (e) => e.data.size && chunks.current.push(e.data);
         mr.onstop = () => {
           stream.current?.getTracks().forEach((t) => t.stop());
-          const url = URL.createObjectURL(new Blob(chunks.current, { type: mr.mimeType || "audio/webm" }));
+          const blob = new Blob(chunks.current, { type: mr.mimeType || "audio/webm" });
+          audioBlob.current = blob;
+          const url = URL.createObjectURL(blob);
           setAudioUrl((old) => {
             if (old) URL.revokeObjectURL(old);
             return url;
@@ -364,12 +314,12 @@ export default function SwingStudio() {
           {["Back angle", "Side angle"].map((label, i) => (
             <label key={label} className="block cursor-pointer rounded-xl border border-dashed border-white/30 p-6 text-center hover:border-lime">
               <span className="font-display text-xl text-lime">{label}</span>
-              <span className="mt-1 block text-sm text-white/70">Choose a swing clip</span>
-              <input type="file" accept="video/*" className="sr-only" data-testid={`file-${i}`} onChange={(e) => load(i, e.target.files?.[0])} />
+              <span className="mt-1 block text-sm text-white/70">Choose a clip or photo</span>
+              <input type="file" accept="video/*,image/*" className="sr-only" data-testid={`file-${i}`} onChange={(e) => load(i, e.target.files?.[0])} />
             </label>
           ))}
           <p className="text-sm text-white/60 sm:col-span-2">
-            Clips stay on your device in this concept. Load one angle or both for a side by side review.
+            Clips and photos stay on your device in this concept. Load one angle or both for a side by side review.
           </p>
         </div>
       )}
@@ -381,15 +331,20 @@ export default function SwingStudio() {
               (v) =>
                 srcs[v] && (
                   <div key={v} className={`relative mx-auto aspect-[9/12] w-full overflow-hidden rounded-xl bg-black ${views === 2 ? "max-w-md sm:max-w-none" : "max-w-md"}`}>
-                    <video
-                      ref={(el) => {
-                        vids.current[v] = el;
-                      }}
-                      src={srcs[v] as string}
-                      playsInline
-                      muted
-                      className="absolute inset-0 h-full w-full object-contain"
-                    />
+                    {isImage(v) ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={srcs[v] as string} alt="" className="absolute inset-0 h-full w-full object-contain" />
+                    ) : (
+                      <video
+                        ref={(el) => {
+                          vids.current[v] = el;
+                        }}
+                        src={srcs[v] as string}
+                        playsInline
+                        muted
+                        className="absolute inset-0 h-full w-full object-contain"
+                      />
+                    )}
                     <canvas
                       ref={(el) => {
                         cans.current[v] = el;
@@ -419,8 +374,9 @@ export default function SwingStudio() {
             )}
           </div>
 
+          {hasVideo && (
           <div className="mt-3 flex items-center gap-3">
-            <button type="button" className={btn(false)} onClick={() => (vids.current[0]?.paused ? play() : pause())}>
+            <button type="button" className={btn(false)} onClick={() => ((vids.current[0] ?? vids.current[1])?.paused ? play() : pause())}>
               Play / pause
             </button>
             <button type="button" className={btn(false)} onClick={() => seek(time - 1 / 30)} aria-label="Back one frame">
@@ -440,6 +396,7 @@ export default function SwingStudio() {
               aria-label="Scrub"
             />
           </div>
+          )}
 
           <div className="mt-3 flex flex-wrap items-center gap-2">
             {(["line", "circle", "angle", "pen"] as Tool[]).map((t) => (
@@ -452,12 +409,16 @@ export default function SwingStudio() {
               <button key={c} type="button" aria-label={`Colour ${c}`} onClick={() => setColor(c)} className={`h-7 w-7 rounded-full border-2 ${color === c ? "border-white" : "border-transparent"}`} style={{ background: c }} />
             ))}
             <span className="mx-1 h-5 w-px bg-white/20" />
-            {SPEEDS.map((s) => (
-              <button key={s} type="button" onClick={() => setRate(s)} className={btn(speed === s)}>
-                {s}x
-              </button>
-            ))}
-            <span className="mx-1 h-5 w-px bg-white/20" />
+            {hasVideo && (
+              <>
+                {SPEEDS.map((s) => (
+                  <button key={s} type="button" onClick={() => setRate(s)} className={btn(speed === s)}>
+                    {s}x
+                  </button>
+                ))}
+                <span className="mx-1 h-5 w-px bg-white/20" />
+              </>
+            )}
             <button type="button" className={btn(false)} onClick={undo}>Undo</button>
             <button type="button" className={btn(false)} onClick={clearAll}>Clear</button>
           </div>
@@ -489,12 +450,23 @@ export default function SwingStudio() {
                   Stop playback
                 </button>
               )}
+              {phase === "edit" && views > 0 && (
+                <button type="button" className={btn(false)} onClick={saveToMyGolf}>
+                  Save to Chloe&apos;s My Golf
+                </button>
+              )}
               {audioUrl && phase === "edit" && (
                 <span className="rounded-full bg-lime px-3 py-1 text-xs font-extrabold uppercase tracking-wider text-black">
                   Review ready
                 </span>
               )}
             </div>
+            {saved && (
+              <p className="mt-3 text-sm text-lime">
+                Saved. <a href={`/my-golf/review?id=${saved}`} className="underline">Open it as Chloe sees it</a> or find it under My videos on{" "}
+                <a href="/my-golf" className="underline">My Golf</a>.
+              </p>
+            )}
             {micError && <p className="mt-3 text-sm text-red-400">{micError}</p>}
             {audioUrl && <audio ref={audioEl} src={audioUrl} className="hidden" />}
             {audioUrl && (
@@ -508,12 +480,12 @@ export default function SwingStudio() {
             {!srcs[1] && (
               <label className="cursor-pointer text-lime underline-offset-4 hover:underline">
                 Add side angle for side by side
-                <input type="file" accept="video/*" className="sr-only" onChange={(e) => load(1, e.target.files?.[0])} />
+                <input type="file" accept="video/*,image/*" className="sr-only" onChange={(e) => load(1, e.target.files?.[0])} />
               </label>
             )}
             <label className="cursor-pointer text-white/70 underline-offset-4 hover:underline">
               Change clip
-              <input type="file" accept="video/*" className="sr-only" onChange={(e) => load(0, e.target.files?.[0])} />
+              <input type="file" accept="video/*,image/*" className="sr-only" onChange={(e) => load(0, e.target.files?.[0])} />
             </label>
           </div>
         </>

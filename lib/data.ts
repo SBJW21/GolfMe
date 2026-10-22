@@ -16,7 +16,7 @@ export const sampleCoaches: Coach[] = [
     suburb: "Balgowlah",
     priceCents: 9500,
     yearsCoaching: 0,
-    focus: ["Slice", "Driving", "Irons"],
+    focus: ["Slice", "Driving", "Irons", "General improvement", "Basics"],
     headline: "One-on-one golf lessons in Balgowlah",
     bio: "Head Professional in Balgowlah, offering lessons for golfers of all levels.",
     reviews: [
@@ -36,7 +36,7 @@ export const sampleCoaches: Coach[] = [
     suburb: "Bondi",
     priceCents: 12000,
     yearsCoaching: 8,
-    focus: ["Chipping", "Bunkers", "Putting"],
+    focus: ["Chipping", "Bunkers", "Putting", "General improvement"],
     headline: "Short game that saves you strokes",
     bio: "Sample profile. Jordan focuses on the short game, where most golfers lose the most shots. Expect plenty of time on the practice green and a simple routine you can repeat under pressure.",
     reviews: [
@@ -64,7 +64,7 @@ export const sampleCoaches: Coach[] = [
     suburb: "Chatswood",
     priceCents: 14500,
     yearsCoaching: 18,
-    focus: ["Driving", "Irons", "Draw"],
+    focus: ["Driving", "Irons", "Draw", "Basics"],
     headline: "Control your ball flight with a reliable draw",
     bio: "Sample profile. Chris coaches low handicap golfers who want more control. Lessons use launch data to build a repeatable shot shape.",
     reviews: [
@@ -92,7 +92,7 @@ export const sampleCoaches: Coach[] = [
     suburb: "Penrith",
     priceCents: 6500,
     yearsCoaching: 3,
-    focus: ["Irons", "Chipping", "Slice"],
+    focus: ["Irons", "Chipping", "Slice", "Basics", "General improvement"],
     headline: "Affordable lessons for steady improvement",
     bio: "Sample profile. Morgan offers relaxed lessons for golfers who want to improve at a sensible price, with regular check-ins between sessions.",
     reviews: [],
@@ -108,6 +108,8 @@ export const focusAreas: FocusArea[] = [
   "Bunkers",
   "Putting",
   "Course management",
+  "General improvement",
+  "Basics",
 ];
 
 const focusPhrases: Record<FocusArea, string> = {
@@ -119,6 +121,8 @@ const focusPhrases: Record<FocusArea, string> = {
   Bunkers: "bunker play",
   Putting: "putting",
   "Course management": "course management",
+  "General improvement": "general improvement",
+  Basics: "the basics",
 };
 
 /** For example "slicing, chipping and iron play". No comma before "and". */

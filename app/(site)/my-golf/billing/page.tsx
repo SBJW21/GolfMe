@@ -14,7 +14,7 @@ export default function BillingPage() {
       <p className="mt-4 text-xs uppercase tracking-[0.16em] text-white/45">Sample admin</p>
       <h1 className="font-display mt-1 text-[clamp(2.2rem,7vw,3.4rem)]">Admin</h1>
       <p className="mt-2 text-white/80">
-        Lessons are paid in full at booking. Cancel up to 24 hours before for a full refund.
+        Lessons are paid in full at booking. Cancel up to 24 hours before and the full amount goes to your account credit. Credit works with any coach for 6 months.
       </p>
 
       <section className="mt-8">

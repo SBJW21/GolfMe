@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ExploreMenu from "./ExploreMenu";
 import PinMark from "./PinMark";
 
 export default function Header() {
@@ -15,9 +16,7 @@ export default function Header() {
           <Link href="/coaches" className="hover:text-lime">
             Find a coach
           </Link>
-          <Link href="/learn" className="hover:text-lime">
-            Learn
-          </Link>
+          <ExploreMenu />
           <Link href="/my-golf" className="hover:text-lime">
             My Golf
           </Link>

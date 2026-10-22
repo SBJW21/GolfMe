@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import FadeScroll from "./FadeScroll";
 import VideoPlaceholder from "@/components/VideoPlaceholder";
 import { formatAud } from "@/lib/pricing";
 import { hubEarnings, hubLearnVideos, hubStudents } from "@/lib/coachHub";
@@ -59,26 +60,24 @@ export default function CoachAdmin() {
                 placeholder="Search students"
                 className="mb-2 w-full rounded-xl border border-white/20 bg-black/70 px-3 py-2.5 text-sm"
               />
-              {list.map((s) => (
-                <button
-                  key={s.id}
-                  type="button"
-                  onClick={() => setSel(s.id)}
-                  className={`flex w-full items-center gap-3 rounded-xl border p-2.5 text-left ${
-                    s.id === sel ? "border-lime/60 bg-lime/10" : "border-transparent hover:bg-white/5"
-                  }`}
-                >
-                  <span className="font-display flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-lime text-black">
-                    {initials(s.name)}
-                  </span>
-                  <span>
-                    <span className="block text-sm font-semibold">{s.name}</span>
-                    <span className="block text-xs text-white/60">
-                      {s.suburb} &middot; {s.lessons} lessons
+              <FadeScroll maxClass="max-h-60" fadeFrom="#141414">
+                {list.map((s) => (
+                  <button
+                    key={s.id}
+                    type="button"
+                    onClick={() => setSel(s.id)}
+                    className={`flex w-full items-center gap-2.5 rounded-lg border px-2 py-1.5 text-left ${
+                      s.id === sel ? "border-lime/60 bg-lime/10" : "border-transparent hover:bg-white/5"
+                    }`}
+                  >
+                    <span className="font-display flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-lime text-sm text-black">
+                      {initials(s.name)}
                     </span>
-                  </span>
-                </button>
-              ))}
+                    <span className="min-w-0 flex-1 truncate text-sm font-semibold">{s.name}</span>
+                    <span className="shrink-0 text-xs text-white/55">{s.suburb}</span>
+                  </button>
+                ))}
+              </FadeScroll>
             </div>
             <div className="glass rounded-2xl p-5">
               <div className="flex items-center gap-4">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import FadeScroll from "./FadeScroll";
 import type { HubDay, HubLesson, HubWeek } from "@/lib/coachHub";
 
 type Picked = { d: HubDay; l: HubLesson };
@@ -74,8 +75,9 @@ export default function CoachCalendar({ weeks }: { weeks: HubWeek[] }) {
 
       {open && (
         <>
+          <FadeScroll maxClass="max-h-[37rem] sm:max-h-none" fadeFrom="#111111" className="mt-4 sm:[&>div:nth-child(n+2)]:hidden">
           {shown.map((wk, wi) => (
-            <div key={wk.label} className="mt-4">
+            <div key={wk.label} className={wi === 0 ? "" : "mt-4"}>
               <p className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-white/50">
                 {names[w + wi]} <span className="font-normal normal-case tracking-normal">&middot; {wk.label}</span>
               </p>
@@ -115,6 +117,7 @@ export default function CoachCalendar({ weeks }: { weeks: HubWeek[] }) {
               </div>
             </div>
           ))}
+          </FadeScroll>
 
           {picked && (
             <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-lime/40 bg-black/40 p-4">

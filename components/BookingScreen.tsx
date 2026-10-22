@@ -1,6 +1,6 @@
 import Link from "next/link";
 import BookingForm from "@/components/BookingForm";
-import { FREE_CANCELLATION_HOURS, formatAud } from "@/lib/pricing";
+import { CREDIT_VALID_MONTHS, FREE_CANCELLATION_HOURS, formatAud } from "@/lib/pricing";
 import type { Coach } from "@/lib/types";
 
 /** The booking page content, shared by the main site and a coach's own page. */
@@ -55,8 +55,9 @@ export default function BookingScreen({
         <p className="text-white/70">60 minutes</p>
         <p className="mt-3 text-2xl font-bold">{formatAud(coach.priceCents)}</p>
         <p className="mt-2 text-sm text-white/70">
-          Free cancellation up to {FREE_CANCELLATION_HOURS} hours before the lesson.
-          Inside {FREE_CANCELLATION_HOURS} hours the lesson is not refundable.
+          Cancel up to {FREE_CANCELLATION_HOURS} hours before the lesson and the full amount
+          goes to your Golf Me account credit. Use it with any coach within {CREDIT_VALID_MONTHS}{" "}
+          months. Inside {FREE_CANCELLATION_HOURS} hours no credit is given.
         </p>
       </div>
 

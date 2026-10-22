@@ -5,8 +5,8 @@
  * Rules agreed so far:
  * - The platform takes 15% of each booking.
  * - Students pay in full at booking. Coaches are paid monthly for lessons that have happened.
- * - Cancelling 24 hours or more before the lesson gives a full refund. Inside 24 hours there is
- *   no refund and the coach still earns their share.
+ * - Cancelling 24 hours or more before the lesson gives the full amount back as account credit
+ *   (not cash), valid for 6 months with any coach. Inside 24 hours there is no credit and the coach still earns their share.
  * - A lesson counts as done automatically a set time after it ends, unless the student disputes it.
  *
  * Later: the fee may drop after a student's 6th lesson with the same coach.
@@ -14,6 +14,8 @@
 
 export const PLATFORM_FEE_RATE = 0.15;
 export const FREE_CANCELLATION_HOURS = 24;
+/** Account credit from a cancellation can be used with any coach until it expires. */
+export const CREDIT_VALID_MONTHS = 6;
 /** Hours after a lesson ends before it counts as done, if not disputed */
 export const AUTO_COMPLETE_HOURS = 24;
 
@@ -34,7 +36,7 @@ export function hoursBetween(from: Date, to: Date) {
   return (to.getTime() - from.getTime()) / 3_600_000;
 }
 
-/** What happens to the money if a student cancels. */
+/** What happens to the money if a student cancels. Early cancellations become account credit. */
 export function cancellationOutcome(
   startsAt: Date,
   cancelledAt: Date,
@@ -42,11 +44,11 @@ export function cancellationOutcome(
 ) {
   const early = hoursBetween(cancelledAt, startsAt) >= FREE_CANCELLATION_HOURS;
   if (early) {
-    return { refundCents: amountCents, coachKeepsCents: 0, platformKeepsCents: 0 };
+    return { creditCents: amountCents, coachKeepsCents: 0, platformKeepsCents: 0 };
   }
   const { feeCents, coachCents } = splitPayment(amountCents);
   return {
-    refundCents: 0,
+    creditCents: 0,
     coachKeepsCents: coachCents,
     platformKeepsCents: feeCents,
   };

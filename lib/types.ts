@@ -6,7 +6,9 @@ export type FocusArea =
   | "Chipping"
   | "Bunkers"
   | "Putting"
-  | "Course management";
+  | "Course management"
+  | "General improvement"
+  | "Basics";
 
 export type Review = {
   id: string;

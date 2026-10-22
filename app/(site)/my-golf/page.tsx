@@ -79,6 +79,17 @@ export default function MyGolfPage() {
         </div>
       </section>
 
+      <Link
+        href="/my-golf/rounds"
+        className="glass mt-4 flex items-center justify-between gap-4 rounded-2xl p-5 hover:!border-lime/70"
+      >
+        <div>
+          <p className="font-display text-2xl text-lime">5 week streak</p>
+          <p className="text-sm text-white/75">Log a round, track courses and invite friends</p>
+        </div>
+        <span className="text-2xl text-lime" aria-hidden="true">&rarr;</span>
+      </Link>
+
       <section className="mt-12">
         <Heading>My lessons</Heading>
         <div className="mt-4">

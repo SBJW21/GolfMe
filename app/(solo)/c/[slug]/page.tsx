@@ -105,7 +105,7 @@ export default async function SoloCoachPage(props: PageProps<"/c/[slug]">) {
           </p>
         </div>
         <p className="mt-1 text-sm text-white/70">
-          Choose a time. Free cancellation up to 24 hours before.
+          Choose a time. Cancel up to 24 hours before for full account credit.
         </p>
         <SlotPicker slots={slots} bookPath={`/c/${coach.slug}/book`} />
       </section>

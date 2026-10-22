@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Metadata } from "next";
 import CoachAdmin from "@/components/coach/CoachAdmin";
 import CoachCalendar from "@/components/coach/CoachCalendar";
@@ -20,6 +21,17 @@ export default function CoachHubPage() {
         <CoachPhoto slug="matt-grenot" name="Matt Grenot" photo="/coaches/matt-grenot.jpg" className="h-14 w-14 shrink-0" />
         <h1 className="font-display text-[clamp(2.2rem,7vw,3.4rem)]">Coach hub</h1>
       </div>
+
+      <Link
+        href="/coach/swing-analysis"
+        className="glass mt-6 flex items-center justify-between gap-4 rounded-2xl p-5 hover:!border-lime/70"
+      >
+        <div>
+          <p className="font-display text-2xl text-lime">Swing analysis</p>
+          <p className="text-sm text-white/75">Draw on a swing, add a voiceover and send it to your student</p>
+        </div>
+        <span className="text-2xl text-lime" aria-hidden="true">&rarr;</span>
+      </Link>
 
       <section className="mt-8">
         <Heading>Upcoming</Heading>

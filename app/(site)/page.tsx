@@ -2,9 +2,9 @@ import Link from "next/link";
 import CoachCard from "@/components/CoachCard";
 import HowItWorks from "@/components/HowItWorks";
 import SampleNotice from "@/components/SampleNotice";
+import FocusPicker from "@/components/FocusPicker";
 import AreaPicker from "@/components/AreaPicker";
 import { areaCounts } from "@/lib/areas";
-import { focusAreas } from "@/lib/data";
 import { loadCoaches } from "@/lib/repo";
 
 export const revalidate = 60;
@@ -30,7 +30,7 @@ export default async function Home() {
   return (
     <main>
       <section
-        className="relative flex flex-col items-center px-4 pb-16 pt-16 text-center"
+        className="relative z-10 flex flex-col items-center px-4 pb-16 pt-16 text-center"
         style={{
           backgroundImage:
             "linear-gradient(180deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.7) 70%, #000 100%), url(/hero.jpg)",
@@ -49,19 +49,7 @@ export default async function Home() {
           method="GET"
           className="mt-8 grid w-full max-w-3xl gap-2 rounded-2xl border border-white/15 bg-black/55 p-2 backdrop-blur sm:grid-cols-[1fr_1fr_auto]"
         >
-          <select
-            name="focus"
-            aria-label="What do you want to work on?"
-            className="field-input"
-            defaultValue=""
-          >
-            <option value="">What do you want to work on?</option>
-            {focusAreas.map((f) => (
-              <option key={f} value={f}>
-                {f}
-              </option>
-            ))}
-          </select>
+          <FocusPicker name="focus" />
           <AreaPicker name="area" counts={areaCounts(coaches.map((c) => c.suburb))} />
           <button type="submit" className="btn">
             Find a coach

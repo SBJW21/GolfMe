@@ -145,3 +145,15 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .wave-bar { animation: none; transform: scaleY(0.6); }
 }
+
+@keyframes flame-flicker {
+  0%, 100% { transform: scale(1) rotate(-1deg); }
+  50% { transform: scale(1.06, 1.1) rotate(2deg); }
+}
+.flame-flicker {
+  transform-origin: 50% 90%;
+  animation: flame-flicker 1.6s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .flame-flicker { animation: none; }
+}

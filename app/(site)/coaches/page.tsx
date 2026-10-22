@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import CoachCard from "@/components/CoachCard";
 import SampleNotice from "@/components/SampleNotice";
+import FocusPicker from "@/components/FocusPicker";
 import AreaPicker from "@/components/AreaPicker";
 import { areaCounts, suburbInArea } from "@/lib/areas";
-import { averageRating, focusAreas } from "@/lib/data";
+import { averageRating } from "@/lib/data";
 import { loadCoaches } from "@/lib/repo";
 import type { FocusArea } from "@/lib/types";
 
@@ -21,6 +22,10 @@ const budgets = [
   { label: "Up to $175", max: 17500 },
 ];
 
+function all(value: string | string[] | undefined) {
+  return (Array.isArray(value) ? value : value ? [value] : []).filter(Boolean);
+}
+
 function first(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
 }
@@ -28,7 +33,7 @@ function first(value: string | string[] | undefined) {
 export default async function CoachesPage(props: PageProps<"/coaches">) {
   const sp = await props.searchParams;
   const area = first(sp.area) ?? "";
-  const focus = first(sp.focus) ?? "";
+  const focus = all(sp.focus);
   const max = Number(first(sp.max) ?? 0) || 0;
   const sort = first(sp.sort) ?? "rating";
   const { coaches, isSample } = await loadCoaches();
@@ -36,7 +41,7 @@ export default async function CoachesPage(props: PageProps<"/coaches">) {
   let results = coaches.filter(
     (c) =>
       (!area || suburbInArea(c.suburb, area)) &&
-      (!focus || c.focus.includes(focus as FocusArea)) &&
+      (focus.length === 0 || focus.some((f) => c.focus.includes(f as FocusArea))) &&
       (!max || c.priceCents <= max),
   );
 
@@ -52,7 +57,7 @@ export default async function CoachesPage(props: PageProps<"/coaches">) {
       </h1>
       <p className="mt-2 text-white/80">Golf coaches across Sydney.</p>
 
-      <form method="GET" className="glass mt-6 grid gap-3 rounded-2xl p-4 sm:grid-cols-2 lg:grid-cols-5">
+      <form method="GET" className="glass relative z-10 mt-6 grid gap-3 rounded-2xl p-4 sm:grid-cols-2 lg:grid-cols-5">
         <div className="text-sm font-semibold">
           Area
           <div className="mt-1">
@@ -63,17 +68,12 @@ export default async function CoachesPage(props: PageProps<"/coaches">) {
             />
           </div>
         </div>
-        <label className="text-sm font-semibold">
+        <div className="text-sm font-semibold">
           Focus
-          <select name="focus" defaultValue={focus} className="field-input mt-1">
-            <option value="">Anything</option>
-            {focusAreas.map((f) => (
-              <option key={f} value={f}>
-                {f}
-              </option>
-            ))}
-          </select>
-        </label>
+          <div className="mt-1">
+            <FocusPicker name="focus" defaultValue={focus} />
+          </div>
+        </div>
         <label className="text-sm font-semibold">
           Budget
           <select name="max" defaultValue={String(max)} className="field-input mt-1">

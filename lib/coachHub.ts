@@ -18,6 +18,10 @@ export const hubStudents: HubStudent[] = [
   { id: "priya", name: "Priya Nair", suburb: "Balgowlah", handicap: "30.0", lessons: 12, goal: "Stop three-putting", bio: "Keen and organised, does her homework. Putting is the focus before a club championship in March.", next: "Wed, 5:00 pm" },
   { id: "ben", name: "Ben Hughes", suburb: "Seaforth", handicap: "No handicap", lessons: 2, goal: "Learn the basics", bio: "Complete beginner, borrowed clubs. Wants to play with his dad over the summer.", next: "Thu, 7:00 am" },
   { id: "aisha", name: "Aisha Khan", suburb: "Dee Why", handicap: "21.4", lessons: 7, goal: "Sharper short game", bio: "Plays twice a week. Loses most shots inside 50 metres.", next: "Sat, 8:00 am" },
+  { id: "liam", name: "Liam Foster", suburb: "Curl Curl", handicap: "15.8", lessons: 6, goal: "Lower his handicap to single figures", bio: "Plays competition golf on Saturdays. Strong ball striker, struggles with distance control on wedges.", next: "Tue, 7:00 am" },
+  { id: "sophie", name: "Sophie Tran", suburb: "Manly", handicap: "28.0", lessons: 3, goal: "Enjoy playing with friends", bio: "Took up golf this year. Wants a relaxed approach and simple things to practise.", next: "Fri, 9:00 am" },
+  { id: "jack", name: "Jack Murray", suburb: "Narrabeen", handicap: "12.3", lessons: 10, goal: "Fix the early extension", bio: "Long-time member who has plateaued. Films every swing and likes detail.", next: "Sat, 11:00 am" },
+  { id: "hannah", name: "Hannah Cole", suburb: "Brookvale", handicap: "No handicap", lessons: 1, goal: "Get comfortable on the course", bio: "Booked a first lesson after a corporate day. Has not played a full round yet.", next: "Sun, 9:00 am" },
 ];
 
 export type HubLesson = { id: string; time: string; student: string; focus: string; place: string };

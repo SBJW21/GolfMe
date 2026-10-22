@@ -101,7 +101,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="glow-bg mx-auto max-w-6xl px-4 py-12">
+      <section className="mx-auto max-w-6xl px-4 py-12">
         <h2 className="font-display mb-6 text-[clamp(1.7rem,5vw,2.3rem)]">
           How it works
         </h2>

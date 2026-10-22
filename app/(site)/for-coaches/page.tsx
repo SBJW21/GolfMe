@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "For golf coaches",
@@ -7,6 +8,7 @@ export const metadata: Metadata = {
 };
 
 const features = [
+  ["Dictate your lesson reports", "Talk through the lesson and Golf Me drafts the report for your student. No typing."],
   ["Your own booking page", "A personalised booking link for your Instagram or website."],
   ["Calendar sync", "Connect your Google Calendar so availability is always up to date."],
   ["Confirmations and reminders", "Automatic messages that reduce no-shows."],
@@ -28,6 +30,9 @@ export default function ForCoachesPage() {
         <p className="mt-2 max-w-xl text-white/85">
           Less admin and more time coaching, with tools to help you grow your student base.
         </p>
+        <Link href="/coach" className="btn mt-5 inline-block">
+          See sample profile page
+        </Link>
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {features.map(([title, text]) => (

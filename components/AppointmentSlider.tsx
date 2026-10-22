@@ -51,7 +51,7 @@ export default function AppointmentSlider({ items }: { items: Appointment[] }) {
           <article
             key={a.id}
             data-upcoming={a.past ? undefined : ""}
-            className={`glass relative w-[38%] shrink-0 overflow-hidden rounded-2xl p-3 sm:w-[300px] sm:p-5 ${
+            className={`glass relative w-[33%] shrink-0 overflow-hidden rounded-2xl p-3 sm:w-[300px] sm:p-5 ${
               a.past ? "opacity-55 grayscale" : "!border-lime/50"
             }`}
           >
@@ -65,7 +65,7 @@ export default function AppointmentSlider({ items }: { items: Appointment[] }) {
             >
               {a.past ? "Completed" : "Upcoming"}
             </span>
-            <p className="font-display text-2xl text-lime sm:text-4xl">{a.dateLabel}</p>
+            <p className="font-display text-xl text-lime sm:text-4xl">{a.dateLabel}</p>
             <p className="mt-1 text-xs font-semibold text-white/85 sm:text-sm">
               {a.weekday}, {a.time}
             </p>
@@ -109,7 +109,7 @@ export default function AppointmentSlider({ items }: { items: Appointment[] }) {
         ))}
         <Link
           href="/coaches"
-          className="flex w-11 shrink-0 items-center justify-center self-stretch rounded-full bg-lime text-sm font-extrabold uppercase tracking-[0.18em] text-black [writing-mode:vertical-rl] hover:brightness-110 sm:w-14"
+          className="sticky right-2 z-10 flex w-9 shrink-0 items-center justify-center self-stretch rounded-full bg-lime text-xs font-extrabold uppercase tracking-[0.16em] text-black [writing-mode:vertical-rl] shadow-[0_0_0_4px_#000] hover:brightness-110 sm:static sm:w-14 sm:text-sm sm:tracking-[0.18em]"
         >
           Book lesson
         </Link>

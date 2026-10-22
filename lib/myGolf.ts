@@ -19,8 +19,8 @@ export const sampleStats = {
 };
 
 export const sampleCoachesWorkedWith = [
-  { slug: "matt-grenot", name: "Matt Grenot", title: "Head Professional", suburb: "Balgowlah", photo: "/coaches/matt-grenot.jpg", lessons: 6 },
-  { slug: "sample-coach-two", name: "Jordan Lee", title: "", suburb: "Bondi", photo: "/coaches/jordan-lee.jpg", lessons: 3 },
+  { slug: "matt-grenot", name: "Matt Grenot", title: "Head Professional", suburb: "Balgowlah", photo: "/coaches/matt-grenot.jpg", lessons: 6, active: true },
+  { slug: "sample-coach-two", name: "Jordan Lee", title: "", suburb: "Bondi", photo: "/coaches/jordan-lee.jpg", lessons: 3, active: false },
 ];
 
 export type Appointment = {
@@ -59,7 +59,7 @@ export function sampleAppointments(): Appointment[] {
     [-11, "9:00 am", jordan, "Short game", "Bondi", true, false],
     [-4, "7:00 am", matt, "Slice and driving", "Balgowlah", true, true],
     [3, "7:00 am", matt, "Slice and driving", "Balgowlah", false, false],
-    [10, "8:00 am", jordan, "Bunkers and chipping", "Bondi", false, false],
+    [10, "8:00 am", matt, "Driving", "Balgowlah", false, false],
     [17, "7:00 am", matt, "Irons", "Balgowlah", false, false],
   ];
   return rows.map(([off, time, c, focus, place, past, report], i) => {

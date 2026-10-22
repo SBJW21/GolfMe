@@ -91,27 +91,41 @@ export default function MyGolfPage() {
 
       <section className="mt-12">
         <Heading>My coaches</Heading>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {sampleCoachesWorkedWith.map((c) => (
-            <Link
-              key={c.slug}
-              href={`/coaches/${c.slug}`}
-              className="glass flex items-center gap-4 rounded-2xl p-4 hover:!border-lime/70"
-            >
-              <CoachPhoto slug={c.slug} name={c.name} photo={c.photo} className="h-16 w-16 shrink-0" />
-              <div className="min-w-0">
-                <p className="font-bold">{c.name}</p>
-                <p className="text-sm text-white/70">
-                  {c.title ? `${c.title}, ` : ""}
-                  {c.suburb}
-                </p>
-                <p className="mt-1 text-sm font-semibold text-lime">
-                  {c.lessons} lessons &middot; Rebook
-                </p>
+        {([
+          ["Active", true],
+          ["Past", false],
+        ] as const).map(([label, active]) => {
+          const list = sampleCoachesWorkedWith.filter((c) => c.active === active);
+          if (list.length === 0) return null;
+          return (
+            <div key={label} className="mt-5">
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/50">{label}</p>
+              <div className="mt-2 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {list.map((c) => (
+                  <Link
+                    key={c.slug}
+                    href={`/coaches/${c.slug}`}
+                    className={`glass flex items-center gap-4 rounded-2xl p-4 hover:!border-lime/70 ${
+                      active ? "" : "opacity-55 grayscale"
+                    }`}
+                  >
+                    <CoachPhoto slug={c.slug} name={c.name} photo={c.photo} className="h-16 w-16 shrink-0" />
+                    <div className="min-w-0">
+                      <p className="font-bold">{c.name}</p>
+                      <p className="text-sm text-white/70">
+                        {c.title ? `${c.title}, ` : ""}
+                        {c.suburb}
+                      </p>
+                      <p className={`mt-1 text-sm font-semibold ${active ? "text-lime" : "text-white/70"}`}>
+                        {c.lessons} lessons &middot; Rebook
+                      </p>
+                    </div>
+                  </Link>
+                ))}
               </div>
-            </Link>
-          ))}
-        </div>
+            </div>
+          );
+        })}
       </section>
 
       <section className="mt-12">

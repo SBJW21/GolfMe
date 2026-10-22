@@ -14,7 +14,11 @@ export default function AppointmentSlider({ items }: { items: Appointment[] }) {
   useEffect(() => {
     const el = track.current;
     const first = el?.querySelector<HTMLElement>("[data-upcoming]");
-    if (el && first) el.scrollLeft = first.offsetLeft - 16;
+    const prev = first?.previousElementSibling as HTMLElement | null;
+    if (el && first) {
+      // Show about half of the most recent past lesson, then the upcoming ones.
+      el.scrollLeft = prev ? prev.offsetLeft + prev.offsetWidth / 2 - 16 : first.offsetLeft - 16;
+    }
   }, []);
 
   function scrollBy(dir: 1 | -1) {
@@ -40,13 +44,13 @@ export default function AppointmentSlider({ items }: { items: Appointment[] }) {
       </div>
       <div
         ref={track}
-        className="relative -mx-4 flex snap-x snap-mandatory scroll-pl-4 gap-4 overflow-x-auto px-4 pb-3 [scrollbar-width:thin]"
+        className="slider-scroll relative -mx-4 flex gap-4 overflow-x-auto px-4 pb-4"
       >
         {items.map((a) => (
           <article
             key={a.id}
             data-upcoming={a.past ? undefined : ""}
-            className={`glass relative w-[78%] shrink-0 snap-start rounded-2xl p-5 sm:w-[300px] ${
+            className={`glass relative w-[78%] shrink-0 rounded-2xl p-5 sm:w-[300px] ${
               a.past ? "opacity-55 grayscale" : "!border-lime/50"
             }`}
           >

@@ -18,9 +18,12 @@ export default function Header() {
           <Link href="/learn" className="hidden hover:text-lime sm:inline">
             Learn
           </Link>
+          <Link href="/my-golf" className="hover:text-lime">
+            My Golf
+          </Link>
           <Link
             href="/for-coaches"
-            className="rounded-lg border border-white/40 px-3 py-1.5 hover:border-lime hover:text-lime"
+            className="hidden rounded-lg border border-white/40 px-3 py-1.5 hover:border-lime hover:text-lime sm:inline"
           >
             For coaches
           </Link>

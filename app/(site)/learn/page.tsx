@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { videoCategories } from "@/lib/data";
+import VideoPlaceholder from "@/components/VideoPlaceholder";
 import { loadVideos } from "@/lib/repo";
 
 export const metadata: Metadata = {
@@ -16,16 +17,23 @@ export default async function LearnPage() {
     <main className="mx-auto max-w-6xl px-4 py-10">
       <h1 className="font-display text-[clamp(2.2rem,7vw,3.4rem)]">Learn</h1>
       <p className="mt-2 max-w-xl text-white/80">
-        Training videos to work on between lessons, sorted by what you want to fix.
+        In here you&apos;ll find drills to cure a slice or shape a draw, driving tips for
+        distance and accuracy, short game lessons for chipping and bunkers, and putting
+        routines to lower your score. Pick what you want to fix and work on it between
+        lessons.
       </p>
 
       {videos.length === 0 ? (
-        <div className="glass mt-8 rounded-2xl p-6">
-          <p className="font-semibold">Videos are being added.</p>
-          <p className="mt-1 text-sm text-white/75">
-            Categories: {videoCategories.join(", ")}.
-          </p>
-        </div>
+        videoCategories.map((cat) => (
+          <section key={cat} className="mt-10">
+            <h2 className="font-display text-[clamp(1.7rem,5vw,2.3rem)]">{cat}</h2>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {[1, 2, 3].map((n) => (
+                <VideoPlaceholder key={n} title={`${cat}: video ${n}`} meta="Video coming soon" />
+              ))}
+            </div>
+          </section>
+        ))
       ) : (
         videoCategories.map((cat) => {
           const items = videos.filter((v) => v.category === cat);

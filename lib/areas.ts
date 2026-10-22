@@ -61,3 +61,13 @@ export function suburbInArea(suburb: string, areaId: string) {
   const found = areaOfSuburb(suburb);
   return areaId === OTHER_AREA_ID ? !found : found?.id === areaId;
 }
+
+/** How many of the given coach suburbs fall in each area id (and "other"). */
+export function areaCounts(suburbs: string[]) {
+  const counts: Record<string, number> = {};
+  for (const s of suburbs) {
+    const id = areaOfSuburb(s)?.id ?? OTHER_AREA_ID;
+    counts[id] = (counts[id] ?? 0) + 1;
+  }
+  return counts;
+}

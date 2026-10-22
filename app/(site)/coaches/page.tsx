@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import CoachCard from "@/components/CoachCard";
 import SampleNotice from "@/components/SampleNotice";
-import { areas, OTHER_AREA_ID, suburbInArea } from "@/lib/areas";
+import AreaPicker from "@/components/AreaPicker";
+import { areaCounts, suburbInArea } from "@/lib/areas";
 import { averageRating, focusAreas } from "@/lib/data";
 import { loadCoaches } from "@/lib/repo";
 import type { FocusArea } from "@/lib/types";
@@ -52,18 +53,16 @@ export default async function CoachesPage(props: PageProps<"/coaches">) {
       <p className="mt-2 text-white/80">Golf coaches across Sydney.</p>
 
       <form method="GET" className="glass mt-6 grid gap-3 rounded-2xl p-4 sm:grid-cols-2 lg:grid-cols-5">
-        <label className="text-sm font-semibold">
+        <div className="text-sm font-semibold">
           Area
-          <select name="area" defaultValue={area} className="field-input mt-1">
-            <option value="">Anywhere in Sydney</option>
-            {areas.map((a) => (
-              <option key={a.id} value={a.id}>
-                {a.label}
-              </option>
-            ))}
-            <option value={OTHER_AREA_ID}>Other Sydney areas</option>
-          </select>
-        </label>
+          <div className="mt-1">
+            <AreaPicker
+              name="area"
+              defaultValue={area}
+              counts={areaCounts(coaches.map((c) => c.suburb))}
+            />
+          </div>
+        </div>
         <label className="text-sm font-semibold">
           Focus
           <select name="focus" defaultValue={focus} className="field-input mt-1">

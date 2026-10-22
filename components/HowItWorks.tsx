@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
-type Step = { title: string; text: string };
+type Step = { title: string; text: string; badge?: string };
 
 /**
  * The three steps. They fade in one after another when scrolled into view, then the
@@ -93,6 +93,11 @@ export default function HowItWorks({ steps }: { steps: Step[] }) {
                 />
               )}
             </span>
+            {s.badge && (
+              <span className="absolute right-4 top-4 rounded-full bg-lime px-2.5 py-1 text-[0.65rem] font-extrabold uppercase leading-none tracking-[0.14em] text-black">
+                {s.badge}
+              </span>
+            )}
             <p
               className={`font-display origin-left text-4xl transition duration-500 ${
                 on ? "scale-125 text-lime" : "scale-100 text-lime/60"

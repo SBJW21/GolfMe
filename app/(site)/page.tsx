@@ -2,7 +2,8 @@ import Link from "next/link";
 import CoachCard from "@/components/CoachCard";
 import HowItWorks from "@/components/HowItWorks";
 import SampleNotice from "@/components/SampleNotice";
-import { areas, OTHER_AREA_ID } from "@/lib/areas";
+import AreaPicker from "@/components/AreaPicker";
+import { areaCounts } from "@/lib/areas";
 import { focusAreas } from "@/lib/data";
 import { loadCoaches } from "@/lib/repo";
 
@@ -19,7 +20,8 @@ const steps = [
   },
   {
     title: "Track your progress",
-    text: "Keep your lesson history, notes and scores in one place and rebook with one click.",
+    text: "Keep your lesson history, get detailed feedback from your coach (videos and schematics where possible), see your scores and rebook easily.",
+    badge: "New feature",
   },
 ];
 
@@ -60,20 +62,7 @@ export default async function Home() {
               </option>
             ))}
           </select>
-          <select
-            name="area"
-            aria-label="Area"
-            className="field-input"
-            defaultValue=""
-          >
-            <option value="">Anywhere in Sydney</option>
-            {areas.map((a) => (
-              <option key={a.id} value={a.id}>
-                {a.label}
-              </option>
-            ))}
-            <option value={OTHER_AREA_ID}>Other Sydney areas</option>
-          </select>
+          <AreaPicker name="area" counts={areaCounts(coaches.map((c) => c.suburb))} />
           <button type="submit" className="btn">
             Find a coach
           </button>

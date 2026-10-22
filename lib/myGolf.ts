@@ -15,7 +15,7 @@ export const sampleStats = {
   lessonsDone: 9,
   lessonsUpcoming: 3,
   hoursCoached: 9,
-  totalSpentCents: 91500,
+  creditCents: 2000,
 };
 
 export const sampleCoachesWorkedWith = [
@@ -50,17 +50,17 @@ function dayOffset(offset: number) {
 
 const REPORT = "/sample/lesson-report-sample.pdf";
 
-/** Three upcoming then three past, always relative to today in Sydney. */
+/** Three past (oldest first) then three upcoming, always relative to today in Sydney. */
 export function sampleAppointments(): Appointment[] {
   const matt = { coachName: "Matt Grenot", coachSlug: "matt-grenot", coachPhoto: "/coaches/matt-grenot.jpg", priceCents: 9500 };
   const jordan = { coachName: "Jordan Lee", coachSlug: "sample-coach-two", coachPhoto: "/coaches/jordan-lee.jpg", priceCents: 12000 };
   const rows: [number, string, typeof matt, string, string, boolean, boolean][] = [
+    [-18, "6:00 pm", matt, "Grip and stance", "Balgowlah", true, true],
+    [-11, "9:00 am", jordan, "Short game", "Bondi", true, false],
+    [-4, "7:00 am", matt, "Slice and driving", "Balgowlah", true, true],
     [3, "7:00 am", matt, "Slice and driving", "Balgowlah", false, false],
     [10, "8:00 am", jordan, "Bunkers and chipping", "Bondi", false, false],
     [17, "7:00 am", matt, "Irons", "Balgowlah", false, false],
-    [-4, "7:00 am", matt, "Slice and driving", "Balgowlah", true, true],
-    [-11, "9:00 am", jordan, "Short game", "Bondi", true, false],
-    [-18, "6:00 pm", matt, "Grip and stance", "Balgowlah", true, true],
   ];
   return rows.map(([off, time, c, focus, place, past, report], i) => {
     const d = dayOffset(off);

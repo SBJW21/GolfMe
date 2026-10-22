@@ -26,7 +26,7 @@ export default function MyGolfPage() {
     { label: "Lessons done", value: String(sampleStats.lessonsDone) },
     { label: "Upcoming", value: String(sampleStats.lessonsUpcoming) },
     { label: "Hours coached", value: String(sampleStats.hoursCoached) },
-    { label: "Total spent", value: formatAud(sampleStats.totalSpentCents) },
+    { label: "Account credit", value: formatAud(sampleStats.creditCents) },
   ];
 
   return (
@@ -82,7 +82,7 @@ export default function MyGolfPage() {
       <section className="mt-12">
         <Heading>My lessons</Heading>
         <p className="mt-1 text-sm text-white/70">
-          Upcoming lessons first. Completed lessons are greyed out.
+          Past lessons are greyed out to the left. Scroll back to see them.
         </p>
         <div className="mt-4">
           <AppointmentSlider items={sampleAppointments()} />
@@ -153,20 +153,19 @@ export default function MyGolfPage() {
       </section>
 
       <section className="mt-12">
-        <Heading>Billing</Heading>
-        <div className="mt-4 grid gap-4 sm:grid-cols-3">
-          {[
-            ["Payment history", "See every lesson you have paid for", "/my-golf/billing"],
-            ["Receipts", "Download receipts for your records", "/my-golf/billing#receipts"],
-            ["Payment methods", "Update the card you pay with", "/my-golf/billing#methods"],
-          ].map(([t, d, href]) => (
-            <Link key={t} href={href} className="glass rounded-2xl p-5 hover:!border-lime/70">
-              <p className="font-bold">{t}</p>
-              <p className="mt-1 text-sm text-white/75">{d}</p>
-              <p className="mt-3 text-sm font-semibold text-lime">Open &rarr;</p>
-            </Link>
-          ))}
+        <Heading>Admin</Heading>
+        <div className="mt-4 max-w-sm">
+          <Link href="/my-golf/billing#methods" className="glass block rounded-2xl p-5 hover:!border-lime/70">
+            <p className="font-bold">Payment methods</p>
+            <p className="mt-1 text-sm text-white/75">Update the card you pay with</p>
+            <p className="mt-3 text-sm font-semibold text-lime">Open &rarr;</p>
+          </Link>
         </div>
+        <p className="mt-5 text-sm">
+          <Link href="/my-golf/billing#receipts" className="text-white/60 underline underline-offset-4 hover:text-white">
+            Payment history
+          </Link>
+        </p>
       </section>
     </main>
   );

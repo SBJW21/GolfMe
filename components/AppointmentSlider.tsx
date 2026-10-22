@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import CoachPhoto from "./CoachPhoto";
 import { formatAud } from "@/lib/pricing";
 import type { Appointment } from "@/lib/myGolf";
@@ -9,6 +9,13 @@ import type { Appointment } from "@/lib/myGolf";
 /** Swipeable row of appointment cards. Upcoming first, past ones greyed out after them. */
 export default function AppointmentSlider({ items }: { items: Appointment[] }) {
   const track = useRef<HTMLDivElement>(null);
+
+  // Start on the first upcoming lesson so past lessons sit just off-screen to the left.
+  useEffect(() => {
+    const el = track.current;
+    const first = el?.querySelector<HTMLElement>("[data-upcoming]");
+    if (el && first) el.scrollLeft = first.offsetLeft - 16;
+  }, []);
 
   function scrollBy(dir: 1 | -1) {
     const el = track.current;
@@ -33,11 +40,12 @@ export default function AppointmentSlider({ items }: { items: Appointment[] }) {
       </div>
       <div
         ref={track}
-        className="-mx-4 flex snap-x snap-mandatory scroll-pl-4 gap-4 overflow-x-auto px-4 pb-3 [scrollbar-width:thin]"
+        className="relative -mx-4 flex snap-x snap-mandatory scroll-pl-4 gap-4 overflow-x-auto px-4 pb-3 [scrollbar-width:thin]"
       >
         {items.map((a) => (
           <article
             key={a.id}
+            data-upcoming={a.past ? undefined : ""}
             className={`glass relative w-[78%] shrink-0 snap-start rounded-2xl p-5 sm:w-[300px] ${
               a.past ? "opacity-55 grayscale" : "!border-lime/50"
             }`}
@@ -85,6 +93,8 @@ export default function AppointmentSlider({ items }: { items: Appointment[] }) {
             </div>
           </article>
         ))}
+        {/* Trailing room so the first upcoming lesson can sit at the left edge on wide screens. */}
+        <div aria-hidden="true" className="w-[25%] shrink-0" />
       </div>
     </div>
   );

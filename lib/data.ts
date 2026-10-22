@@ -24,6 +24,7 @@ export const sampleCoaches: Coach[] = [
   {
     slug: "sample-coach-two",
     name: "Jordan Lee",
+    photo: "/coaches/jordan-lee.jpg",
     suburb: "Bondi",
     priceCents: 12000,
     yearsCoaching: 8,

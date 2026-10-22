@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import CoachPhoto from "@/components/CoachPhoto";
 import SampleNotice from "@/components/SampleNotice";
 import Stars from "@/components/Stars";
 import SlotPicker from "@/components/SlotPicker";
@@ -39,9 +40,17 @@ export default async function CoachPage(props: PageProps<"/coaches/[slug]">) {
 
       <div className="mt-4 grid gap-8 lg:grid-cols-[1fr_340px]">
         <div>
-          <h1 className="font-display text-[clamp(2.2rem,7vw,3.4rem)]">
-            {coach.name}
-          </h1>
+          <div className="flex items-center gap-4 sm:gap-5">
+            <CoachPhoto
+              slug={coach.slug}
+              name={coach.name}
+              photo={coach.photo}
+              className="h-20 w-20 shrink-0 sm:h-28 sm:w-28"
+            />
+            <h1 className="font-display text-[clamp(2.2rem,7vw,3.4rem)]">
+              {coach.name}
+            </h1>
+          </div>
           <p className="mt-2 text-white/80">
             {coach.title ? `${coach.title}, ` : ""}
             {coach.suburb}

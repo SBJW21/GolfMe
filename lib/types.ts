@@ -26,6 +26,8 @@ export type Coach = {
   suburb: string;
   /** Role line, for example "Head Professional". */
   title?: string;
+  /** Short credentials shown as pills, for example "NDIS Certified". */
+  badges?: string[];
   /** A real coach shown as a draft preview. Price, times and details are examples. */
   preview?: boolean;
   /** Lesson price in cents (AUD) for a 60 minute lesson */

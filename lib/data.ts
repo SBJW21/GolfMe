@@ -12,6 +12,7 @@ export const sampleCoaches: Coach[] = [
     preview: true,
     name: "Matt Grenot",
     title: "Head Professional",
+    badges: ["NDIS Certified", "20 years experience", "Beginner to advanced"],
     suburb: "Balgowlah",
     priceCents: 9500,
     yearsCoaching: 0,

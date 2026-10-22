@@ -59,6 +59,18 @@ export default async function SoloCoachPage(props: PageProps<"/c/[slug]">) {
           {coach.name} services {coach.suburb} and surrounding areas.
           {coach.focus.length > 0 && <> Works well with {focusSentence(coach.focus)}.</>}
         </p>
+        {coach.badges && coach.badges.length > 0 && (
+          <ul className="mt-4 flex flex-wrap justify-center gap-2">
+            {coach.badges.map((b) => (
+              <li
+                key={b}
+                className="rounded-full border border-lime/50 px-3.5 py-1 text-sm font-semibold text-lime"
+              >
+                {b}
+              </li>
+            ))}
+          </ul>
+        )}
         {coach.reviews.length > 0 && (
           <div className="mt-3">
             <Stars rating={averageRating(coach)} count={coach.reviews.length} />

@@ -54,6 +54,19 @@ export default async function CoachPage(props: PageProps<"/coaches/[slug]">) {
           <p className="mt-6 text-xl font-semibold">{coach.headline}</p>
           <p className="mt-3 text-white/85">{coach.bio}</p>
 
+          {coach.badges && coach.badges.length > 0 && (
+            <ul className="mt-5 flex flex-wrap gap-2">
+              {coach.badges.map((b) => (
+                <li
+                  key={b}
+                  className="rounded-full border border-lime/50 px-3 py-1 text-sm font-semibold text-lime"
+                >
+                  {b}
+                </li>
+              ))}
+            </ul>
+          )}
+
           <div className="mt-5 flex flex-wrap gap-1.5">
             {coach.focus.map((f) => (
               <span

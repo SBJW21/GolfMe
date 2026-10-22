@@ -127,3 +127,21 @@ body {
 .slider-scroll::-webkit-scrollbar {
   display: none;
 }
+
+/* Dictation waveform bars */
+@keyframes wave {
+  0%, 100% { transform: scaleY(0.25); }
+  50% { transform: scaleY(1); }
+}
+.wave-bar {
+  display: block;
+  width: 5px;
+  height: 36px;
+  border-radius: 999px;
+  background: var(--lime);
+  transform-origin: center;
+  animation: wave 0.9s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .wave-bar { animation: none; transform: scaleY(0.6); }
+}

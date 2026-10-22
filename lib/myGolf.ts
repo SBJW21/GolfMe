@@ -78,11 +78,13 @@ export function sampleAppointments(): Appointment[] {
   });
 }
 
-export const sampleMattVideos = [
-  { id: "v1", title: "Your slice: gate drill walkthrough", date: "14 Oct", length: "2:41" },
-  { id: "v2", title: "Driver tempo and the three-count", date: "14 Oct", length: "1:58" },
-  { id: "v3", title: "Swing review: down the line", date: "7 Oct", length: "3:12" },
-  { id: "v4", title: "Grip check and setup", date: "30 Sep", length: "2:05" },
+export type MyVideo = { id: string; title: string; date: string; length: string; tag: "Saved" | "Shared" | "Uploaded" };
+
+export const sampleMyVideos: MyVideo[] = [
+  { id: "v1", title: "Your slice: gate drill walkthrough", date: "14 Oct", length: "2:41", tag: "Uploaded" },
+  { id: "v2", title: "Driver tempo and the three-count", date: "14 Oct", length: "1:58", tag: "Uploaded" },
+  { id: "v3", title: "Slices: grip fix", date: "7 Oct", length: "3:12", tag: "Shared" },
+  { id: "v4", title: "Putting: gate drill", date: "30 Sep", length: "2:05", tag: "Saved" },
 ];
 
 export const sampleReports = [

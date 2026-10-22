@@ -7,7 +7,7 @@ import { formatAud } from "@/lib/pricing";
 import {
   sampleAppointments,
   sampleCoachesWorkedWith,
-  sampleMattVideos,
+  sampleMyVideos,
   sampleReports,
   sampleStats,
   sampleStudent,
@@ -126,13 +126,19 @@ export default function MyGolfPage() {
       </section>
 
       <section className="mt-12">
-        <Heading>Videos from Matt</Heading>
+        <Heading>My videos</Heading>
         <p className="mt-1 text-sm text-white/70">
-          Swing reviews and drills Matt Grenot has uploaded for you.
+          Videos you&apos;ve saved or your coach has shared or uploaded.
         </p>
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {sampleMattVideos.map((v) => (
-            <VideoPlaceholder key={v.id} title={v.title} meta={`${v.date} · ${v.length}`} label="Sample" />
+          {sampleMyVideos.map((v) => (
+            <VideoPlaceholder
+              key={v.id}
+              title={v.title}
+              meta={`${v.date} \u00b7 ${v.length}`}
+              label="Sample"
+              tag={v.tag}
+            />
           ))}
         </div>
       </section>

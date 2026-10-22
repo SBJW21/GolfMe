@@ -4,18 +4,18 @@ import PinMark from "./PinMark";
 export default function Header() {
   return (
     <header className="sticky top-0 z-30 border-b border-white/10 bg-black/80 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-        <Link href="/" className="flex shrink-0 items-center gap-2 whitespace-nowrap font-display text-2xl text-white sm:text-3xl">
-          <PinMark className="h-7 w-auto sm:h-8" />
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
+        <Link href="/" className="flex shrink-0 items-center gap-1.5 whitespace-nowrap font-display text-xl text-white min-[400px]:gap-2 min-[400px]:text-2xl sm:text-3xl">
+          <PinMark className="h-6 w-auto min-[400px]:h-7 sm:h-8" />
           <span>
             Golf <span className="text-lime">Me</span>
           </span>
         </Link>
-        <nav className="flex items-center gap-4 whitespace-nowrap text-sm font-semibold sm:gap-5">
+        <nav className="flex items-center gap-3 whitespace-nowrap text-[13px] font-semibold sm:gap-5 sm:text-sm">
           <Link href="/coaches" className="hover:text-lime">
             Find a coach
           </Link>
-          <Link href="/learn" className="hidden hover:text-lime sm:inline">
+          <Link href="/learn" className="hover:text-lime">
             Learn
           </Link>
           <Link href="/my-golf" className="hover:text-lime">

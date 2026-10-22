@@ -4,12 +4,15 @@ export default function VideoPlaceholder({
   meta,
   label = "Coming soon",
   locked = false,
+  tag,
 }: {
   title: string;
   meta?: string;
   label?: string;
   /** Greyed out with a lock, for videos that need a log-in. */
   locked?: boolean;
+  /** Small status label with a green dot, for example SAVED. */
+  tag?: string;
 }) {
   return (
     <div className={`glass overflow-hidden rounded-2xl ${locked ? "grayscale" : ""}`}>
@@ -35,6 +38,12 @@ export default function VideoPlaceholder({
         </span>
       </div>
       <div className={`p-3 ${locked ? "opacity-70" : ""}`}>
+        {tag && (
+          <p className="mb-1 flex items-center gap-1.5 text-[0.65rem] font-extrabold uppercase tracking-[0.14em] text-white/80">
+            <span className="h-2 w-2 rounded-full bg-lime" aria-hidden="true" />
+            {tag}
+          </p>
+        )}
         <p className="text-sm font-semibold">{title}</p>
         {meta && <p className="mt-0.5 text-xs text-white/60">{meta}</p>}
       </div>

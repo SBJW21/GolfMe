@@ -107,12 +107,6 @@ export default function AppointmentSlider({ items }: { items: Appointment[] }) {
             </div>
           </article>
         ))}
-        <Link
-          href="/coaches"
-          className="sticky right-2 z-10 flex w-9 shrink-0 items-center justify-center self-stretch rounded-full bg-lime text-xs font-extrabold uppercase tracking-[0.16em] text-black [writing-mode:vertical-rl] shadow-[0_0_0_4px_#000] hover:brightness-110 sm:w-14 sm:text-sm sm:tracking-[0.18em]"
-        >
-          Book lesson
-        </Link>
         {/* Trailing room so the first upcoming lesson can sit at the left edge on wide screens. */}
         <div aria-hidden="true" className="w-[25%] shrink-0" />
       </div>

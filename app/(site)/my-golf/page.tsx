@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import AppointmentSlider from "@/components/AppointmentSlider";
 import CoachPhoto from "@/components/CoachPhoto";
+import Flame from "@/components/Flame";
+import { milestoneProgress, sampleRounds, streakInfo } from "@/lib/rounds";
 import VideoPlaceholder from "@/components/VideoPlaceholder";
 import { formatAud } from "@/lib/pricing";
 import {
@@ -22,6 +24,8 @@ function Heading({ children }: { children: React.ReactNode }) {
 
 export default function MyGolfPage() {
   const s = sampleStudent;
+  const streak = streakInfo(sampleRounds());
+  const prog = milestoneProgress(streak.current);
   const stats = [
     { label: "Lessons done", value: String(sampleStats.lessonsDone) },
     { label: "Upcoming", value: String(sampleStats.lessonsUpcoming) },
@@ -81,17 +85,45 @@ export default function MyGolfPage() {
 
       <Link
         href="/my-golf/rounds"
-        className="glass mt-4 flex items-center justify-between gap-4 rounded-2xl p-5 hover:!border-lime/70"
+        className="glass mt-4 block rounded-2xl p-5 hover:!border-lime/70"
       >
-        <div>
-          <p className="font-display text-2xl text-lime">5 week streak</p>
-          <p className="text-sm text-white/75">Log a round, track courses and invite friends</p>
+        <div className="flex items-center gap-4">
+          <Flame lit={streak.current > 0} className="h-14 w-11 shrink-0" />
+          <div className="min-w-0 flex-1">
+            <p className="font-display text-2xl text-lime">{streak.current} week streak</p>
+            <p className="text-sm text-white/75">
+              {streak.atRisk
+                ? "Play this week to keep it alive"
+                : prog.next
+                  ? `${prog.toGo} ${prog.toGo === 1 ? "week" : "weeks"} to ${prog.next.name}`
+                  : "Top level reached"}
+            </p>
+          </div>
+          <span className="text-2xl text-lime" aria-hidden="true">&rarr;</span>
         </div>
-        <span className="text-2xl text-lime" aria-hidden="true">&rarr;</span>
+        <div className="mt-4 grid grid-cols-12 gap-1" aria-hidden="true">
+          {streak.tiles.map((t) => (
+            <span
+              key={t.idx}
+              className={`h-2.5 rounded-full ${t.played ? "bg-lime" : "bg-white/15"} ${t.current && !t.played ? "animate-pulse" : ""}`}
+            />
+          ))}
+        </div>
+        <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/10" aria-hidden="true">
+          <div className="h-full rounded-full bg-lime" style={{ width: `${prog.pct}%` }} />
+        </div>
       </Link>
 
       <section className="mt-12">
-        <Heading>My lessons</Heading>
+        <div className="flex items-center justify-between gap-3">
+          <Heading>My lessons</Heading>
+          <Link
+            href="/coaches"
+            className="shrink-0 rounded-full bg-lime px-4 py-2 text-xs font-extrabold uppercase tracking-[0.16em] text-black hover:brightness-110 sm:px-5 sm:text-sm"
+          >
+            Book lesson
+          </Link>
+        </div>
         <div className="mt-4">
           <AppointmentSlider items={sampleAppointments()} />
         </div>
@@ -99,7 +131,7 @@ export default function MyGolfPage() {
 
       <section className="mt-12">
         <Heading>My coaches</Heading>
-        <div className="mt-5 flex gap-3">
+        <div className="mt-5 flex items-stretch gap-3">
           {([
             ["Past", false],
             ["Active", true],
@@ -107,17 +139,17 @@ export default function MyGolfPage() {
             const list = sampleCoachesWorkedWith.filter((c) => c.active === active);
             if (list.length === 0) return null;
             return (
-              <div key={label} className={active ? "basis-3/4" : "basis-1/4"}>
+              <div key={label} className={`flex flex-col ${active ? "basis-3/4" : "basis-1/4"}`}>
                 <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/50">{label}</p>
-                <div className="mt-2 grid gap-3">
+                <div className="mt-2 grid flex-1 gap-3">
                   {list.map((c) => (
                     <Link
                       key={c.slug}
                       href={`/coaches/${c.slug}`}
-                      className={`glass rounded-2xl hover:!border-lime/70 ${
+                      className={`glass h-full rounded-2xl hover:!border-lime/70 ${
                         active
                           ? "flex items-center gap-3 p-3 sm:gap-4 sm:p-4"
-                          : "flex flex-col items-center gap-2 p-3 text-center opacity-55 grayscale"
+                          : "flex flex-col items-center justify-center gap-2 p-3 text-center opacity-55 grayscale"
                       }`}
                     >
                       <CoachPhoto

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { courses } from "@/lib/courses";
+import { courses, regions } from "@/lib/courses";
+import { regionOf } from "@/lib/courses";
 
 export const metadata: Metadata = {
   title: "Sydney golf courses and nearby lessons",
@@ -16,16 +17,32 @@ export default function CoursesIndex() {
       <p className="mt-2 max-w-xl text-white/80">
         Playing at one of these courses soon? Find a coach nearby and sharpen your game first.
       </p>
-      <ul className="mt-8 grid gap-3 sm:grid-cols-2">
-        {sorted.map((c) => (
-          <li key={c.slug}>
-            <Link href={`/courses/${c.slug}`} className="glass block rounded-2xl p-4 hover:!border-lime/70">
-              <p className="font-bold">{c.name}</p>
-              <p className="text-sm text-white/70">{c.suburb}</p>
-            </Link>
-          </li>
+      <nav aria-label="Regions" className="mt-6 flex flex-wrap gap-2 text-sm font-semibold">
+        {regions.map((r) => (
+          <a key={r} href={`#${r.toLowerCase().replace(/ /g, "-")}`} className="rounded-full border border-white/20 px-3 py-1.5 hover:border-lime hover:text-lime">
+            {r}
+          </a>
         ))}
-      </ul>
+      </nav>
+      {regions.map((r) => {
+        const list = sorted.filter((c) => regionOf(c) === r);
+        if (list.length === 0) return null;
+        return (
+          <section key={r} id={r.toLowerCase().replace(/ /g, "-")} className="mt-10 scroll-mt-24">
+            <h2 className="font-display text-[clamp(1.5rem,5vw,2rem)] text-lime">{r}</h2>
+            <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+              {list.map((c) => (
+                <li key={c.slug}>
+                  <Link href={`/courses/${c.slug}`} className="glass block rounded-2xl p-4 hover:!border-lime/70">
+                    <p className="font-bold">{c.name}</p>
+                    <p className="text-sm text-white/70">{c.suburb}, {r}</p>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        );
+      })}
     </main>
   );
 }

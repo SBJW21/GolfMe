@@ -3,7 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import CoachCard from "@/components/CoachCard";
 import { areaOfSuburb } from "@/lib/areas";
-import { courseSuburbSlug, courses, getCourse } from "@/lib/courses";
+import { courseSuburbSlug, courses, getCourse, regionOf } from "@/lib/courses";
+import { courseDetails } from "@/lib/courseDetails";
 import { loadCoaches } from "@/lib/repo";
 import { SITE_URL } from "@/lib/suburbs";
 
@@ -33,8 +34,14 @@ export default async function CoursePage(props: PageProps<"/courses/[course]">) 
   const { coaches } = await loadCoaches();
   const nearby = area ? coaches.filter((k) => areaOfSuburb(k.suburb)?.id === area.id) : [];
   const suburbSlug = courseSuburbSlug(c);
+  const d = courseDetails[c.slug];
+  const rows: [string, string | undefined][] = d
+    ? [["Bar", d.bar], ["Social area", d.social], ["Parking", d.parking], ["Nearest train", d.nearestTrain], ["Nearest bus", d.nearestBus]]
+    : [];
+  const shown = rows.filter(([, v]) => v) as [string, string][];
   const facts = [
     ["Suburb", c.suburb],
+    ["Region", regionOf(c)],
     ...(c.holes ? [["Holes", String(c.holes)]] : []),
     ...(c.par ? [["Par", String(c.par)]] : []),
   ];
@@ -60,7 +67,7 @@ export default async function CoursePage(props: PageProps<"/courses/[course]">) 
         {c.name}, <span className="text-lime">{c.suburb}</span>
       </h1>
       <p className="mt-3 max-w-2xl text-lg text-white/85">
-        {c.name} is a golf course in {c.suburb}, Sydney. Before your next round there, a lesson with a
+        {c.name} is a golf course in {c.suburb}, in Sydney&apos;s {regionOf(c)}. Before your next round there, a lesson with a
         local coach can take shots off your score.
       </p>
 
@@ -82,6 +89,28 @@ export default async function CoursePage(props: PageProps<"/courses/[course]">) 
             Book a round on the course website
           </a>
         </p>
+      )}
+
+      {shown.length > 0 && (
+        <section className="mt-10">
+          <h2 className="font-display text-[clamp(1.5rem,5vw,2rem)]">Facilities and getting there</h2>
+          <dl className="glass mt-4 grid gap-x-8 gap-y-4 rounded-2xl p-5 sm:grid-cols-2">
+            {shown.map(([k, v]) => (
+              <div key={k}>
+                <dt className="text-xs uppercase tracking-[0.14em] text-white/50">{k}</dt>
+                <dd className="mt-0.5 font-semibold">{v}</dd>
+              </div>
+            ))}
+          </dl>
+          {d?.source && (
+            <p className="mt-2 text-xs text-white/50">
+              Checked {d.checked ?? "recently"}.{" "}
+              <a href={d.source} target="_blank" rel="noopener" className="underline-offset-4 hover:underline">
+                Source
+              </a>
+            </p>
+          )}
+        </section>
       )}
 
       <section className="mt-12">

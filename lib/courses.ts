@@ -1,6 +1,53 @@
 import { areaOfSuburb } from "./areas";
 import { slugify } from "./suburbs";
 
+export type Region =
+  | "Northern Beaches"
+  | "North Shore"
+  | "Eastern Suburbs"
+  | "Inner West"
+  | "Western Sydney"
+  | "Hawkesbury"
+  | "South West"
+  | "Southern Sydney";
+
+export const regions: Region[] = [
+  "Northern Beaches",
+  "North Shore",
+  "Eastern Suburbs",
+  "Inner West",
+  "Western Sydney",
+  "Hawkesbury",
+  "South West",
+  "Southern Sydney",
+];
+
+const regionOfSuburb: Record<string, Region> = {
+  "Little Bay": "Eastern Suburbs", "Rose Bay": "Eastern Suburbs", "Moore Park": "Eastern Suburbs",
+  "Eastlakes": "Eastern Suburbs", "North Bondi": "Eastern Suburbs", "Malabar": "Eastern Suburbs",
+  "Banksmeadow": "Eastern Suburbs",
+  "Collaroy": "Northern Beaches", "Mona Vale": "Northern Beaches", "Allambie Heights": "Northern Beaches",
+  "Palm Beach": "Northern Beaches", "North Manly": "Northern Beaches", "Avalon Beach": "Northern Beaches",
+  "Balgowlah": "Northern Beaches", "Warriewood": "Northern Beaches",
+  "Northbridge": "North Shore", "Asquith": "North Shore", "North Ryde": "North Shore", "Gordon": "North Shore",
+  "Castle Cove": "North Shore", "Cammeray": "North Shore", "Chatswood West": "North Shore", "Lane Cove": "North Shore",
+  "Earlwood": "Inner West", "Canada Bay": "Inner West", "Concord": "Inner West",
+  "Colebee": "Western Sydney", "St Marys": "Western Sydney", "Lidcombe": "Western Sydney", "Greystanes": "Western Sydney",
+  "Werrington": "Western Sydney", "Mulgoa": "Western Sydney", "North Rocks": "Western Sydney", "Leonay": "Western Sydney",
+  "Girraween": "Western Sydney", "Parramatta": "Western Sydney", "Auburn": "Western Sydney", "Guildford": "Western Sydney",
+  "Glenmore Park": "Western Sydney", "Wallacia": "Western Sydney", "Prairiewood": "Western Sydney",
+  "Richmond": "Hawkesbury", "South Windsor": "Hawkesbury", "Ebenezer": "Hawkesbury", "Pitt Town": "Hawkesbury",
+  "Cabramatta": "South West", "Milperra": "South West", "Gledswood Hills": "South West", "Macquarie Links": "South West",
+  "Glen Alpine": "South West", "Narellan": "South West", "Moorebank": "South West", "Bankstown Aerodrome": "South West",
+  "Bardwell Park": "Southern Sydney", "Woolooware": "Southern Sydney", "Sylvania": "Southern Sydney",
+  "Beverley Park": "Southern Sydney", "Beverly Hills": "Southern Sydney", "Bexley": "Southern Sydney",
+  "Miranda": "Southern Sydney", "Mortdale": "Southern Sydney",
+};
+
+export function regionOf(c: { suburb: string }): Region {
+  return regionOfSuburb[c.suburb] ?? "Western Sydney";
+}
+
 export type Course = {
   slug: string;
   name: string;

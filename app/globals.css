@@ -120,23 +120,10 @@ body {
   }
 }
 
-/* Slim lime scrollbar for horizontal sliders */
+/* Horizontal slider with no visible scrollbar (arrows and swipe still work) */
 .slider-scroll {
-  scrollbar-width: thin;
-  scrollbar-color: var(--lime) rgba(255, 255, 255, 0.08);
+  scrollbar-width: none;
 }
 .slider-scroll::-webkit-scrollbar {
-  height: 6px;
-}
-.slider-scroll::-webkit-scrollbar-track {
-  margin: 0 16px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
-}
-.slider-scroll::-webkit-scrollbar-thumb {
-  border-radius: 999px;
-  background: linear-gradient(90deg, #8fbf1f, var(--lime));
-}
-.slider-scroll::-webkit-scrollbar-thumb:hover {
-  background: var(--lime);
+  display: none;
 }

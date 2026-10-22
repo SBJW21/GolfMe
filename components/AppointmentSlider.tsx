@@ -30,14 +30,14 @@ export default function AppointmentSlider({ items }: { items: Appointment[] }) {
 
   return (
     <div>
-      <div className="mb-3 flex justify-end gap-2">
+      <div className="mb-4 flex gap-3">
         {([-1, 1] as const).map((d) => (
           <button
             key={d}
             type="button"
             onClick={() => scrollBy(d)}
             aria-label={d < 0 ? "Scroll to earlier cards" : "Scroll to later cards"}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/30 text-lg hover:border-lime hover:text-lime"
+            className="flex h-12 w-12 items-center justify-center rounded-full border border-lime/60 text-2xl text-lime hover:bg-lime hover:text-black"
           >
             {d < 0 ? "←" : "→"}
           </button>
@@ -45,7 +45,7 @@ export default function AppointmentSlider({ items }: { items: Appointment[] }) {
       </div>
       <div
         ref={track}
-        className="slider-scroll relative -mx-4 flex gap-4 overflow-x-auto px-4 pb-4"
+        className="slider-scroll relative -mx-4 flex gap-4 overflow-x-auto px-4 pb-1"
       >
         {items.map((a) => (
           <article

@@ -81,9 +81,6 @@ export default function MyGolfPage() {
 
       <section className="mt-12">
         <Heading>My lessons</Heading>
-        <p className="mt-1 text-sm text-white/70">
-          Past lessons are greyed out to the left. Scroll back to see them.
-        </p>
         <div className="mt-4">
           <AppointmentSlider items={sampleAppointments()} />
         </div>

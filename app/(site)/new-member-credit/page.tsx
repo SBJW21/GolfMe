@@ -3,14 +3,14 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "$10 new member credit: terms",
-  description: "Terms for the $10 Golf Me credit offered to new members who sign up through the ScoreCard or an invite link.",
+  description: "Terms for the $10 Golf Me credit offered to new members who sign up through the ScoreCard or an invite link.",
 };
 
 const sections: { title: string; points: string[] }[] = [
   {
     title: "Who can get it",
     points: [
-      "New members only. You must not have had a Golf Me account before, under any email address or phone number",
+      "New members only. You must not have had a Golf Me account before, under any email address or phone number",
       "One account per person",
       "You must be 18 or over, or have a parent or guardian's consent",
       "You must sign up through the ScoreCard or an invite link",
@@ -28,7 +28,7 @@ const sections: { title: string; points: string[] }[] = [
     points: [
       "It is account credit only. It has no cash value and cannot be cashed out or transferred",
       "It expires 6 months after it is added",
-      "You can use it with any coach on Golf Me",
+      "You can use it with any coach on Golf Me",
       "It cannot be used for gift purchases or to top up other credit",
       "It is applied automatically at checkout. If your lesson costs less than your credit, the rest stays on your account until it expires",
       "Credit from a cancelled lesson follows our cancellation rule: cancel 24 hours or more before the lesson and the full amount comes back as account credit, valid for 6 months",
@@ -46,7 +46,7 @@ const sections: { title: string; points: string[] }[] = [
   {
     title: "Inviting friends",
     points: [
-      "Invites are sent by you, not by Golf Me. Only invite people who would expect to hear from you",
+      "Invites are sent by you, not by Golf Me. Only invite people who would expect to hear from you",
       "We do not upload or store your phone contacts. Share your invite link yourself by text or any app you like",
     ],
   },
@@ -54,7 +54,7 @@ const sections: { title: string; points: string[] }[] = [
     title: "General",
     points: [
       "These terms are governed by the laws of New South Wales",
-      "Questions? Contact us through the Golf Me contact page",
+      "Questions? Contact us through the Golf Me contact page",
     ],
   },
 ];
@@ -65,7 +65,7 @@ export default function Page() {
       <p className="text-xs uppercase tracking-[0.16em] text-white/45">Terms</p>
       <h1 className="font-display mt-1 text-[clamp(2.2rem,7vw,3.4rem)]">$10 new member credit</h1>
       <p className="mt-3 text-white/80">
-        New members get $10 Golf Me credit when they join through the ScoreCard or an invite link. Here is how it works.
+        New members get $10 Golf Me credit when they join through the ScoreCard or an invite link. Here is how it works.
       </p>
       <div className="mt-8 grid gap-4">
         {sections.map((s) => (

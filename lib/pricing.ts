@@ -1,5 +1,5 @@
 /**
- * Money and lesson rules for Golf Me.
+ * Money and lesson rules for Golf Me.
  * All amounts are in cents (AUD).
  *
  * Rules agreed so far:

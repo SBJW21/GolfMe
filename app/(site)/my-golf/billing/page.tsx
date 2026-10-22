@@ -34,7 +34,7 @@ export default function BillingPage() {
             <p className="font-bold">Visa ending 4242</p>
             <p className="text-sm text-white/70">Expires 08/28</p>
           </div>
-          <span className="rounded-lg border border-white/40 px-3 py-1.5 text-sm font-semibold">
+          <span className="pill-arrow rounded-lg border border-white/40 px-3 py-1.5 text-sm font-semibold">
             Update
           </span>
         </div>

@@ -22,7 +22,7 @@ export default function Header() {
           </Link>
           <Link
             href="/for-coaches"
-            className="hidden rounded-lg border border-white/40 px-3 py-1.5 hover:border-lime hover:text-lime sm:inline"
+            className="pill-arrow hidden rounded-lg border border-white/40 px-3 py-1.5 hover:border-lime hover:text-lime sm:inline"
           >
             For coaches
           </Link>

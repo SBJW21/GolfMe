@@ -29,7 +29,7 @@ export async function generateMetadata(
 
 /**
  * A coach's own page: the one they share on Instagram, their website or in a message.
- * It has no Golf Me menu and no links to the rest of the site.
+ * It has no Golf Me menu and no links to the rest of the site.
  */
 export default async function SoloCoachPage(props: PageProps<"/c/[slug]">) {
   const { slug } = await props.params;

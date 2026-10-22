@@ -130,7 +130,7 @@ export default function CoachCalendar({ weeks }: { weeks: HubWeek[] }) {
                 </p>
               </div>
               <div className="flex gap-2 text-sm font-semibold">
-                <span className="rounded-full bg-lime px-4 py-1.5 text-black">Message</span>
+                <span className="pill-arrow rounded-full bg-lime px-4 py-1.5 text-black">Message</span>
                 <span className="rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-white/60">Modify</span>
               </div>
             </div>

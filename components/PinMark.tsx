@@ -1,5 +1,5 @@
 /**
- * Golf Me map pin with a flagstick inside it: a place on the map, and a pin on the green.
+ * Golf Me map pin with a flagstick inside it: a place on the map, and a pin on the green.
  */
 export default function PinMark({ className = "" }: { className?: string }) {
   return (

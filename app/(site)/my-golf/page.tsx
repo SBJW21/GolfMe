@@ -42,18 +42,16 @@ export default function MyGolfPage() {
       </p>
       <h1 className="font-display mt-1 text-[clamp(2.2rem,7vw,3.4rem)]">My Golf</h1>
 
-      <section className="mt-6 grid gap-4 lg:grid-cols-[1.25fr_0.9fr_1fr]">
+      <section className="mt-6 grid gap-4 lg:grid-cols-[1.3fr_0.8fr_1fr]">
         <div className="glass rounded-2xl p-5">
-          <div className="flex items-center gap-4">
-            <span className="font-display flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-lime text-2xl text-black">
+          <div className="flex flex-col items-center text-center">
+            <span className="font-display flex h-28 w-28 shrink-0 items-center justify-center rounded-full bg-lime text-4xl text-black sm:h-32 sm:w-32 sm:text-5xl">
               CA
             </span>
-            <div>
-              <p className="text-xl font-bold">{s.name}</p>
-              <p className="text-sm text-white/70">Member since {s.memberSince}</p>
-            </div>
+            <p className="mt-3 text-2xl font-bold">{s.name}</p>
+            <p className="text-sm text-white/70">Member since {s.memberSince}</p>
           </div>
-          <dl className="mt-5 grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
+          <dl className="mt-5 grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
             {[
               ["Handicap", s.handicap],
               ["Location", s.suburb],
@@ -63,12 +61,12 @@ export default function MyGolfPage() {
                 <dd className="mt-0.5 font-semibold">{v}</dd>
               </div>
             ))}
-            <div className="sm:col-span-2">
+            <div className="col-span-2">
               <dt className="text-xs uppercase tracking-[0.14em] text-white/50">My goal</dt>
               <dd className="mt-0.5 font-semibold">{s.goal}</dd>
             </div>
           </dl>
-          <span className="mt-5 inline-block rounded-lg border border-white/40 px-3 py-1.5 text-sm font-semibold">
+          <span className="pill-arrow mt-5 inline-block rounded-lg border border-white/40 px-3 py-1.5 text-sm font-semibold">
             Edit details
           </span>
         </div>
@@ -76,18 +74,20 @@ export default function MyGolfPage() {
         {coach && (
           <Link
             href={`/coaches/${coach.slug}`}
-            className="glass flex flex-col items-center justify-center gap-3 rounded-2xl p-5 text-center hover:!border-lime/70"
+            className="glass flex flex-col items-start justify-center gap-3 self-start rounded-2xl p-4 hover:!border-lime/70 lg:self-center"
           >
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/50">My coach</p>
-            <CoachPhoto slug={coach.slug} name={coach.name} photo={coach.photo} className="h-28 w-28 shrink-0 sm:h-32 sm:w-32" />
-            <div>
-              <p className="text-xl font-bold">{coach.name}</p>
-              <p className="text-sm text-white/70">
-                {coach.title ? `${coach.title}, ` : ""}
-                {coach.suburb}
-              </p>
-              <p className="mt-2 text-sm font-semibold text-lime">{coach.lessons} lessons &middot; Rebook</p>
+            <div className="flex items-center gap-3">
+              <CoachPhoto slug={coach.slug} name={coach.name} photo={coach.photo} className="h-14 w-14 shrink-0" />
+              <div className="min-w-0">
+                <p className="font-bold">{coach.name}</p>
+                <p className="text-sm text-white/70">
+                  {coach.title ? `${coach.title}, ` : ""}
+                  {coach.suburb}
+                </p>
+              </div>
             </div>
+            <p className="text-sm font-semibold text-lime">{coach.lessons} lessons &middot; Rebook</p>
           </Link>
         )}
 
@@ -105,9 +105,9 @@ export default function MyGolfPage() {
         href="/my-golf/rounds"
         className="glass mt-4 block rounded-2xl p-5 hover:!border-lime/70"
       >
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
           <Flame lit={streak.current > 0} className="h-14 w-11 shrink-0" />
-          <div className="min-w-0 flex-1">
+          <div className="min-w-[11rem] flex-1">
             <p className="font-display text-2xl text-lime">{streak.current} week streak</p>
             <p className="text-sm text-white/75">
               {streak.atRisk
@@ -117,7 +117,11 @@ export default function MyGolfPage() {
                   : "Top level reached"}
             </p>
           </div>
-          <span className="text-2xl text-lime" aria-hidden="true">&rarr;</span>
+          <span className="flex shrink-0 items-center gap-2">
+            <span className="pill-arrow whitespace-nowrap rounded-full bg-lime px-3 py-1.5 text-xs font-extrabold uppercase tracking-[0.14em] text-black sm:px-4 sm:text-sm">
+              My rounds
+            </span>
+          </span>
         </div>
         <div className="mt-4 grid grid-cols-12 gap-1" aria-hidden="true">
           {streak.tiles.map((t) => (
@@ -137,7 +141,7 @@ export default function MyGolfPage() {
           <Heading>My lessons</Heading>
           <Link
             href="/coaches"
-            className="shrink-0 rounded-full bg-lime px-4 py-2 text-xs font-extrabold uppercase tracking-[0.16em] text-black hover:brightness-110 sm:px-5 sm:text-sm"
+            className="pill-arrow shrink-0 whitespace-nowrap rounded-full bg-lime px-4 py-2 text-xs font-extrabold uppercase tracking-[0.16em] text-black hover:brightness-110 sm:px-5 sm:text-sm"
           >
             Book lesson
           </Link>
@@ -204,7 +208,7 @@ export default function MyGolfPage() {
             <Link
               key={t}
               href={href}
-              className="rounded-full border border-white/30 px-4 py-1.5 text-sm font-semibold hover:border-lime hover:text-lime"
+              className="pill-arrow rounded-full border border-white/30 px-4 py-1.5 text-sm font-semibold hover:border-lime hover:text-lime"
             >
               {t}
             </Link>

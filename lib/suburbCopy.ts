@@ -50,7 +50,7 @@ export function suburbCopy(i: Input) {
   const intro =
     n === 0
       ? pick(slug, "i0", [
-          `Golf Me is growing around ${name}. Browse coaches across ${areaLabel} and Sydney while we sign up more nearby.`,
+          `Golf Me is growing around ${name}. Browse coaches across ${areaLabel} and Sydney while we sign up more nearby.`,
           `We are still adding coaches close to ${name}. See who is available across ${areaLabel} and book online.`,
         ])
       : pick(slug, "i1", [

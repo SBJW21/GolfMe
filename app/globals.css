@@ -65,6 +65,14 @@ body {
   text-align: center;
 }
 
+.btn::after,
+.pill-arrow::after {
+  content: "\2192";
+  display: inline-block;
+  margin-left: 0.5em;
+  font-style: normal;
+}
+
 .btn:hover {
   filter: brightness(1.08);
 }

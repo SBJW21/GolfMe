@@ -122,7 +122,7 @@ export default function CoachAdmin() {
                   setNote("");
                   setSent(`Preview only. In the live version this goes to ${student.name.split(" ")[0]}.`);
                 }}
-                className="mt-2 rounded-full bg-lime px-4 py-1.5 text-sm font-semibold text-black"
+                className="pill-arrow mt-2 rounded-full bg-lime px-4 py-1.5 text-sm font-semibold text-black"
               >
                 Message
               </button>
@@ -170,7 +170,7 @@ export default function CoachAdmin() {
                     <button
                       type="button"
                       onClick={() => setShared(`"${v}" ready to share with ${shareTo.split(" ")[0]}. Preview only.`)}
-                      className="mt-2 rounded-full bg-lime px-4 py-1.5 text-sm font-semibold text-black"
+                      className="pill-arrow mt-2 rounded-full bg-lime px-4 py-1.5 text-sm font-semibold text-black"
                     >
                       Share
                     </button>

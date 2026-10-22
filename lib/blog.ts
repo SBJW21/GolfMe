@@ -41,9 +41,9 @@ export const posts: Post[] = [
       {
         h: "How to get good value",
         p: [
-          "Pick one thing to work on before you book. Tick it when you search on Golf Me so the coach knows what you want from the first minute.",
+          "Pick one thing to work on before you book. Tick it when you search on Golf Me so the coach knows what you want from the first minute.",
           "Book a short run of lessons rather than one. One lesson shows you the fix. Follow-up lessons check you are still doing it.",
-          "Compare coaches before you commit. On Golf Me, every coach shows their hourly price and real reviews, and you can cancel up to 24 hours before for full account credit.",
+          "Compare coaches before you commit. On Golf Me, every coach shows their hourly price and real reviews, and you can cancel up to 24 hours before for full account credit.",
         ],
       },
     ],
@@ -94,7 +94,7 @@ export const posts: Post[] = [
       {
         h: "Match the course to your lesson",
         p: [
-          "Slicing the ball off the tee? Book a driving lesson before a longer course. Losing shots around the green? A short game lesson pays back fastest. Every course page on Golf Me links to coaches nearby.",
+          "Slicing the ball off the tee? Book a driving lesson before a longer course. Losing shots around the green? A short game lesson pays back fastest. Every course page on Golf Me links to coaches nearby.",
         ],
       },
     ],
@@ -138,9 +138,9 @@ export const posts: Post[] = [
       {
         h: "What to look for in a coach",
         p: [
-          "Qualifications. Ask what qualification the coach holds. Look for a professional with current training. All coaches on Golf Me are checked before they appear.",
+          "Qualifications. Ask what qualification the coach holds. Look for a professional with current training. All coaches on Golf Me are checked before they appear.",
           "Experience that fits you. Check that the coach works with players at your level and enjoys teaching beginners. Look for reviews from golfers like you.",
-          "The right focus. If you slice the ball or struggle with putting, choose a coach who covers it. On Golf Me you can tick what you want to work on and see who matches.",
+          "The right focus. If you slice the ball or struggle with putting, choose a coach who covers it. On Golf Me you can tick what you want to work on and see who matches.",
           "A style that suits you. A good coach adapts to you and avoids a one-size-fits-all method. Some people want tough love and some prefer a gentle approach. Reviews help you see which you are getting.",
           "Clear communication. Expect straightforward answers on price, timing and what to practise between lessons. A lesson report afterwards makes that easy.",
           "Use of video. Seeing your swing on screen makes a fix easier to understand. It also lets you check your progress.",
@@ -150,7 +150,7 @@ export const posts: Post[] = [
       {
         h: "Your first week",
         p: [
-          "Book one lesson before you buy anything big. Your coach can tell you which clubs suit your height and swing. Then borrow or rent a half set and book a short run of lessons. Search by suburb on Golf Me to find coaches near you.",
+          "Book one lesson before you buy anything big. Your coach can tell you which clubs suit your height and swing. Then borrow or rent a half set and book a short run of lessons. Search by suburb on Golf Me to find coaches near you.",
         ],
       },
     ],

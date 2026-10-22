@@ -84,7 +84,7 @@ export default function RoundsTracker() {
   async function invite() {
     try {
       if (navigator.share) {
-        await navigator.share({ title: "Golf Me", text: "Join me on Golf Me. Log your rounds and get $10 Golf Me credit", url: link });
+        await navigator.share({ title: "Golf Me", text: "Join me on Golf Me. Log your rounds and get $10 Golf Me credit", url: link });
         return;
       }
       await navigator.clipboard.writeText(link);
@@ -438,7 +438,7 @@ export default function RoundsTracker() {
             ))}
           </ol>
           <div className="glass rounded-2xl p-5">
-            <p className="font-bold">Invite your friends to play. They get $10 Golf Me credit.</p>
+            <p className="font-bold">Invite your friends to play. They get $10 Golf Me credit.</p>
             <p className="mt-1 text-sm text-white/75">
               Friends who join get $10 credit towards their first lesson, can log their own scorecard for the same round and join your leaderboard.
             </p>
@@ -452,8 +452,8 @@ export default function RoundsTracker() {
                 {copied ? "Link copied" : "Invite friends"}
               </button>
               <a
-                className="rounded-full border border-white/30 px-4 py-2 text-sm font-semibold"
-                href={`sms:?&body=${encodeURIComponent("Join me on Golf Me and get $10 credit towards a lesson: " + link)}`}
+                className="pill-arrow rounded-full border border-white/30 px-4 py-2 text-sm font-semibold"
+                href={`sms:?&body=${encodeURIComponent("Join me on Golf Me and get $10 credit towards a lesson: " + link)}`}
               >
                 Text
               </a>

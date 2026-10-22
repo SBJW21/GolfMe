@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 };
 
 const features = [
-  ["Dictate your lesson reports", "Talk through the lesson and Golf Me drafts the report for your student. No typing."],
+  ["Dictate your lesson reports", "Talk through the lesson and Golf Me drafts the report for your student. No typing."],
   ["Your own booking page", "A personalised booking link for your Instagram or website."],
   ["Calendar sync", "Connect your Google Calendar so availability is always up to date."],
   ["Confirmations and reminders", "Automatic messages that reduce no-shows."],

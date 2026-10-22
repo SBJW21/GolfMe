@@ -58,7 +58,7 @@ export default async function Home() {
         <p className="mt-4 text-sm text-white/75">
           Are you a coach?{" "}
           <Link href="/for-coaches" className="font-semibold text-lime underline-offset-4 hover:underline">
-            Join Golf Me
+            Join Golf Me
           </Link>
         </p>
       </section>

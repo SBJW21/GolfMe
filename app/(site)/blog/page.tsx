@@ -3,7 +3,7 @@ import Link from "next/link";
 import { posts } from "@/lib/blog";
 
 export const metadata: Metadata = {
-  title: "Golf Me blog",
+  title: "Golf Me blog",
   description: "Guides to golf lessons, courses and improving your game in Sydney.",
 };
 

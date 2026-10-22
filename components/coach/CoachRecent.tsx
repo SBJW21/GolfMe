@@ -103,7 +103,7 @@ export default function CoachRecent() {
           Dictate your lesson report
         </h3>
         <p className="mt-3 max-w-xl text-white/85">
-          Tap the microphone and talk through the lesson as you walk off the range. Golf Me turns
+          Tap the microphone and talk through the lesson as you walk off the range. Golf Me turns
           it into a clear report for your student. No typing, no evenings of admin.
         </p>
 

@@ -1,6 +1,6 @@
 /**
- * Layout for a coach's own shareable page. There is no Golf Me menu, so the page works as the
- * coach's own booking page. The only link out is the "Powered by Golf Me" mark in the footer.
+ * Layout for a coach's own shareable page. There is no Golf Me menu, so the page works as the
+ * coach's own booking page. The only link out is the "Powered by Golf Me" mark in the footer.
  */
 export default function SoloLayout({ children }: LayoutProps<"/">) {
   return (

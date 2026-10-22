@@ -3,8 +3,8 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "Golf Me | Find a golf coach in Sydney",
-    template: "%s | Golf Me",
+    default: "Golf Me | Find a golf coach in Sydney",
+    template: "%s | Golf Me",
   },
   description:
     "Compare golf coaches in Sydney, read reviews and book lessons online.",
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
       ? { index: true, follow: true }
       : { index: false, follow: false },
   openGraph: {
-    title: "Golf Me | Find a golf coach in Sydney",
+    title: "Golf Me | Find a golf coach in Sydney",
     description:
       "Compare golf coaches in Sydney, read reviews and book lessons online.",
     url: "https://golfme.com.au",

@@ -81,25 +81,25 @@ export default function AppointmentSlider({ items }: { items: Appointment[] }) {
             <div className="mt-3 flex flex-wrap gap-1.5 text-xs font-semibold sm:mt-4 sm:gap-2 sm:text-sm">
               {a.past ? (
                 a.reportHref ? (
-                  <a href={a.reportHref} target="_blank" rel="noreferrer" className="rounded-lg border border-white/40 px-2.5 py-1 sm:px-3 sm:py-1.5">
+                  <a href={a.reportHref} target="_blank" rel="noreferrer" className="pill-arrow rounded-lg border border-white/40 px-2.5 py-1 sm:px-3 sm:py-1.5">
                     View report
                   </a>
                 ) : (
-                  <Link href={`/coaches/${a.coachSlug}`} className="rounded-lg border border-white/40 px-2.5 py-1 sm:px-3 sm:py-1.5">
+                  <Link href={`/coaches/${a.coachSlug}`} className="pill-arrow rounded-lg border border-white/40 px-2.5 py-1 sm:px-3 sm:py-1.5">
                     Rebook
                   </Link>
                 )
               ) : (
                 a.id === firstUpcomingId ? (
                   <>
-                    <span className="rounded-full bg-lime px-3 py-1 sm:px-4 sm:py-1.5 text-black">Message</span>
+                    <span className="pill-arrow rounded-full bg-lime px-3 py-1 sm:px-4 sm:py-1.5 text-black">Message</span>
                     <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 sm:px-4 sm:py-1.5 text-white/60">
                       Modify
                     </span>
                   </>
                 ) : (
                   <>
-                    <span className="rounded-lg border border-white/40 px-2.5 py-1 sm:px-3 sm:py-1.5">Reschedule</span>
+                    <span className="pill-arrow rounded-lg border border-white/40 px-2.5 py-1 sm:px-3 sm:py-1.5">Reschedule</span>
                     <span className="rounded-lg border border-white/20 px-2.5 py-1 sm:px-3 sm:py-1.5 text-white/70">Cancel</span>
                   </>
                 )

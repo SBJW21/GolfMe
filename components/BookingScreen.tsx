@@ -56,7 +56,7 @@ export default function BookingScreen({
         <p className="mt-3 text-2xl font-bold">{formatAud(coach.priceCents)}</p>
         <p className="mt-2 text-sm text-white/70">
           Cancel up to {FREE_CANCELLATION_HOURS} hours before the lesson and the full amount
-          goes to your Golf Me account credit. Use it with any coach within {CREDIT_VALID_MONTHS}{" "}
+          goes to your Golf Me account credit. Use it with any coach within {CREDIT_VALID_MONTHS}{" "}
           months. Inside {FREE_CANCELLATION_HOURS} hours no credit is given.
         </p>
       </div>

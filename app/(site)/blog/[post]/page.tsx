@@ -32,8 +32,8 @@ export default async function BlogPost(props: PageProps<"/blog/[post]">) {
     description: p.description,
     datePublished: p.date,
     dateModified: p.date,
-    author: { "@type": "Organization", name: "Golf Me" },
-    publisher: { "@type": "Organization", name: "Golf Me" },
+    author: { "@type": "Organization", name: "Golf Me" },
+    publisher: { "@type": "Organization", name: "Golf Me" },
     mainEntityOfPage: `${SITE_URL}/blog/${p.slug}`,
   };
 

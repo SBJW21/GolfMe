@@ -60,7 +60,7 @@ export default async function SuburbPage(props: PageProps<"/golf-lessons/[suburb
       q: `How do I find a golf coach in ${page.name}?`,
       a:
         nearby.length > 0
-          ? `Golf Me lists ${nearby.length} ${nearby.length === 1 ? "coach" : "coaches"} serving ${page.name} and nearby suburbs including ${neighbours.slice(0, 3).join(", ")}. Compare prices and reviews, then book a time online.`
+          ? `Golf Me lists ${nearby.length} ${nearby.length === 1 ? "coach" : "coaches"} serving ${page.name} and nearby suburbs including ${neighbours.slice(0, 3).join(", ")}. Compare prices and reviews, then book a time online.`
           : `We are adding coaches around ${page.name} now. Search all of Sydney or register your interest and we will let you know when a coach joins nearby.`,
     },
     {
@@ -73,7 +73,7 @@ export default async function SuburbPage(props: PageProps<"/golf-lessons/[suburb
     { q: copy.beginnerQ, a: copy.beginnerA },
     {
       q: "What if I need to cancel?",
-      a: "Cancel up to 24 hours before and the full amount goes to your Golf Me account credit. Use it with any coach within 6 months.",
+      a: "Cancel up to 24 hours before and the full amount goes to your Golf Me account credit. Use it with any coach within 6 months.",
     },
   ];
 
@@ -82,7 +82,7 @@ export default async function SuburbPage(props: PageProps<"/golf-lessons/[suburb
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
       itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Golf Me", item: SITE_URL },
+        { "@type": "ListItem", position: 1, name: "Golf Me", item: SITE_URL },
         { "@type": "ListItem", position: 2, name: "Golf lessons", item: `${SITE_URL}/golf-lessons` },
         { "@type": "ListItem", position: 3, name: page.name, item: `${SITE_URL}/golf-lessons/${page.slug}` },
       ],
@@ -166,7 +166,7 @@ export default async function SuburbPage(props: PageProps<"/golf-lessons/[suburb
             <li key={s}>
               <Link
                 href={`/golf-lessons/${slugify(s)}`}
-                className="block rounded-full border border-white/20 px-3 py-1.5 hover:border-lime hover:text-lime"
+                className="pill-arrow block rounded-full border border-white/20 px-3 py-1.5 hover:border-lime hover:text-lime"
               >
                 {s}
               </Link>
@@ -183,7 +183,7 @@ export default async function SuburbPage(props: PageProps<"/golf-lessons/[suburb
               <li key={c.slug}>
                 <Link
                   href={`/courses/${c.slug}`}
-                  className="block rounded-full border border-white/20 px-3 py-1.5 hover:border-lime hover:text-lime"
+                  className="pill-arrow block rounded-full border border-white/20 px-3 py-1.5 hover:border-lime hover:text-lime"
                 >
                   {c.name}
                 </Link>

@@ -19,7 +19,15 @@ export const sampleCoaches: Coach[] = [
     focus: ["Slice", "Driving", "Irons"],
     headline: "One-on-one golf lessons in Balgowlah",
     bio: "Head Professional in Balgowlah, offering lessons for golfers of all levels.",
-    reviews: [],
+    reviews: [
+      {
+        id: "matt-r1",
+        author: "Golf Me student",
+        rating: 5,
+        date: "2026-10-22",
+        text: "Matt taught me in Balgowlah recently and I thoroughly enjoyed his approach to golf. I've had lessons before from 3 to 4 different professionals, but what Matt said to me really resonated. Within 10 to 15 minutes he helped iron out a number of issues with my swing and I was hitting consistent shots. Still in touch today through Golf Me as I perfect my game and work on my handicap.",
+      },
+    ],
   },
   {
     slug: "sample-coach-two",

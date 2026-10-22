@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import SampleNotice from "@/components/SampleNotice";
 import Stars from "@/components/Stars";
+import SlotPicker from "@/components/SlotPicker";
 import { averageRating } from "@/lib/data";
 import { getCoach, getSlots } from "@/lib/repo";
 import { formatAud } from "@/lib/pricing";
@@ -22,21 +23,6 @@ export async function generateMetadata(
   };
 }
 
-function dayLabel(date: string) {
-  const d = new Date(`${date}T00:00:00`);
-  return d.toLocaleDateString("en-AU", {
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-  });
-}
-
-function timeLabel(time: string) {
-  const [h, m] = time.split(":").map(Number);
-  const d = new Date(2000, 0, 1, h, m);
-  return d.toLocaleTimeString("en-AU", { hour: "numeric", minute: "2-digit" });
-}
-
 export default async function CoachPage(props: PageProps<"/coaches/[slug]">) {
   const { slug } = await props.params;
   const found = await getCoach(slug);
@@ -44,11 +30,6 @@ export default async function CoachPage(props: PageProps<"/coaches/[slug]">) {
   const { coach, isSample } = found;
 
   const slots = await getSlots(coach);
-  const byDay = new Map<string, string[]>();
-  for (const s of slots) {
-    const [date, time] = s.startsAt.split("T");
-    byDay.set(date, [...(byDay.get(date) ?? []), time]);
-  }
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-10">
@@ -120,29 +101,7 @@ export default async function CoachPage(props: PageProps<"/coaches/[slug]">) {
           <p className="text-sm text-white/70">
             Choose a time. Free cancellation up to 24 hours before.
           </p>
-          {byDay.size === 0 && (
-            <p className="mt-4 text-sm text-white/70">
-              No times are open right now. Please check back soon.
-            </p>
-          )}
-          <div className="mt-4 grid max-h-[420px] gap-4 overflow-y-auto pr-1">
-            {Array.from(byDay.entries()).map(([date, times]) => (
-              <div key={date}>
-                <p className="mb-1.5 text-sm font-semibold">{dayLabel(date)}</p>
-                <div className="flex flex-wrap gap-2">
-                  {times.map((t) => (
-                    <Link
-                      key={t}
-                      href={`/book/${coach.slug}?slot=${encodeURIComponent(`${date}T${t}`)}`}
-                      className="rounded-lg border border-white/30 px-3 py-1.5 text-sm hover:border-lime hover:bg-lime hover:text-black"
-                    >
-                      {timeLabel(t)}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
+          <SlotPicker slots={slots} bookPath={`/book/${coach.slug}`} />
         </aside>
       </div>
     </main>

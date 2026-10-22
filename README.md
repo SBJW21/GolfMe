@@ -8,6 +8,7 @@ Golf coach comparison and booking for Sydney. Built with Next.js, Supabase and S
 - Booking page and a payment route that creates a Stripe Checkout session
 - Training video library (add videos in the Supabase `videos` table)
 - Coach information page
+- A shareable page for each coach at `/c/<coach-slug>`: no Golf Me menu, no links to the rest of the site, footer reads "Powered by Golf Me". Booking and payment stay on that page.
 - Rules in `lib/pricing.ts`: 15% fee, 24 hour free cancellation, lessons count as done automatically 24 hours after they end
 - Monthly payout logic in `lib/payouts.ts` (not yet tested against Stripe)
 - Database schema in `supabase/schema.sql`, then `supabase/migration-002-public-views.sql`

@@ -5,9 +5,12 @@ import { useState } from "react";
 export default function BookingForm({
   slug,
   slot,
+  source = "site",
 }: {
   slug: string;
   slot: string;
+  /** "solo" when booked from a coach's own page, so the customer stays on that page. */
+  source?: "site" | "solo";
 }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -24,6 +27,7 @@ export default function BookingForm({
         body: JSON.stringify({
           slug,
           slot,
+          source,
           name: form.get("name"),
           email: form.get("email"),
           phone: form.get("phone"),

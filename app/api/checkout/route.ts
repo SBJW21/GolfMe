@@ -8,6 +8,7 @@ type Body = {
   name: string;
   email: string;
   phone: string;
+  source: "site" | "solo";
 };
 
 function parseBody(value: unknown): Body | null {
@@ -23,6 +24,7 @@ function parseBody(value: unknown): Body | null {
     name: (v.name as string).trim().slice(0, 120),
     email: (v.email as string).trim().slice(0, 200),
     phone: (v.phone as string).trim().slice(0, 40),
+    source: v.source === "solo" ? "solo" : "site",
   };
 }
 
@@ -100,8 +102,14 @@ export async function POST(request: Request) {
       metadata,
     },
     metadata,
-    success_url: `${siteUrl}/book/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${siteUrl}/coaches/${coach.slug}`,
+    success_url:
+      body.source === "solo"
+        ? `${siteUrl}/c/${coach.slug}/booked?session_id={CHECKOUT_SESSION_ID}`
+        : `${siteUrl}/book/success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url:
+      body.source === "solo"
+        ? `${siteUrl}/c/${coach.slug}`
+        : `${siteUrl}/coaches/${coach.slug}`,
   });
 
   return Response.json({ url: session.url });

@@ -100,6 +100,24 @@ export const focusAreas: FocusArea[] = [
   "Course management",
 ];
 
+const focusPhrases: Record<FocusArea, string> = {
+  Slice: "slicing",
+  Draw: "shaping a draw",
+  Driving: "driving",
+  Irons: "iron play",
+  Chipping: "chipping",
+  Bunkers: "bunker play",
+  Putting: "putting",
+  "Course management": "course management",
+};
+
+/** For example "slicing, chipping and iron play". No comma before "and". */
+export function focusSentence(focus: FocusArea[]) {
+  const phrases = focus.map((f) => focusPhrases[f] ?? f.toLowerCase());
+  if (phrases.length <= 1) return phrases.join("");
+  return `${phrases.slice(0, -1).join(", ")} and ${phrases[phrases.length - 1]}`;
+}
+
 export function suburbsOf(list: Coach[]) {
   return Array.from(new Set(list.map((c) => c.suburb))).sort();
 }

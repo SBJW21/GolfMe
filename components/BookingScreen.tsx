@@ -1,27 +1,22 @@
-import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import BookingForm from "@/components/BookingForm";
-import { getCoach, getSlots } from "@/lib/repo";
 import { FREE_CANCELLATION_HOURS, formatAud } from "@/lib/pricing";
+import type { Coach } from "@/lib/types";
 
-export const dynamic = "force-dynamic";
-
-export const metadata: Metadata = {
-  title: "Book a lesson",
-  robots: { index: false },
-};
-
-export default async function BookPage(props: PageProps<"/book/[slug]">) {
-  const { slug } = await props.params;
-  const sp = await props.searchParams;
-  const found = await getCoach(slug);
-  if (!found) notFound();
-  const { coach } = found;
-
-  const slot = Array.isArray(sp.slot) ? sp.slot[0] : sp.slot;
-  const valid = slot && (await getSlots(coach)).some((s) => s.startsAt === slot);
-
+/** The booking page content, shared by the main site and a coach's own page. */
+export default function BookingScreen({
+  coach,
+  slot,
+  valid,
+  backHref,
+  source,
+}: {
+  coach: Coach;
+  slot: string | undefined;
+  valid: boolean;
+  backHref: string;
+  source: "site" | "solo";
+}) {
   if (!slot || !valid) {
     return (
       <main className="mx-auto max-w-xl px-4 py-12">
@@ -29,15 +24,14 @@ export default async function BookPage(props: PageProps<"/book/[slug]">) {
         <p className="mt-3 text-white/80">
           That time is no longer available. Please pick another time on the coach&apos;s page.
         </p>
-        <Link href={`/coaches/${coach.slug}`} className="btn mt-6">
+        <Link href={backHref} className="btn mt-6">
           Back to {coach.name}
         </Link>
       </main>
     );
   }
 
-  const when = new Date(slot);
-  const whenLabel = when.toLocaleString("en-AU", {
+  const whenLabel = new Date(slot).toLocaleString("en-AU", {
     weekday: "long",
     day: "numeric",
     month: "long",
@@ -47,7 +41,7 @@ export default async function BookPage(props: PageProps<"/book/[slug]">) {
 
   return (
     <main className="mx-auto max-w-xl px-4 py-10">
-      <Link href={`/coaches/${coach.slug}`} className="text-sm text-lime">
+      <Link href={backHref} className="text-sm text-lime">
         &larr; Back to {coach.name}
       </Link>
       <h1 className="font-display mt-4 text-[clamp(2.2rem,7vw,3.4rem)]">
@@ -67,7 +61,7 @@ export default async function BookPage(props: PageProps<"/book/[slug]">) {
       </div>
 
       <div className="mt-6 rounded-2xl bg-card p-5">
-        <BookingForm slug={coach.slug} slot={slot} />
+        <BookingForm slug={coach.slug} slot={slot} source={source} />
       </div>
     </main>
   );

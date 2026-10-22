@@ -25,7 +25,7 @@ export default function CoachPhoto({
           src={photo}
           alt={`${name}, golf coach`}
           fill
-          sizes="(min-width: 640px) 120px, 64px"
+          sizes="(min-width: 640px) 160px, 64px"
           className="object-cover object-[50%_35%]"
         />
       </div>

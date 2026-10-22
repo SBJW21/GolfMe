@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import BookingForm from "@/components/BookingForm";
-import { getCoach, sampleSlots } from "@/lib/data";
+import { getCoach, getSlots } from "@/lib/repo";
 import { FREE_CANCELLATION_HOURS, formatAud } from "@/lib/pricing";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Book a lesson",
@@ -13,11 +15,12 @@ export const metadata: Metadata = {
 export default async function BookPage(props: PageProps<"/book/[slug]">) {
   const { slug } = await props.params;
   const sp = await props.searchParams;
-  const coach = getCoach(slug);
-  if (!coach) notFound();
+  const found = await getCoach(slug);
+  if (!found) notFound();
+  const { coach } = found;
 
   const slot = Array.isArray(sp.slot) ? sp.slot[0] : sp.slot;
-  const valid = slot && sampleSlots(coach.slug).some((s) => s.startsAt === slot);
+  const valid = slot && (await getSlots(coach)).some((s) => s.startsAt === slot);
 
   if (!slot || !valid) {
     return (

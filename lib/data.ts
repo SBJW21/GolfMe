@@ -2,12 +2,10 @@ import type { Coach, Slot, Video } from "./types";
 
 /**
  * SAMPLE DATA ONLY.
- * These coaches, reviews and prices are placeholders so the site can be designed and tested.
- * They will be replaced by the database once Supabase is connected.
+ * These coaches, reviews and prices are placeholders. The site shows them only while the
+ * database has no published coaches (see lib/repo.ts).
  */
-export const SAMPLE_DATA = true;
-
-export const coaches: Coach[] = [
+export const sampleCoaches: Coach[] = [
   {
     slug: "sample-coach-one",
     name: "Alex Morgan",
@@ -89,10 +87,8 @@ export const coaches: Coach[] = [
   },
 ];
 
-export const allSuburbs = Array.from(new Set(coaches.map((c) => c.suburb))).sort();
-
-export function getCoach(slug: string) {
-  return coaches.find((c) => c.slug === slug);
+export function suburbsOf(list: Coach[]) {
+  return Array.from(new Set(list.map((c) => c.suburb))).sort();
 }
 
 export function averageRating(coach: Coach) {
@@ -101,8 +97,20 @@ export function averageRating(coach: Coach) {
   return total / coach.reviews.length;
 }
 
-function pad(n: number) {
+export function pad(n: number) {
   return String(n).padStart(2, "0");
+}
+
+/** Today's date in Sydney as year, month (1-12) and day, whatever time zone the server runs in. */
+export function sydneyToday() {
+  const parts = new Intl.DateTimeFormat("en-AU", {
+    timeZone: "Australia/Sydney",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+  const get = (t: string) => Number(parts.find((p) => p.type === t)?.value);
+  return { y: get("year"), m: get("month"), d: get("day") };
 }
 
 /**
@@ -113,11 +121,11 @@ function pad(n: number) {
 export function sampleSlots(slug: string, days = 14): Slot[] {
   const seed = slug.length;
   const slots: Slot[] = [];
-  const base = new Date();
+  const t = sydneyToday();
   for (let i = 1; i <= days; i++) {
-    const d = new Date(base.getFullYear(), base.getMonth(), base.getDate() + i);
-    const day = d.getDay(); // 0 Sunday
-    const date = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    const d = new Date(Date.UTC(t.y, t.m - 1, t.d + i));
+    const day = d.getUTCDay(); // 0 Sunday
+    const date = `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`;
     const hours =
       day === 0 || day === 6 ? [8, 9, 10] : [6, 7, 17, 18];
     hours.forEach((h, idx) => {
@@ -129,10 +137,8 @@ export function sampleSlots(slug: string, days = 14): Slot[] {
   return slots;
 }
 
-export const videos: Video[] = [
-  // Add real YouTube video IDs here. Example:
-  // { id: "v1", category: "Slices", title: "Why you slice and how to fix it", youtubeId: "XXXXXXXXXXX" },
-];
+/** Used only if the database has no videos yet. Add real videos in the Supabase "videos" table. */
+export const sampleVideos: Video[] = [];
 
 export const videoCategories = [
   "Slices",

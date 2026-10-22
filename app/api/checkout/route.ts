@@ -1,5 +1,5 @@
 import Stripe from "stripe";
-import { getCoach, sampleSlots } from "@/lib/data";
+import { getCoach, getSlots } from "@/lib/repo";
 import { splitPayment } from "@/lib/pricing";
 
 type Body = {
@@ -43,9 +43,10 @@ export async function POST(request: Request) {
   }
 
   // Never trust the browser for price or availability: look both up on the server.
-  const coach = getCoach(body.slug);
+  const found = await getCoach(body.slug);
+  const coach = found?.coach;
   const slotOk =
-    coach && sampleSlots(coach.slug).some((s) => s.startsAt === body.slot);
+    coach && (await getSlots(coach)).some((s) => s.startsAt === body.slot);
   if (!coach || !slotOk) {
     return Response.json(
       { error: "That time is no longer available. Please choose another." },

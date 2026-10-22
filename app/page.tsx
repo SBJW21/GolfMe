@@ -1,7 +1,9 @@
 import Link from "next/link";
 import CoachCard from "@/components/CoachCard";
 import SampleNotice from "@/components/SampleNotice";
-import { coaches } from "@/lib/data";
+import { loadCoaches } from "@/lib/repo";
+
+export const revalidate = 60;
 
 const steps = [
   {
@@ -18,7 +20,8 @@ const steps = [
   },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const { coaches, isSample } = await loadCoaches();
   return (
     <main>
       <section
@@ -71,7 +74,7 @@ export default function Home() {
           </Link>
         </div>
         <div className="mb-4">
-          <SampleNotice />
+          <SampleNotice show={isSample} />
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {coaches.slice(0, 3).map((c) => (

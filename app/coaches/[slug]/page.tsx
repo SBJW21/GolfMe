@@ -3,15 +3,19 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import SampleNotice from "@/components/SampleNotice";
 import Stars from "@/components/Stars";
-import { averageRating, getCoach, sampleSlots } from "@/lib/data";
+import { averageRating } from "@/lib/data";
+import { getCoach, getSlots } from "@/lib/repo";
 import { formatAud } from "@/lib/pricing";
+
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata(
   props: PageProps<"/coaches/[slug]">,
 ): Promise<Metadata> {
   const { slug } = await props.params;
-  const coach = getCoach(slug);
-  if (!coach) return {};
+  const found = await getCoach(slug);
+  if (!found) return {};
+  const { coach } = found;
   return {
     title: `${coach.name}, golf coach in ${coach.suburb}`,
     description: coach.headline,
@@ -35,10 +39,11 @@ function timeLabel(time: string) {
 
 export default async function CoachPage(props: PageProps<"/coaches/[slug]">) {
   const { slug } = await props.params;
-  const coach = getCoach(slug);
-  if (!coach) notFound();
+  const found = await getCoach(slug);
+  if (!found) notFound();
+  const { coach, isSample } = found;
 
-  const slots = sampleSlots(coach.slug);
+  const slots = await getSlots(coach);
   const byDay = new Map<string, string[]>();
   for (const s of slots) {
     const [date, time] = s.startsAt.split("T");
@@ -78,7 +83,7 @@ export default async function CoachPage(props: PageProps<"/coaches/[slug]">) {
           </div>
 
           <div className="mt-6">
-            <SampleNotice />
+            <SampleNotice show={isSample} />
           </div>
 
           <h2 className="font-display mt-10 text-[clamp(1.7rem,5vw,2.3rem)]">
@@ -115,6 +120,11 @@ export default async function CoachPage(props: PageProps<"/coaches/[slug]">) {
           <p className="text-sm text-white/70">
             Choose a time. Free cancellation up to 24 hours before.
           </p>
+          {byDay.size === 0 && (
+            <p className="mt-4 text-sm text-white/70">
+              No times are open right now. Please check back soon.
+            </p>
+          )}
           <div className="mt-4 grid max-h-[420px] gap-4 overflow-y-auto pr-1">
             {Array.from(byDay.entries()).map(([date, times]) => (
               <div key={date}>

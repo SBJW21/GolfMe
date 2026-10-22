@@ -16,7 +16,11 @@ export type Review = {
   text: string;
 };
 
+export type CoachGender = "woman" | "man" | "non_binary";
+
 export type Coach = {
+  /** Database id. Missing for sample coaches. */
+  id?: string;
   slug: string;
   name: string;
   suburb: string;
@@ -26,6 +30,8 @@ export type Coach = {
   focus: FocusArea[];
   headline: string;
   bio: string;
+  gender?: CoachGender;
+  levels?: string[];
   reviews: Review[];
 };
 

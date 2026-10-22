@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import CoachCard from "@/components/CoachCard";
 import SampleNotice from "@/components/SampleNotice";
-import { allSuburbs, averageRating, coaches } from "@/lib/data";
+import { averageRating, suburbsOf } from "@/lib/data";
+import { loadCoaches } from "@/lib/repo";
 import type { FocusArea } from "@/lib/types";
 
 export const metadata: Metadata = {
@@ -39,6 +40,8 @@ export default async function CoachesPage(props: PageProps<"/coaches">) {
   const focus = first(sp.focus) ?? "";
   const max = Number(first(sp.max) ?? 0) || 0;
   const sort = first(sp.sort) ?? "rating";
+  const { coaches, isSample } = await loadCoaches();
+  const allSuburbs = suburbsOf(coaches);
 
   let results = coaches.filter(
     (c) =>
@@ -105,7 +108,7 @@ export default async function CoachesPage(props: PageProps<"/coaches">) {
       </form>
 
       <div className="mt-6">
-        <SampleNotice />
+        <SampleNotice show={isSample} />
       </div>
 
       <p className="mt-6 text-sm text-white/70" aria-live="polite">

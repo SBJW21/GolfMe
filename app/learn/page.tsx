@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { videoCategories, videos } from "@/lib/data";
+import { videoCategories } from "@/lib/data";
+import { loadVideos } from "@/lib/repo";
 
 export const metadata: Metadata = {
   title: "Golf training videos",
@@ -7,7 +8,10 @@ export const metadata: Metadata = {
     "Free golf training videos on slices, draws, chipping, bunkers and more.",
 };
 
-export default function LearnPage() {
+export const revalidate = 60;
+
+export default async function LearnPage() {
+  const videos = await loadVideos();
   return (
     <main className="mx-auto max-w-6xl px-4 py-10">
       <h1 className="font-display text-[clamp(2.2rem,7vw,3.4rem)]">Learn</h1>

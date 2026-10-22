@@ -51,56 +51,56 @@ export default function AppointmentSlider({ items }: { items: Appointment[] }) {
           <article
             key={a.id}
             data-upcoming={a.past ? undefined : ""}
-            className={`glass relative w-[78%] shrink-0 rounded-2xl p-5 sm:w-[300px] ${
+            className={`glass relative w-[38%] shrink-0 overflow-hidden rounded-2xl p-3 sm:w-[300px] sm:p-5 ${
               a.past ? "opacity-55 grayscale" : "!border-lime/50"
             }`}
           >
-            <span className="absolute inset-x-0 top-0 h-[3px] rounded-t-2xl bg-white/10">
-              {!a.past && <span className="block h-full w-full rounded-t-2xl bg-lime" />}
+            <span className="absolute inset-x-0 top-0 hidden h-[3px] bg-white/10 sm:block">
+              {!a.past && <span className="block h-full w-full bg-lime" />}
             </span>
             <span
-              className={`absolute right-4 top-4 rounded-full px-2.5 py-1 text-[0.65rem] font-extrabold uppercase leading-none tracking-[0.14em] ${
+              className={`mb-2 block w-fit rounded-full px-2 py-1 text-[0.55rem] font-extrabold uppercase leading-none tracking-[0.1em] sm:absolute sm:right-4 sm:top-4 sm:mb-0 sm:px-2.5 sm:text-[0.65rem] sm:tracking-[0.14em] ${
                 a.past ? "bg-white/20 text-white" : "bg-lime text-black"
               }`}
             >
               {a.past ? "Completed" : "Upcoming"}
             </span>
-            <p className="font-display text-4xl text-lime">{a.dateLabel}</p>
-            <p className="mt-1 text-sm font-semibold text-white/85">
+            <p className="font-display text-2xl text-lime sm:text-4xl">{a.dateLabel}</p>
+            <p className="mt-1 text-xs font-semibold text-white/85 sm:text-sm">
               {a.weekday}, {a.time}
             </p>
-            <div className="mt-4 flex items-center gap-3">
-              <CoachPhoto slug={a.coachSlug} name={a.coachName} photo={a.coachPhoto} className="h-12 w-12 shrink-0" />
+            <div className="mt-3 flex items-center gap-2 sm:mt-4 sm:gap-3">
+              <CoachPhoto slug={a.coachSlug} name={a.coachName} photo={a.coachPhoto} className="h-8 w-8 shrink-0 sm:h-12 sm:w-12" />
               <div className="min-w-0">
-                <p className="truncate font-bold">{a.coachName}</p>
-                <p className="truncate text-sm text-white/70">{a.place}</p>
+                <p className="truncate text-xs font-bold sm:text-base">{a.coachName}</p>
+                <p className="truncate text-xs text-white/70 sm:text-sm">{a.place}</p>
               </div>
             </div>
-            <p className="mt-3 text-sm text-white/80">{a.focus}</p>
-            <p className="mt-1 text-sm text-white/60">{formatAud(a.priceCents)} per hour</p>
-            <div className="mt-4 flex flex-wrap gap-2 text-sm font-semibold">
+            <p className="mt-2 text-xs text-white/80 sm:mt-3 sm:text-sm">{a.focus}</p>
+            <p className="mt-1 hidden text-sm text-white/60 sm:block">{formatAud(a.priceCents)} per hour</p>
+            <div className="mt-3 flex flex-wrap gap-1.5 text-xs font-semibold sm:mt-4 sm:gap-2 sm:text-sm">
               {a.past ? (
                 a.reportHref ? (
-                  <a href={a.reportHref} target="_blank" rel="noreferrer" className="rounded-lg border border-white/40 px-3 py-1.5">
+                  <a href={a.reportHref} target="_blank" rel="noreferrer" className="rounded-lg border border-white/40 px-2.5 py-1 sm:px-3 sm:py-1.5">
                     View report
                   </a>
                 ) : (
-                  <Link href={`/coaches/${a.coachSlug}`} className="rounded-lg border border-white/40 px-3 py-1.5">
+                  <Link href={`/coaches/${a.coachSlug}`} className="rounded-lg border border-white/40 px-2.5 py-1 sm:px-3 sm:py-1.5">
                     Rebook
                   </Link>
                 )
               ) : (
                 a.id === firstUpcomingId ? (
                   <>
-                    <span className="rounded-full bg-lime px-4 py-1.5 text-black">Message</span>
-                    <span className="rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-white/60">
+                    <span className="rounded-full bg-lime px-3 py-1 sm:px-4 sm:py-1.5 text-black">Message</span>
+                    <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 sm:px-4 sm:py-1.5 text-white/60">
                       Modify
                     </span>
                   </>
                 ) : (
                   <>
-                    <span className="rounded-lg border border-white/40 px-3 py-1.5">Reschedule</span>
-                    <span className="rounded-lg border border-white/20 px-3 py-1.5 text-white/70">Cancel</span>
+                    <span className="rounded-lg border border-white/40 px-2.5 py-1 sm:px-3 sm:py-1.5">Reschedule</span>
+                    <span className="rounded-lg border border-white/20 px-2.5 py-1 sm:px-3 sm:py-1.5 text-white/70">Cancel</span>
                   </>
                 )
               )}

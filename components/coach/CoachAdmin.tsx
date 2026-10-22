@@ -17,6 +17,8 @@ export default function CoachAdmin() {
   const [shareTo, setShareTo] = useState(hubStudents[0].name);
   const [shared, setShared] = useState("");
   const [upload, setUpload] = useState("");
+  const [note, setNote] = useState("");
+  const [sent, setSent] = useState("");
   const [prefs, setPrefs] = useState({
     search: true,
     booking: true,
@@ -104,6 +106,28 @@ export default function CoachAdmin() {
               </dl>
               <p className="mt-4 text-xs font-bold uppercase tracking-[0.14em] text-white/50">About {student.name.split(" ")[0]}</p>
               <p className="mt-1 text-white/85">{student.bio}</p>
+
+              <p className="mt-5 text-xs font-bold uppercase tracking-[0.14em] text-white/50">
+                Contact {student.name.split(" ")[0]}
+              </p>
+              <textarea
+                rows={3}
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder={`Write a quick message to ${student.name.split(" ")[0]}`}
+                className="mt-2 w-full rounded-xl border border-white/20 bg-black/70 px-3 py-2.5 text-sm"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  setNote("");
+                  setSent(`Preview only. In the live version this goes to ${student.name.split(" ")[0]}.`);
+                }}
+                className="mt-2 rounded-full bg-lime px-4 py-1.5 text-sm font-semibold text-black"
+              >
+                Message
+              </button>
+              {sent && <p className="mt-2 text-sm text-lime">{sent}</p>}
             </div>
           </div>
         )}

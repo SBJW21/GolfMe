@@ -34,10 +34,29 @@ export type HubWeek = { label: string; days: HubDay[] };
 
 // Weekday index 0 = Monday
 const TEMPLATE: Record<number, [string, string, string, string][]> = {
-  0: [["6:00 am", "Tom Wallace", "Irons", "Freshwater"]],
-  2: [["5:00 pm", "Priya Nair", "Putting", "Balgowlah"]],
-  3: [["7:00 am", "Ben Hughes", "Beginner basics", "Seaforth"]],
-  5: [["8:00 am", "Aisha Khan", "Short game", "Dee Why"]],
+  0: [
+    ["6:00 am", "Tom Wallace", "Irons", "Freshwater"],
+    ["5:30 pm", "Aisha Khan", "Short game", "Dee Why"],
+  ],
+  1: [
+    ["7:00 am", "Priya Nair", "Putting", "Balgowlah"],
+    ["12:00 pm", "Ben Hughes", "Beginner basics", "Seaforth"],
+    ["6:00 pm", "Tom Wallace", "Driving", "Freshwater"],
+  ],
+  2: [
+    ["6:30 am", "Chloe Anderson", "Slice", "Manly"],
+    ["5:00 pm", "Priya Nair", "Putting", "Balgowlah"],
+  ],
+  3: [
+    ["7:00 am", "Ben Hughes", "Beginner basics", "Seaforth"],
+    ["4:00 pm", "Aisha Khan", "Short game", "Dee Why"],
+  ],
+  4: [["9:00 am", "Tom Wallace", "Irons", "Freshwater"]],
+  5: [
+    ["8:00 am", "Aisha Khan", "Short game", "Dee Why"],
+    ["9:30 am", "Priya Nair", "Putting", "Balgowlah"],
+    ["11:00 am", "Chloe Anderson", "Slice and driving", "Manly"],
+  ],
   6: [["7:00 am", "Chloe Anderson", "Slice and driving", "Manly"]],
 };
 
@@ -60,9 +79,6 @@ export function hubWeeks(): HubWeek[] {
         focus,
         place,
       }));
-      if (i === 1 && w % 2 === 0) {
-        lessons.push({ id: `${w}-${i}-x`, time: "6:00 pm", student: "Tom Wallace", focus: "Driving", place: "Freshwater" });
-      }
       return {
         iso: `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`,
         weekday: fmtDay.format(d),

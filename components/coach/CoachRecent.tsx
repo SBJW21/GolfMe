@@ -24,9 +24,6 @@ export default function CoachRecent() {
   const [drafting, setDrafting] = useState(false);
   const [ready, setReady] = useState(false);
   const [note, setNote] = useState("");
-  const [file, setFile] = useState("");
-  const [msgTo, setMsgTo] = useState(hubStudents[0].name);
-  const [msg, setMsg] = useState("");
   const tick = useRef<ReturnType<typeof setInterval> | null>(null);
   const talk = useRef<ReturnType<typeof setInterval> | null>(null);
   const reportRef = useRef<HTMLDivElement>(null);
@@ -73,11 +70,37 @@ export default function CoachRecent() {
 
   return (
     <div className="grid gap-4">
+      {/* Reports waiting */}
+      <div className="glass rounded-2xl p-4 sm:p-5">
+        <p className="font-bold">Reports waiting</p>
+        <ul className="mt-2 divide-y divide-white/10">
+          {hubReports.map((r) => (
+            <li key={r.id} className="flex flex-wrap items-center justify-between gap-2 py-2.5 text-sm">
+              <span>
+                <span className="font-semibold">{r.student}</span>
+                <span className="text-white/60"> &middot; {r.focus} &middot; {r.when}</span>
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setWho(r.student);
+                  heroRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                }}
+                className="rounded-full bg-lime px-3.5 py-1 font-semibold text-black"
+              >
+                Dictate
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+
       {/* Dictation hero */}
       <div ref={heroRef} className="relative overflow-hidden rounded-3xl border border-lime/60 bg-[radial-gradient(circle_at_20%_0%,#27340f,#0b0d08_70%)] p-5 sm:p-8">
         <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-lime">New for coaches</p>
         <h3 className="font-display mt-2 text-[clamp(1.8rem,6vw,3rem)] leading-[1.02]">
-          Talk. We write the report.
+          Dictate your lesson report
         </h3>
         <p className="mt-3 max-w-xl text-white/85">
           Tap the microphone and talk through the lesson as you walk off the range. Golf Me turns
@@ -183,9 +206,6 @@ export default function CoachRecent() {
               <button type="button" onClick={() => setNote(`Preview only. In the live version this goes to ${who}.`)} className="btn">
                 Send to {first}
               </button>
-              <button type="button" onClick={() => setNote("Preview only. PDF export comes with the live version.")} className="rounded-xl border border-white/40 px-4 py-2.5">
-                Save as PDF
-              </button>
               <button type="button" onClick={reset} className="rounded-xl border border-white/40 px-4 py-2.5">
                 Dictate again
               </button>
@@ -195,71 +215,6 @@ export default function CoachRecent() {
         )}
       </div>
 
-      {/* Reports waiting */}
-      <div className="glass rounded-2xl p-4 sm:p-5">
-        <p className="font-bold">Reports waiting</p>
-        <ul className="mt-2 divide-y divide-white/10">
-          {hubReports.map((r) => (
-            <li key={r.id} className="flex flex-wrap items-center justify-between gap-2 py-2.5 text-sm">
-              <span>
-                <span className="font-semibold">{r.student}</span>
-                <span className="text-white/60"> &middot; {r.focus} &middot; {r.when}</span>
-              </span>
-              <button
-                type="button"
-                onClick={() => {
-                  setWho(r.student);
-                  heroRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-                }}
-                className="rounded-full bg-lime px-3.5 py-1 font-semibold text-black"
-              >
-                Dictate
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2">
-        {/* Upload report */}
-        <div className="glass rounded-2xl p-4 sm:p-5">
-          <p className="font-bold">Upload a report</p>
-          <p className="mt-1 text-sm text-white/70">Already written one? Attach a PDF for your student.</p>
-          <label className="mt-3 block cursor-pointer rounded-xl border-2 border-dashed border-lime/50 p-5 text-center text-sm hover:bg-lime/5">
-            <span className="font-semibold text-lime">{file || "Choose a PDF"}</span>
-            <input
-              type="file"
-              accept="application/pdf"
-              className="sr-only"
-              onChange={(e) => setFile(e.target.files?.[0]?.name ?? "")}
-            />
-          </label>
-          {file && <p className="mt-2 text-sm text-lime">Preview only. In the live version this attaches to the lesson.</p>}
-        </div>
-
-        {/* Contact student */}
-        <div className="glass rounded-2xl p-4 sm:p-5">
-          <p className="font-bold">Contact a student</p>
-          <select
-            value={msgTo}
-            onChange={(e) => setMsgTo(e.target.value)}
-            className="mt-3 w-full rounded-xl border border-white/20 bg-black/70 px-3 py-2.5"
-          >
-            {hubStudents.map((s) => (
-              <option key={s.id}>{s.name}</option>
-            ))}
-          </select>
-          <textarea
-            rows={3}
-            placeholder="Write a quick message"
-            className="mt-2 w-full rounded-xl border border-white/20 bg-black/70 px-3 py-2.5 text-sm"
-          />
-          <button type="button" onClick={() => setMsg(`Preview only. In the live version this goes to ${msgTo}.`)} className="mt-2 rounded-full bg-lime px-4 py-1.5 text-sm font-semibold text-black">
-            Message
-          </button>
-          {msg && <p className="mt-2 text-sm text-lime">{msg}</p>}
-        </div>
-      </div>
     </div>
   );
 }

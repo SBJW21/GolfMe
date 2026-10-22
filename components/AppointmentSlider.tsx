@@ -51,7 +51,7 @@ export default function AppointmentSlider({ items }: { items: Appointment[] }) {
           <article
             key={a.id}
             data-upcoming={a.past ? undefined : ""}
-            className={`glass relative w-[33%] shrink-0 overflow-hidden rounded-2xl p-3 sm:w-[300px] sm:p-5 ${
+            className={`glass relative w-[33%] shrink-0 overflow-hidden rounded-2xl p-3 sm:w-[260px] sm:p-5 ${
               a.past ? "opacity-55 grayscale" : "!border-lime/50"
             }`}
           >
@@ -59,7 +59,7 @@ export default function AppointmentSlider({ items }: { items: Appointment[] }) {
               {!a.past && <span className="block h-full w-full bg-lime" />}
             </span>
             <span
-              className={`mb-2 block w-fit rounded-full px-2 py-1 text-[0.55rem] font-extrabold uppercase leading-none tracking-[0.1em] sm:absolute sm:right-4 sm:top-4 sm:mb-0 sm:px-2.5 sm:text-[0.65rem] sm:tracking-[0.14em] ${
+              className={`mb-2 block w-fit rounded-full px-2 py-1 text-[0.55rem] font-extrabold uppercase leading-none tracking-[0.1em] sm:px-2.5 sm:text-[0.65rem] sm:tracking-[0.14em] ${
                 a.past ? "bg-white/20 text-white" : "bg-lime text-black"
               }`}
             >
@@ -109,7 +109,7 @@ export default function AppointmentSlider({ items }: { items: Appointment[] }) {
         ))}
         <Link
           href="/coaches"
-          className="sticky right-2 z-10 flex w-9 shrink-0 items-center justify-center self-stretch rounded-full bg-lime text-xs font-extrabold uppercase tracking-[0.16em] text-black [writing-mode:vertical-rl] shadow-[0_0_0_4px_#000] hover:brightness-110 sm:static sm:w-14 sm:text-sm sm:tracking-[0.18em]"
+          className="sticky right-2 z-10 flex w-9 shrink-0 items-center justify-center self-stretch rounded-full bg-lime text-xs font-extrabold uppercase tracking-[0.16em] text-black [writing-mode:vertical-rl] shadow-[0_0_0_4px_#000] hover:brightness-110 sm:w-14 sm:text-sm sm:tracking-[0.18em]"
         >
           Book lesson
         </Link>

@@ -94,9 +94,18 @@ export default async function Home() {
         <div className="mb-4">
           <SampleNotice show={isSample} />
         </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {coaches.slice(0, 3).map((c) => (
-            <CoachCard key={c.slug} coach={c} />
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:py-6">
+          {coaches.slice(0, 3).map((c, i) => (
+            <div
+              key={c.slug}
+              className={`[&>a]:h-full ${
+                i === 1
+                  ? "lg:relative lg:z-10 lg:scale-[1.16] lg:shadow-[0_24px_70px_rgba(0,0,0,0.75)]"
+                  : "lg:scale-[0.97]"
+              }`}
+            >
+              <CoachCard coach={c} />
+            </div>
           ))}
         </div>
       </section>

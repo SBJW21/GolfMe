@@ -88,16 +88,17 @@ export default function MyGolfPage() {
 
       <section className="mt-12">
         <Heading>My coaches</Heading>
+        <div className="mt-5 grid gap-5 sm:grid-cols-2">
         {([
-          ["Active", true],
           ["Past", false],
+          ["Active", true],
         ] as const).map(([label, active]) => {
           const list = sampleCoachesWorkedWith.filter((c) => c.active === active);
           if (list.length === 0) return null;
           return (
-            <div key={label} className="mt-5">
+            <div key={label}>
               <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/50">{label}</p>
-              <div className="mt-2 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="mt-2 grid gap-4">
                 {list.map((c) => (
                   <Link
                     key={c.slug}
@@ -123,6 +124,7 @@ export default function MyGolfPage() {
             </div>
           );
         })}
+        </div>
       </section>
 
       <section className="mt-12">
@@ -171,18 +173,20 @@ export default function MyGolfPage() {
 
       <section className="mt-12">
         <Heading>Admin</Heading>
-        <div className="mt-4 max-w-sm">
-          <Link href="/my-golf/billing#methods" className="glass block rounded-2xl p-5 hover:!border-lime/70">
-            <p className="font-bold">Payment methods</p>
-            <p className="mt-1 text-sm text-white/75">Update the card you pay with</p>
-            <p className="mt-3 text-sm font-semibold text-lime">Open &rarr;</p>
-          </Link>
+        <div className="mt-4 flex flex-wrap gap-3">
+          {[
+            ["Payment methods", "/my-golf/billing#methods"],
+            ["Payment history", "/my-golf/billing#receipts"],
+          ].map(([t, href]) => (
+            <Link
+              key={t}
+              href={href}
+              className="rounded-full border border-white/30 px-4 py-1.5 text-sm font-semibold hover:border-lime hover:text-lime"
+            >
+              {t}
+            </Link>
+          ))}
         </div>
-        <p className="mt-5 text-sm">
-          <Link href="/my-golf/billing#receipts" className="text-white/60 underline underline-offset-4 hover:text-white">
-            Payment history
-          </Link>
-        </p>
       </section>
     </main>
   );

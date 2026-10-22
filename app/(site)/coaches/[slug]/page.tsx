@@ -103,7 +103,7 @@ export default async function CoachPage(props: PageProps<"/coaches/[slug]">) {
           <p className="text-sm text-white/70">
             Choose a time. Free cancellation up to 24 hours before.
           </p>
-          <SlotPicker slots={slots} bookPath={`/book/${coach.slug}`} />
+          <SlotPicker slots={slots} bookPath={`/book/${coach.slug}`} sidebar />
         </aside>
       </div>
     </main>

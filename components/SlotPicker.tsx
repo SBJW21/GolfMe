@@ -20,9 +20,12 @@ function timeLabel(time: string) {
 export default function SlotPicker({
   slots,
   bookPath,
+  sidebar = false,
 }: {
   slots: Slot[];
   bookPath: string;
+  /** In the narrow desktop sidebar the list scrolls inside its box. Everywhere else the page scrolls. */
+  sidebar?: boolean;
 }) {
   const byDay = new Map<string, string[]>();
   for (const s of slots) {
@@ -39,7 +42,13 @@ export default function SlotPicker({
   }
 
   return (
-    <div className="mt-4 grid max-h-[420px] gap-4 overflow-y-auto pr-1">
+    <div
+      className={
+        sidebar
+          ? "mt-4 grid gap-4 lg:max-h-[420px] lg:overflow-y-auto lg:overscroll-contain lg:pr-1"
+          : "mt-4 grid gap-4 sm:grid-cols-2 sm:gap-x-6"
+      }
+    >
       {Array.from(byDay.entries()).map(([date, times]) => (
         <div key={date}>
           <p className="mb-1.5 text-sm font-semibold">{dayLabel(date)}</p>

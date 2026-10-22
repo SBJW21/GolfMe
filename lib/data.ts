@@ -7,19 +7,18 @@ import type { Coach, FocusArea, Slot, Video } from "./types";
  */
 export const sampleCoaches: Coach[] = [
   {
-    slug: "sample-coach-one",
-    photo: "/coaches/sample-coach-one.jpg",
-    name: "Alex Morgan",
-    suburb: "Manly",
+    slug: "matt-grenot",
+    photo: "/coaches/matt-grenot.jpg",
+    preview: true,
+    name: "Matt Grenot",
+    title: "Head Professional",
+    suburb: "Balgowlah",
     priceCents: 9500,
-    yearsCoaching: 12,
+    yearsCoaching: 0,
     focus: ["Slice", "Driving", "Irons"],
-    headline: "Fix your slice and add distance off the tee",
-    bio: "Sample profile. Alex works with golfers who are tired of losing the ball right. Lessons start with a short video review of your swing and finish with two or three drills to practise before the next session.",
-    reviews: [
-      { id: "r1", author: "Sample golfer", rating: 5, date: "2026-09-12", text: "Clear advice and I could see the difference within the hour." },
-      { id: "r2", author: "Sample golfer", rating: 4, date: "2026-08-30", text: "Good drills to take away and practise." },
-    ],
+    headline: "One-on-one golf lessons in Balgowlah",
+    bio: "Head Professional in Balgowlah, offering lessons for golfers of all levels.",
+    reviews: [],
   },
   {
     slug: "sample-coach-two",
@@ -64,6 +63,7 @@ export const sampleCoaches: Coach[] = [
   },
   {
     slug: "sample-coach-five",
+    photo: "/coaches/sample-coach-five.jpg",
     name: "Riley Chen",
     suburb: "Mosman",
     priceCents: 10500,

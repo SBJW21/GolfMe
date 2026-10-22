@@ -24,6 +24,10 @@ export type Coach = {
   slug: string;
   name: string;
   suburb: string;
+  /** Role line, for example "Head Professional". */
+  title?: string;
+  /** A real coach shown as a draft preview. Price, times and details are examples. */
+  preview?: boolean;
   /** Lesson price in cents (AUD) for a 60 minute lesson */
   priceCents: number;
   yearsCoaching: number;

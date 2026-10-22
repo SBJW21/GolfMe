@@ -24,7 +24,10 @@ export default function CoachCard({ coach }: { coach: Coach }) {
         <div className="flex min-w-0 flex-1 items-start justify-between gap-3">
           <div className="min-w-0">
             <h3 className="truncate text-base font-bold sm:text-lg">{coach.name}</h3>
-            <p className="text-sm text-white/70">{coach.suburb}</p>
+            <p className="text-sm text-white/70">
+              {coach.title ? `${coach.title}, ` : ""}
+              {coach.suburb}
+            </p>
           </div>
           <p className="shrink-0 text-right">
             <span className="text-lg font-bold sm:text-xl">

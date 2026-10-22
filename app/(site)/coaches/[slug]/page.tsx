@@ -43,7 +43,9 @@ export default async function CoachPage(props: PageProps<"/coaches/[slug]">) {
             {coach.name}
           </h1>
           <p className="mt-2 text-white/80">
-            {coach.suburb} &middot; {coach.yearsCoaching} years coaching
+            {coach.title ? `${coach.title}, ` : ""}
+            {coach.suburb}
+            {coach.yearsCoaching > 0 && <> &middot; {coach.yearsCoaching} years coaching</>}
           </p>
           <div className="mt-2">
             <Stars rating={averageRating(coach)} count={coach.reviews.length} />
@@ -64,7 +66,7 @@ export default async function CoachPage(props: PageProps<"/coaches/[slug]">) {
           </div>
 
           <div className="mt-6">
-            <SampleNotice show={isSample} />
+            <SampleNotice show={isSample && !coach.preview} />
           </div>
 
           <h2 className="font-display mt-10 text-[clamp(1.7rem,5vw,2.3rem)]">

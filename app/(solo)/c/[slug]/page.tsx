@@ -23,6 +23,7 @@ export async function generateMetadata(
     title: { absolute: title },
     description,
     openGraph: { title, description, type: "profile" },
+    ...(coach.preview ? { robots: { index: false, follow: false } } : {}),
   };
 }
 
@@ -49,17 +50,30 @@ export default async function SoloCoachPage(props: PageProps<"/c/[slug]">) {
         <h1 className="font-display mt-5 text-[clamp(2.6rem,9vw,4.2rem)]">
           {coach.name}
         </h1>
+        {coach.title && (
+          <p className="mt-2 text-sm font-semibold uppercase tracking-[0.16em] text-lime">
+            {coach.title}
+          </p>
+        )}
         <p className="mt-3 max-w-xl text-lg text-white/90">
           {coach.name} services {coach.suburb} and surrounding areas.
           {coach.focus.length > 0 && <> Works well with {focusSentence(coach.focus)}.</>}
         </p>
-        <div className="mt-3">
-          <Stars rating={averageRating(coach)} count={coach.reviews.length} />
-        </div>
-        {isSample && (
-          <div className="mt-4">
-            <SampleNotice show />
+        {coach.reviews.length > 0 && (
+          <div className="mt-3">
+            <Stars rating={averageRating(coach)} count={coach.reviews.length} />
           </div>
+        )}
+        {coach.preview ? (
+          <p className="mt-4 max-w-md text-xs uppercase tracking-[0.16em] text-white/45">
+            Preview page. Price and available times are examples
+          </p>
+        ) : (
+          isSample && (
+            <div className="mt-4">
+              <SampleNotice show />
+            </div>
+          )
         )}
       </section>
 

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import CoachCard from "@/components/CoachCard";
 import SampleNotice from "@/components/SampleNotice";
+import { focusAreas, suburbsOf } from "@/lib/data";
 import { loadCoaches } from "@/lib/repo";
 
 export const revalidate = 60;
@@ -22,6 +23,7 @@ const steps = [
 
 export default async function Home() {
   const { coaches, isSample } = await loadCoaches();
+  const suburbs = suburbsOf(coaches);
   return (
     <main>
       <section
@@ -39,13 +41,63 @@ export default async function Home() {
         <p className="mt-4 max-w-xl text-lg text-white/90">
           Compare golf coaches in Sydney, read reviews and book lessons online.
         </p>
-        <div className="mt-7 flex flex-wrap justify-center gap-3">
-          <Link href="/coaches" className="btn">
+        <form
+          action="/coaches"
+          method="GET"
+          className="mt-8 grid w-full max-w-3xl gap-2 rounded-2xl border border-white/15 bg-black/55 p-2 backdrop-blur sm:grid-cols-[1fr_1fr_auto]"
+        >
+          <select
+            name="focus"
+            aria-label="What do you want to work on?"
+            className="field-input"
+            defaultValue=""
+          >
+            <option value="">What do you want to work on?</option>
+            {focusAreas.map((f) => (
+              <option key={f} value={f}>
+                {f}
+              </option>
+            ))}
+          </select>
+          <select
+            name="suburb"
+            aria-label="Suburb"
+            className="field-input"
+            defaultValue=""
+          >
+            <option value="">Anywhere in Sydney</option>
+            {suburbs.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
+          <button type="submit" className="btn">
             Find a coach
+          </button>
+        </form>
+        <p className="mt-4 text-sm text-white/75">
+          Are you a coach?{" "}
+          <Link href="/for-coaches" className="font-semibold text-lime underline-offset-4 hover:underline">
+            Join Golf Me
           </Link>
-          <Link href="/for-coaches" className="btn btn-ghost">
-            I&apos;m a coach
-          </Link>
+        </p>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-4 pt-12">
+        <h2 className="font-display mb-5 text-[clamp(1.7rem,5vw,2.3rem)]">
+          Start with what you want to fix
+        </h2>
+        <div className="flex flex-wrap gap-2.5">
+          {focusAreas.map((f) => (
+            <Link
+              key={f}
+              href={`/coaches?focus=${encodeURIComponent(f)}`}
+              className="rounded-full border border-white/25 px-4 py-2 text-sm font-semibold hover:border-lime hover:bg-lime hover:text-black"
+            >
+              {f}
+            </Link>
+          ))}
         </div>
       </section>
 

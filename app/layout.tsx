@@ -11,6 +11,11 @@ export const metadata: Metadata = {
   description:
     "Compare golf coaches in Sydney, read reviews and book lessons online.",
   metadataBase: new URL("https://golfme.com.au"),
+  // Hidden from Google until launch. Set ALLOW_INDEXING=true in Netlify to switch this off.
+  robots:
+    process.env.ALLOW_INDEXING === "true"
+      ? { index: true, follow: true }
+      : { index: false, follow: false },
   openGraph: {
     title: "Golf Me | Find a golf coach in Sydney",
     description:

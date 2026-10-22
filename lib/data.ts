@@ -1,4 +1,4 @@
-import type { Coach, Slot, Video } from "./types";
+import type { Coach, FocusArea, Slot, Video } from "./types";
 
 /**
  * SAMPLE DATA ONLY.
@@ -85,6 +85,17 @@ export const sampleCoaches: Coach[] = [
     bio: "Sample profile. Morgan offers relaxed lessons for golfers who want to improve at a sensible price, with regular check-ins between sessions.",
     reviews: [],
   },
+];
+
+export const focusAreas: FocusArea[] = [
+  "Slice",
+  "Draw",
+  "Driving",
+  "Irons",
+  "Chipping",
+  "Bunkers",
+  "Putting",
+  "Course management",
 ];
 
 export function suburbsOf(list: Coach[]) {

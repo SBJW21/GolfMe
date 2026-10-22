@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import CoachCard from "@/components/CoachCard";
 import SampleNotice from "@/components/SampleNotice";
-import { averageRating, suburbsOf } from "@/lib/data";
+import { averageRating, focusAreas, suburbsOf } from "@/lib/data";
 import { loadCoaches } from "@/lib/repo";
 import type { FocusArea } from "@/lib/types";
 
@@ -10,17 +10,6 @@ export const metadata: Metadata = {
   description:
     "Compare Sydney golf coaches by suburb, price and focus area. Read reviews and book online.",
 };
-
-const focusOptions: FocusArea[] = [
-  "Slice",
-  "Draw",
-  "Driving",
-  "Irons",
-  "Chipping",
-  "Bunkers",
-  "Putting",
-  "Course management",
-];
 
 const budgets = [
   { label: "Any budget", max: 0 },
@@ -78,7 +67,7 @@ export default async function CoachesPage(props: PageProps<"/coaches">) {
           Focus
           <select name="focus" defaultValue={focus} className="field-input mt-1">
             <option value="">Anything</option>
-            {focusOptions.map((f) => (
+            {focusAreas.map((f) => (
               <option key={f} value={f}>
                 {f}
               </option>

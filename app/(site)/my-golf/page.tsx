@@ -43,7 +43,7 @@ export default function MyGolfPage() {
       <h1 className="font-display mt-1 text-[clamp(2.2rem,7vw,3.4rem)]">My Golf</h1>
 
       <section className="mt-6 grid gap-4 lg:grid-cols-[1.3fr_0.8fr_1fr]">
-        <div className="glass rounded-2xl p-5">
+        <div className="glass rounded-2xl p-5 text-center">
           <div className="flex flex-col items-center text-center">
             <span className="font-display flex h-28 w-28 shrink-0 items-center justify-center rounded-full bg-lime text-4xl text-black sm:h-32 sm:w-32 sm:text-5xl">
               CA
@@ -51,7 +51,7 @@ export default function MyGolfPage() {
             <p className="mt-3 text-2xl font-bold">{s.name}</p>
             <p className="text-sm text-white/70">Member since {s.memberSince}</p>
           </div>
-          <dl className="mt-5 grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
+          <dl className="mt-5 grid grid-cols-2 gap-x-6 gap-y-3 text-center text-sm">
             {[
               ["Handicap", s.handicap],
               ["Location", s.suburb],
@@ -74,7 +74,7 @@ export default function MyGolfPage() {
         {coach && (
           <Link
             href={`/coaches/${coach.slug}`}
-            className="glass flex flex-col items-start justify-center gap-3 self-start rounded-2xl p-4 hover:!border-lime/70 lg:self-center"
+            className="glass flex flex-col items-start justify-center gap-3 self-start rounded-2xl p-4 hover:!border-lime/70 lg:self-stretch lg:p-6"
           >
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/50">My coach</p>
             <div className="flex items-center gap-3">
@@ -134,6 +134,16 @@ export default function MyGolfPage() {
         <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/10" aria-hidden="true">
           <div className="h-full rounded-full bg-lime" style={{ width: `${prog.pct}%` }} />
         </div>
+      </Link>
+
+      <Link href="/my-golf/shots" className="glass mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl p-5 hover:!border-lime/70">
+        <span>
+          <span className="font-display block text-2xl text-lime">Shot tracker</span>
+          <span className="text-sm text-white/75">Mark your shots on the course and see distance by club</span>
+        </span>
+        <span className="pill-arrow whitespace-nowrap rounded-full bg-lime px-3 py-1.5 text-xs font-extrabold uppercase tracking-[0.14em] text-black sm:px-4 sm:text-sm">
+          Open
+        </span>
       </Link>
 
       <section className="mt-12">

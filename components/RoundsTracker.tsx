@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import CourseMap from "./CourseMap";
 import { courses as allCourses } from "@/lib/courses";
@@ -330,6 +331,9 @@ export default function RoundsTracker() {
               </div>
               <p className="mt-2 text-xs text-white/50">
                 Points are an estimate on a standard par 72 layout. Real course cards come later.
+              </p>
+              <p className="mt-2 text-sm">
+                <Link href="/my-golf/shots" className="font-semibold text-lime underline-offset-4 hover:underline">Track your shots with GPS</Link>
               </p>
             </div>
           )}

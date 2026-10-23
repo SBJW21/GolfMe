@@ -1,5 +1,5 @@
 export type Pt = { x: number; y: number }; // 0..1 of the frame
-export type Tool = "line" | "circle" | "angle" | "pen";
+export type Tool = "line" | "circle" | "angle" | "pen" | "tracer" | "move";
 export type Stroke = {
   id: number;
   view: number;
@@ -39,6 +39,30 @@ export function prepCanvas(c: HTMLCanvasElement) {
   return { g, w, h };
 }
 
+
+/** Points along a smooth curve (Catmull-Rom) through the tapped points. */
+export function smoothPath(P: { x: number; y: number }[], steps = 18) {
+  if (P.length < 3) return P;
+  const out: { x: number; y: number }[] = [];
+  for (let i = 0; i < P.length - 1; i++) {
+    const p0 = P[Math.max(i - 1, 0)];
+    const p1 = P[i];
+    const p2 = P[i + 1];
+    const p3 = P[Math.min(i + 2, P.length - 1)];
+    for (let k = 0; k < steps; k++) {
+      const t = k / steps;
+      const t2 = t * t;
+      const t3 = t2 * t;
+      out.push({
+        x: 0.5 * (2 * p1.x + (-p0.x + p2.x) * t + (2 * p0.x - 5 * p1.x + 4 * p2.x - p3.x) * t2 + (-p0.x + 3 * p1.x - 3 * p2.x + p3.x) * t3),
+        y: 0.5 * (2 * p1.y + (-p0.y + p2.y) * t + (2 * p0.y - 5 * p1.y + 4 * p2.y - p3.y) * t2 + (-p0.y + 3 * p1.y - 3 * p2.y + p3.y) * t3),
+      });
+    }
+  }
+  out.push(P[P.length - 1]);
+  return out;
+}
+
 export function drawShape(g: CanvasRenderingContext2D, w: number, h: number, tool: Tool, pts: Pt[], col: string) {
         g.strokeStyle = col;
   g.fillStyle = col;
@@ -57,6 +81,44 @@ export function drawShape(g: CanvasRenderingContext2D, w: number, h: number, too
     g.moveTo(P[0].x, P[0].y);
     P.slice(1).forEach((p) => g.lineTo(p.x, p.y));
     g.stroke();
+  } else if (tool === "tracer") {
+    if (P.length === 1) {
+      g.beginPath();
+      g.arc(P[0].x, P[0].y, 5, 0, Math.PI * 2);
+      g.fill();
+    } else if (P.length >= 2) {
+      const C = smoothPath(P);
+      const trace = () => {
+        g.beginPath();
+        g.moveTo(C[0].x, C[0].y);
+        C.slice(1).forEach((q) => g.lineTo(q.x, q.y));
+      };
+      g.save();
+      g.globalAlpha = 0.35;
+      g.lineWidth = 9;
+      trace();
+      g.stroke();
+      g.globalAlpha = 1;
+      g.shadowColor = col;
+      g.shadowBlur = 10;
+      g.lineWidth = 3.5;
+      trace();
+      g.stroke();
+      g.shadowBlur = 0;
+      g.strokeStyle = "#fff";
+      g.lineWidth = 1.2;
+      trace();
+      g.stroke();
+      g.fillStyle = "#fff";
+      g.beginPath();
+      g.arc(C[0].x, C[0].y, 4, 0, Math.PI * 2);
+      g.fill();
+      g.fillStyle = col;
+      g.beginPath();
+      g.arc(C[C.length - 1].x, C[C.length - 1].y, 5, 0, Math.PI * 2);
+      g.fill();
+      g.restore();
+    }
   } else if (tool === "angle") {
     P.forEach((p) => {
       g.beginPath();

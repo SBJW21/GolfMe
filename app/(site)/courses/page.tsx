@@ -17,6 +17,9 @@ export default function CoursesIndex() {
       <p className="mt-2 max-w-xl text-white/80">
         Playing at one of these courses soon? Find a coach nearby and sharpen your game first.
       </p>
+      <p className="mt-3 text-sm">
+        <Link href="/courses/9-hole" className="text-lime underline-offset-4 hover:underline">Browse 9 hole courses</Link>
+      </p>
       <nav aria-label="Regions" className="mt-6 flex flex-wrap gap-2 text-sm font-semibold">
         {regions.map((r) => (
           <a key={r} href={`#${r.toLowerCase().replace(/ /g, "-")}`} className="rounded-full border border-white/20 px-3 py-1.5 hover:border-lime hover:text-lime">

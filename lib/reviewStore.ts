@@ -4,7 +4,7 @@
  */
 import type { Ev, Stroke } from "./swingDraw";
 
-export type ReviewMedia = { kind: "video" | "image"; blob: Blob; name: string };
+export type ReviewMedia = { kind: "video" | "image"; blob: Blob; name: string; label?: string };
 export type Review = {
   id: string;
   title: string;

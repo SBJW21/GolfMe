@@ -81,14 +81,14 @@ export const posts: Post[] = [
       {
         h: "Want a full test: Mona Vale",
         p: [
-          "Mona Vale Golf Club on the Northern Beaches is 18 holes, par 73. It has the highest par of the courses we have details for. Par is only a rough guide to difficulty, but it points to a longer round.",
+          "Mona Vale Golf Club on the Northern Beaches is listed as 18 holes, par 73, which is the highest par of the courses we have details for. We have not yet confirmed this with the club. Par is only a rough guide to difficulty, but it points to a longer round.",
           "Our take: a good target once you can hit the ball forward with some control. Pair it with a driving lesson beforehand.",
         ],
       },
       {
         h: "Other 18-hole courses with published details",
         p: [
-          "Long Reef Golf Course at Collaroy is 18 holes, par 71. Wakehurst Golf Club at Allambie Heights is 18 holes, par 72. St Michael's Golf Club at Little Bay is 18 holes, par 72. Stonecutters Ridge at Colebee is 18 holes, par 71. Lynwood Golf and Country Club at Pitt Town is 18 holes, par 72. Brighton Lakes at Moorebank is 18 holes, par 70.",
+          "Long Reef Golf Course at Collaroy is 18 holes, par 71. Wakehurst Golf Club at Allambie Heights is listed as 18 holes, par 72. St Michael's Golf Club at Little Bay is 18 holes, par 72. Stonecutters Ridge at Colebee is 18 holes, par 71. Lynwood Golf and Country Club at Pitt Town and Brighton Lakes at Moorebank are listed at par 72 and par 70, both 18 holes, and we are still confirming those with the clubs.",
         ],
       },
       {

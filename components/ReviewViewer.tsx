@@ -120,7 +120,7 @@ export default function ReviewViewer({ id }: { id: string }) {
   const n = review.media.length;
   return (
     <div>
-      <div className={`grid gap-2 ${n === 2 ? "sm:grid-cols-2" : "mx-auto max-w-md"}`}>
+      <div className={`grid gap-2 ${n >= 2 ? "sm:grid-cols-2" : "mx-auto max-w-md"}`}>
         {review.media.map((m, v) => (
           <div key={v} className="relative aspect-[9/16] overflow-hidden rounded-xl bg-black">
             {urls[v] &&
@@ -139,6 +139,7 @@ export default function ReviewViewer({ id }: { id: string }) {
                   className="absolute inset-0 h-full w-full object-contain"
                 />
               ))}
+            {m.label && <span className="absolute left-2 top-2 rounded bg-black/60 px-2 py-0.5 text-xs font-bold">{m.label}</span>}
             <canvas
               ref={(el) => {
                 cans.current[v] = el;

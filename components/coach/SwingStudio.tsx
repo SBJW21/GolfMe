@@ -6,13 +6,42 @@ import { drawShape, prepCanvas, type Ev, type Pt, type Stroke, type Tool } from 
 
 const COLORS = ["#c6ff3d", "#ffffff", "#ff4d4d", "#4db8ff"];
 const SPEEDS = [0.25, 0.5, 1];
+const SLOTS = 4;
+const SLOT_IDX = [0, 1, 2, 3];
+const defaultLabel = (i: number) => (i === 0 ? "Before" : i === 1 ? "After" : `Photo ${i + 1}`);
+
+/** Distance in px from point (px,py) to segment a-b. */
+function segDist(px: number, py: number, ax: number, ay: number, bx: number, by: number) {
+  const dx = bx - ax;
+  const dy = by - ay;
+  const l2 = dx * dx + dy * dy;
+  const t = l2 ? Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / l2)) : 0;
+  return Math.hypot(px - (ax + t * dx), py - (ay + t * dy));
+}
+function hits(st: Stroke, p: Pt, w: number, h: number) {
+  const P = st.pts.map((q) => ({ x: q.x * w, y: q.y * h }));
+  const x = p.x * w;
+  const y = p.y * h;
+  const R = 14;
+  if (st.tool === "circle" && P.length >= 2) {
+    const r = Math.hypot(P[1].x - P[0].x, P[1].y - P[0].y);
+    return Math.abs(Math.hypot(x - P[0].x, y - P[0].y) - r) < R || Math.hypot(x - P[0].x, y - P[0].y) < R;
+  }
+  if (st.tool === "angle") {
+    if (P.some((q) => Math.hypot(x - q.x, y - q.y) < R)) return true;
+  }
+  for (let i = 0; i < P.length - 1; i++) if (segDist(x, y, P[i].x, P[i].y, P[i + 1].x, P[i + 1].y) < R) return true;
+  return false;
+}
 
 const clock = () => performance.now();
 const stamp = () => Date.now();
 
 export default function SwingStudio() {
-  const [srcs, setSrcs] = useState<(string | null)[]>([null, null]);
-  const [files, setFiles] = useState<(File | null)[]>([null, null]);
+  const [srcs, setSrcs] = useState<(string | null)[]>(Array(SLOTS).fill(null));
+  const [files, setFiles] = useState<(File | null)[]>(Array(SLOTS).fill(null));
+  const [labels, setLabels] = useState<string[]>(SLOT_IDX.map(defaultLabel));
+  const moving = useRef<{ id: number; view: number; last: Pt } | null>(null);
   const [saved, setSaved] = useState<string | null>(null);
   const audioBlob = useRef<Blob | null>(null);
   const [tool, setTool] = useState<Tool>("line");
@@ -29,8 +58,8 @@ export default function SwingStudio() {
   const [micError, setMicError] = useState("");
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
 
-  const vids = useRef<(HTMLVideoElement | null)[]>([null, null]);
-  const cans = useRef<(HTMLCanvasElement | null)[]>([null, null]);
+  const vids = useRef<(HTMLVideoElement | null)[]>(Array(SLOTS).fill(null));
+  const cans = useRef<(HTMLCanvasElement | null)[]>(Array(SLOTS).fill(null));
   const nextId = useRef(1);
   const events = useRef<Ev[]>([]);
   const recStart = useRef(0);
@@ -61,6 +90,23 @@ export default function SwingStudio() {
     });
     setStrokes((st) => st.filter((x) => x.view !== view));
   }
+  /** Drop several chosen files into the empty slots in order. */
+  function loadMany(list: FileList | null | undefined) {
+    if (!list) return;
+    const free = SLOT_IDX.filter((i) => !srcs[i]);
+    Array.from(list)
+      .slice(0, free.length)
+      .forEach((f, k) => load(free[k], f));
+  }
+  function removeView(view: number) {
+    setSrcs((s) => {
+      if (s[view]) URL.revokeObjectURL(s[view] as string);
+      return s.map((x, i) => (i === view ? null : x));
+    });
+    setFiles((f) => f.map((x, i) => (i === view ? null : x)));
+    setStrokes((st) => st.filter((x) => x.view !== view));
+    vids.current[view] = null;
+  }
 
   const visible = useCallback(
     (s: Stroke) => {
@@ -75,7 +121,7 @@ export default function SwingStudio() {
 
   // Redraw overlays
   useEffect(() => {
-    for (let v = 0; v < 2; v++) {
+    for (let v = 0; v < SLOTS; v++) {
       const c = cans.current[v];
       if (!c) continue;
       const prep = prepCanvas(c);
@@ -83,7 +129,7 @@ export default function SwingStudio() {
       const { g, w, h } = prep;
       const draw = (tool: Tool, pts: Pt[], col: string) => drawShape(g, w, h, tool, pts, col);
       strokes.filter((s) => s.view === v && visible(s)).forEach((s) => draw(s.tool, s.pts, s.color));
-      if (pending?.view === v) draw("angle", pending.pts, color);
+      if (pending?.view === v) draw(tool === "tracer" ? "tracer" : "angle", pending.pts, color);
       if (drag?.view === v) draw(tool, drag.pts, color);
     }
   }, [strokes, pending, drag, tool, color, visible, srcs, time]);
@@ -105,10 +151,13 @@ export default function SwingStudio() {
   }, [srcs]);
 
   async function saveToMyGolf() {
-    const media = files
-      .map((f, i) => (srcs[i] && f ? { kind: (f.type.startsWith("image/") ? "image" : "video") as "image" | "video", blob: f as Blob, name: f.name } : null))
-      .filter((m): m is NonNullable<typeof m> => !!m);
-    if (!media.length) return;
+    const used = SLOT_IDX.filter((i) => srcs[i] && files[i]);
+    if (!used.length) return;
+    const media = used.map((i) => {
+      const f = files[i] as File;
+      return { kind: (f.type.startsWith("image/") ? "image" : "video") as "image" | "video", blob: f as Blob, name: f.name, label: labels[i] };
+    });
+    const map = new Map(used.map((slot, k) => [slot, k]));
     const now = stamp();
     const id = String(now);
     const label = new Date().toLocaleDateString("en-AU", { day: "numeric", month: "short" });
@@ -117,8 +166,8 @@ export default function SwingStudio() {
       title: `Swing review from Matt, ${label}`,
       createdAt: now,
       media,
-      strokes,
-      events: events.current,
+      strokes: strokes.filter((x) => map.has(x.view)).map((x) => ({ ...x, view: map.get(x.view) as number })),
+      events: events.current.filter((e) => map.has(e.view)).map((e) => ({ ...e, view: map.get(e.view) as number })),
       audio: audioBlob.current,
     });
     setSaved(id);
@@ -170,6 +219,18 @@ export default function SwingStudio() {
     if (phase === "replay") return;
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
     const p = pos(e);
+    if (tool === "move") {
+      if (recording) return;
+      const el = e.currentTarget as HTMLElement;
+      const hit = [...strokes].reverse().find((x) => x.view === view && x.removedMs === null && hits(x, p, el.clientWidth, el.clientHeight));
+      moving.current = hit ? { id: hit.id, view, last: p } : null;
+      return;
+    }
+    if (tool === "tracer") {
+      const pts = pending?.view === view ? [...pending.pts, p] : [p];
+      setPending({ view, pts });
+      return;
+    }
     if (tool === "angle") {
       const pts = pending?.view === view ? [...pending.pts, p] : [p];
       if (pts.length === 3) {
@@ -181,18 +242,36 @@ export default function SwingStudio() {
     setDrag({ view, pts: [p, p] });
   }
   function move(e: React.PointerEvent, view: number) {
+    if (moving.current && moving.current.view === view) {
+      const p = pos(e);
+      const { id, last } = moving.current;
+      const dx = p.x - last.x;
+      const dy = p.y - last.y;
+      moving.current = { id, view, last: p };
+      setStrokes((st) => st.map((x) => (x.id === id ? { ...x, pts: x.pts.map((q) => ({ x: Math.max(0, Math.min(1, q.x + dx)), y: Math.max(0, Math.min(1, q.y + dy)) })) } : x)));
+      return;
+    }
     if (!drag || drag.view !== view) return;
     const p = pos(e);
     setDrag((d) => (d ? { ...d, pts: tool === "pen" ? [...d.pts, p] : [d.pts[0], p] } : d));
   }
   function up() {
+    moving.current = null;
     if (drag) {
       const long = drag.pts.length > 2 || Math.hypot(drag.pts[1].x - drag.pts[0].x, drag.pts[1].y - drag.pts[0].y) > 0.01;
       if (long) add(drag.view, tool, drag.pts);
       setDrag(null);
     }
   }
+  function finishTracer() {
+    if (pending && pending.pts.length >= 2) add(pending.view, "tracer", pending.pts);
+    setPending(null);
+  }
   function undo() {
+    if (pending && pending.pts.length > 1) {
+      setPending({ view: pending.view, pts: pending.pts.slice(0, -1) });
+      return;
+    }
     setPending(null);
     setStrokes((s) => {
       const last = [...s].reverse().find((x) => x.removedMs === null);
@@ -311,26 +390,30 @@ export default function SwingStudio() {
     <div>
       {views === 0 && (
         <div className="glass grid gap-4 rounded-2xl p-6 sm:grid-cols-2">
-          {["Back angle", "Side angle"].map((label, i) => (
+          {["Before", "After"].map((label, i) => (
             <label key={label} className="block cursor-pointer rounded-xl border border-dashed border-white/30 p-6 text-center hover:border-lime">
               <span className="font-display text-xl text-lime">{label}</span>
               <span className="mt-1 block text-sm text-white/70">Choose a clip or photo</span>
               <input type="file" accept="video/*,image/*" className="sr-only" data-testid={`file-${i}`} onChange={(e) => load(i, e.target.files?.[0])} />
             </label>
           ))}
+          <label className="block cursor-pointer rounded-xl border border-white/25 p-3 text-center text-sm font-semibold hover:border-lime sm:col-span-2">
+            Or choose several photos or clips at once
+            <input type="file" multiple accept="video/*,image/*" className="sr-only" data-testid="file-many" onChange={(e) => loadMany(e.target.files)} />
+          </label>
           <p className="text-sm text-white/60 sm:col-span-2">
-            Clips and photos stay on your device in this concept. Load one angle or both for a side by side review.
+            Compare a swing before and after a correction, or two angles side by side. Add up to four. Clips and photos stay on your device in this concept.
           </p>
         </div>
       )}
 
       {views > 0 && (
         <>
-          <div className={`grid gap-2 ${views === 2 ? "sm:grid-cols-2" : ""}`}>
-            {[0, 1].map(
+          <div className={`grid gap-2 ${views >= 2 ? "sm:grid-cols-2" : ""}`}>
+            {SLOT_IDX.map(
               (v) =>
                 srcs[v] && (
-                  <div key={v} className={`relative mx-auto aspect-[9/12] w-full overflow-hidden rounded-xl bg-black ${views === 2 ? "max-w-md sm:max-w-none" : "max-w-md"}`}>
+                  <div key={v} className={`relative mx-auto aspect-[9/12] w-full overflow-hidden rounded-xl bg-black ${views >= 2 ? "max-w-md sm:max-w-none" : "max-w-md"}`}>
                     {isImage(v) ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={srcs[v] as string} alt="" className="absolute inset-0 h-full w-full object-contain" />
@@ -351,21 +434,31 @@ export default function SwingStudio() {
                       }}
                       data-testid={`canvas-${v}`}
                       className="absolute inset-0 h-full w-full touch-none"
-                      style={{ cursor: "crosshair" }}
+                      style={{ cursor: tool === "move" ? "grab" : "crosshair" }}
                       onPointerDown={(e) => down(e, v)}
                       onPointerMove={(e) => move(e, v)}
                       onPointerUp={up}
                     />
-                    <span className="absolute left-2 top-2 rounded bg-black/60 px-2 py-0.5 text-xs font-bold">
-                      {v === 0 ? "Back" : "Side"}
-                    </span>
+                    <input
+                      value={labels[v]}
+                      maxLength={20}
+                      aria-label="Label"
+                      disabled={phase !== "edit"}
+                      onChange={(e) => setLabels((l) => l.map((x, i) => (i === v ? e.target.value : x)))}
+                      className="absolute left-2 top-2 w-28 rounded bg-black/60 px-2 py-0.5 text-xs font-bold outline-none focus:ring-1 focus:ring-lime"
+                    />
+                    {phase === "edit" && (
+                      <button type="button" aria-label="Remove" onClick={() => removeView(v)} className="absolute right-2 top-2 grid h-6 w-6 place-items-center rounded-full bg-black/60 text-sm font-bold hover:bg-red-600">
+                        &times;
+                      </button>
+                    )}
                     {phase === "countdown" && (
                       <div className="absolute inset-0 grid place-items-center bg-black/60">
                         <span className="font-display text-[8rem] text-lime">{count}</span>
                       </div>
                     )}
                     {recording && (
-                      <span className="absolute right-2 top-2 flex items-center gap-1 rounded bg-red-600 px-2 py-0.5 text-xs font-bold">
+                      <span className="absolute right-2 bottom-2 flex items-center gap-1 rounded bg-red-600 px-2 py-0.5 text-xs font-bold">
                         <span className="h-2 w-2 animate-pulse rounded-full bg-white" /> REC
                       </span>
                     )}
@@ -399,8 +492,8 @@ export default function SwingStudio() {
           )}
 
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            {(["line", "circle", "angle", "pen"] as Tool[]).map((t) => (
-              <button key={t} type="button" onClick={() => { setTool(t); setPending(null); }} className={btn(tool === t)}>
+            {(["line", "circle", "angle", "pen", "tracer", "move"] as Tool[]).map((t) => (
+              <button key={t} type="button" disabled={t === "move" && recording} onClick={() => { setTool(t); setPending(null); }} className={`${btn(tool === t)} disabled:opacity-40`}>
                 {t === "angle" ? "Angle" : t[0].toUpperCase() + t.slice(1)}
               </button>
             ))}
@@ -423,6 +516,15 @@ export default function SwingStudio() {
             <button type="button" className={btn(false)} onClick={clearAll}>Clear</button>
           </div>
           {tool === "angle" && <p className="mt-2 text-sm text-white/65">Tap three points. The middle one is the joint.</p>}
+          {tool === "tracer" && (
+            <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-white/65">
+              <p>Tap the ball, then a few points along its flight, ending where it lands. Three to six taps gives the smoothest arc.</p>
+              <button type="button" className={`${btn(true)} disabled:opacity-40`} disabled={!pending || pending.pts.length < 2} onClick={finishTracer}>
+                Draw tracer
+              </button>
+            </div>
+          )}
+          {tool === "move" && <p className="mt-2 text-sm text-white/65">Drag a line, circle or angle to reposition it. Moving is off while recording.</p>}
 
           <div className="glass mt-6 rounded-2xl p-5">
             <p className="font-display text-2xl">Voiceover review</p>
@@ -476,17 +578,13 @@ export default function SwingStudio() {
             )}
           </div>
 
-          <div className="mt-4 flex gap-3 text-sm">
-            {!srcs[1] && (
+          <div className="mt-4 flex gap-4 text-sm">
+            {views < SLOTS && (
               <label className="cursor-pointer text-lime underline-offset-4 hover:underline">
-                Add side angle for side by side
-                <input type="file" accept="video/*,image/*" className="sr-only" onChange={(e) => load(1, e.target.files?.[0])} />
+                Add photos or clips to compare
+                <input type="file" multiple accept="video/*,image/*" className="sr-only" data-testid="add-more" onChange={(e) => loadMany(e.target.files)} />
               </label>
             )}
-            <label className="cursor-pointer text-white/70 underline-offset-4 hover:underline">
-              Change clip
-              <input type="file" accept="video/*,image/*" className="sr-only" onChange={(e) => load(0, e.target.files?.[0])} />
-            </label>
           </div>
         </>
       )}

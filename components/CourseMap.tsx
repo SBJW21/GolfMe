@@ -24,42 +24,107 @@ type Props = {
   holeData?: HoleInfo[];
   /** Club page where the official scorecard lives, if known. */
   scorecardUrl?: string;
+  /** Highlight a hole from outside (for example the hole being played). */
+  selected?: number | null;
 };
 
-/** Stylised, illustrative layout (not a surveyed map). Shape is generated from the course name. */
-export default function CourseMap({ name, interactive = false, holeData, scorecardUrl }: Props) {
-  const [sel, setSel] = useState<number | null>(null);
+type Pt = { x: number; y: number };
+const W = 320, H = 170;
+
+function segDist(p: Pt, a: Pt, b: Pt) {
+  const dx = b.x - a.x, dy = b.y - a.y;
+  const l2 = dx * dx + dy * dy || 1;
+  const t = Math.max(0, Math.min(1, ((p.x - a.x) * dx + (p.y - a.y) * dy) / l2));
+  return Math.hypot(p.x - (a.x + t * dx), p.y - (a.y + t * dy));
+}
+
+/** Holes laid out in tidy rows, snaking left to right then back, so the route never crosses itself. */
+function layout(holes: number): Pt[] {
+  const rows = holes > 9 ? 3 : 2;
+  const per = Math.ceil(holes / rows);
+  const ys = rows === 3 ? [36, 85, 134] : [50, 120];
+  return Array.from({ length: holes }, (_, i) => {
+    const r = Math.floor(i / per);
+    const k = i % per;
+    const count = Math.min(per, holes - r * per);
+    const step = count > 1 ? (W - 56) / (count > 1 ? Math.max(per - 1, 1) : 1) : 0;
+    const x = r % 2 === 0 ? 28 + k * step : W - 28 - k * step;
+    const y = ys[r] + (k % 2 === 0 ? -5 : 5);
+    return { x, y };
+  });
+}
+
+/** Scenery goes only where it will not sit under a hole or the route between holes. */
+function scenery(slug: string, pts: Pt[]) {
+  const rnd = seed(slug);
+  const clear = (p: Pt, r: number) => pts.every((q, i) => Math.hypot(p.x - q.x, p.y - q.y) > r + 14 && (i === 0 || segDist(p, pts[i - 1], q) > r + 10));
+  const out: { x: number; y: number; r: number }[] = [];
+  for (let n = 0; n < 5; n++) {
+    for (let t = 0; t < 40; t++) {
+      const r = 5 + rnd() * 5;
+      const p = { x: 16 + rnd() * (W - 32), y: 12 + rnd() * (H - 24) };
+      if (clear(p, r) && out.every((o) => Math.hypot(p.x - o.x, p.y - o.y) > r + o.r + 6)) {
+        out.push({ ...p, r });
+        break;
+      }
+    }
+  }
+  let water: { x: number; y: number; rx: number; ry: number } | null = null;
+  for (let t = 0; t < 60 && !water; t++) {
+    const rx = 22 + rnd() * 14, ry = 6 + rnd() * 3;
+    const p = { x: 30 + rnd() * (W - 60), y: 14 + rnd() * (H - 28) };
+    if (clear(p, Math.max(rx, ry)) && out.every((o) => Math.hypot(p.x - o.x, p.y - o.y) > rx + o.r)) water = { ...p, rx, ry };
+  }
+  return { bunkers: out, water };
+}
+
+/** Stylised, illustrative layout (not a surveyed map). Hole positions are neat rows, not the real routing. */
+export default function CourseMap({ name, interactive = false, holeData, scorecardUrl, selected }: Props) {
+  const [own, setOwn] = useState<number | null>(null);
   const c = findCourse(name);
   if (!c) return null;
-  const holes = c.holes; // unknown hole counts are not drawn
-  const rnd = seed(c.slug);
-  const W = 320, H = 170;
-  const pts = holes
-    ? Array.from({ length: holes }, (_, i) => {
-        const t = i / Math.max(holes - 1, 1);
-        const row = i < holes / 2 ? 0 : 1;
-        const k = row === 0 ? i / (holes / 2) : 1 - (i - holes / 2) / (holes / 2);
-        return { x: 22 + k * (W - 44) + (rnd() - 0.5) * 14, y: (row === 0 ? 48 : 118) + (rnd() - 0.5) * 30 + Math.sin(t * 6) * 6 };
-      })
-    : [];
-  const d = pts.map((p, i) => `${i ? "L" : "M"}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" ");
-  const blobs = Array.from({ length: 5 }, () => ({ x: 20 + rnd() * (W - 40), y: 15 + rnd() * (H - 30), r: 6 + rnd() * 9 }));
-  const water = { x: 40 + rnd() * (W - 120), y: 76 + rnd() * 10, rx: 28 + rnd() * 20, ry: 7 + rnd() * 5 };
+  const sel = selected !== undefined ? selected : own;
+  const holes = c.holes;
+  const pts = holes ? layout(holes) : [];
+  const { bunkers, water } = pts.length
+    ? scenery(c.slug, pts)
+    : { bunkers: [{ x: 80, y: 38, r: 7 }, { x: 150, y: 28, r: 5 }, { x: 272, y: 112, r: 8 }], water: { x: 200, y: 118, rx: 28, ry: 8 } };
+  const d = pts.length
+    ? pts.reduce((acc, p, i) => {
+        if (i === 0) return `M${p.x.toFixed(1)},${p.y.toFixed(1)}`;
+        const q = pts[i - 1];
+        const sameRow = Math.abs(p.y - q.y) < 30;
+        if (sameRow) return `${acc} L${p.x.toFixed(1)},${p.y.toFixed(1)}`;
+        const bend = p.x > W / 2 ? W - 8 : 8;
+        return `${acc} Q${bend},${((p.y + q.y) / 2).toFixed(1)} ${p.x.toFixed(1)},${p.y.toFixed(1)}`;
+      }, "")
+    : "";
   const info = sel ? holeData?.find((h) => h.n === sel) : undefined;
-  const pick = (n: number) => setSel(n);
+  const pick = (n: number) => setOwn(n);
 
   return (
-    <div className="mt-3 overflow-hidden rounded-xl border border-white/15 bg-[#0d2a14]">
+    <div className="overflow-hidden rounded-xl border border-white/15 bg-[#0d2a14]">
       <svg viewBox={`0 0 ${W} ${H}`} className="block w-full" role="img" aria-label={`Illustrative layout of ${c.name}`}>
         <rect width={W} height={H} fill="#12361b" />
-        <ellipse cx={water.x} cy={water.y} rx={water.rx} ry={water.ry} fill="#1e6a8f" opacity=".8" />
-        {blobs.map((b, i) => (
+        {water && <ellipse cx={water.x} cy={water.y} rx={water.rx} ry={water.ry} fill="#1e6a8f" opacity=".8" />}
+        {bunkers.map((b, i) => (
           <circle key={i} cx={b.x} cy={b.y} r={b.r} fill="#e9d9a6" opacity=".55" />
         ))}
-        {pts.length > 0 && (
+        {pts.length > 0 ? (
           <>
             <path d={d} fill="none" stroke="#4f9a5f" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" opacity=".7" />
             <path d={d} fill="none" stroke="#c6ff3d" strokeWidth="1.2" strokeDasharray="3 4" opacity=".8" />
+          </>
+        ) : (
+          <>
+            {/* Hole count not confirmed, so show one tidy example hole instead of a made-up course */}
+            <path d="M40,128 C90,120 120,60 270,52" fill="none" stroke="#2f7a47" strokeWidth="26" strokeLinecap="round" />
+            <path d="M40,128 C90,120 120,60 270,52" fill="none" stroke="#4f9a5f" strokeWidth="1.2" strokeDasharray="3 4" />
+            <rect x="26" y="121" width="16" height="12" rx="2" fill="#4f9a5f" />
+            <ellipse cx="274" cy="52" rx="20" ry="16" fill="#3fae60" stroke="#c6ff3d" strokeOpacity=".5" />
+            <line x1="274" y1="52" x2="274" y2="30" stroke="#fff" strokeWidth="1.5" />
+            <path d="M274,30 l11,4 l-11,4z" fill="#c6ff3d" />
+            <text x={W / 2} y={H - 12} textAnchor="middle" fontSize="9" fill="#fff" opacity=".7">Hole by hole map added once the club&apos;s card is confirmed</text>
           </>
         )}
         {pts.map((p, i) => {
@@ -73,7 +138,7 @@ export default function CourseMap({ name, interactive = false, holeData, scoreca
                 "aria-pressed": on,
                 style: { cursor: "pointer" },
                 onClick: () => pick(n),
-                onMouseEnter: () => setSel(n),
+                onMouseEnter: () => setOwn(n),
                 onKeyDown: (e: React.KeyboardEvent) => {
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();

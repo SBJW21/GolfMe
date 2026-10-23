@@ -27,29 +27,6 @@ export function shotsOf(marks: Mark[]) {
   return marks.slice(1).map((m, i) => ({ n: i + 1, from: marks[i], to: m, metres: distM(marks[i], m), club: marks[i].club }));
 }
 
-/** Local flat projection in metres (east, north) around the first point. Fine at hole scale. */
-export function project(marks: Mark[]) {
-  if (!marks.length) return [];
-  const o = marks[0];
-  const kLat = 111_132;
-  const kLon = 111_320 * Math.cos((o.lat * Math.PI) / 180);
-  return marks.map((m) => ({ x: (m.lon - o.lon) * kLon, y: (o.lat - m.lat) * kLat }));
-}
-
-/** A made-up next position, for trying the tracker indoors. */
-export function demoNext(prev: Mark | undefined, seed: number): Mark {
-  const base = prev ?? { lat: -33.7396, lon: 151.3061, ts: Date.now() };
-  const r = (n: number) => {
-    const x = Math.sin(seed * 9301 + n * 49297) * 233280;
-    return x - Math.floor(x);
-  };
-  const metres = prev ? 60 + r(1) * 170 : 0;
-  const bearing = ((20 + (r(2) - 0.5) * 50) * Math.PI) / 180; // roughly north-east with some wander
-  const dLat = (metres * Math.cos(bearing)) / 111_132;
-  const dLon = (metres * Math.sin(bearing)) / (111_320 * Math.cos((base.lat * Math.PI) / 180));
-  return { lat: base.lat + dLat, lon: base.lon + dLon, ts: Date.now(), demo: true };
-}
-
 const KEY = "golfme-shots-v1";
 export function loadRounds(): ShotRound[] {
   try {
@@ -67,3 +44,30 @@ export function saveRounds(r: ShotRound[]) {
   }
 }
 export const toYards = (m: number) => m * 1.0936133;
+
+const rnd = (seed: number, n: number) => {
+  const x = Math.sin(seed * 12.9898 + n * 78.233) * 43758.5453;
+  return x - Math.floor(x);
+};
+
+/** A believable made-up hole for trying the tracker indoors: tee, full shots, then putts. Ends at the pin. */
+export function demoRoute(lengthM: number, par: number, seed: number): Mark[] {
+  const full = Math.max(1, par - 2);
+  const pts: { u: number; v: number }[] = [{ u: 0, v: 0 }];
+  for (let i = 1; i <= full; i++) {
+    const last = i === full;
+    const u = last ? lengthM - (6 + rnd(seed, i) * 10) : (lengthM * i) / full * (0.93 + rnd(seed, i) * 0.06);
+    const v = last ? (rnd(seed, i + 9) - 0.5) * 12 : (rnd(seed, i + 9) - 0.5) * 26;
+    pts.push({ u, v });
+  }
+  const g = pts[pts.length - 1];
+  pts.push({ u: lengthM - 0.5 + (g.u - lengthM) * 0.1, v: g.v * 0.1 });
+  pts.push({ u: lengthM, v: 0 });
+  const b = (28 * Math.PI) / 180;
+  const base = { lat: -33.7396, lon: 151.3061 };
+  return pts.map((p) => {
+    const east = p.u * Math.sin(b) + p.v * Math.cos(b);
+    const north = p.u * Math.cos(b) - p.v * Math.sin(b);
+    return { lat: base.lat + north / 111_132, lon: base.lon + east / (111_320 * Math.cos((base.lat * Math.PI) / 180)), ts: Date.now(), demo: true };
+  });
+}

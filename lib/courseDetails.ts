@@ -233,4 +233,9 @@ export const courseDetails: Record<string, CourseDetails> = {
     checked: "23 October 2026",
     source: "https://www.nsw.gov.au/visiting-and-exploring-nsw/locations-and-attractions/colonial-golf-and-footgolf-course",
   },
+  "balgowlah-golf-club": {
+    highlights: ["Nine holes, described by the club as the fastest and friendliest on the Northern Beaches", "Daily social tee times can be booked online through the club's site or the pro shop"],
+    checked: "23 October 2026",
+    source: "http://www.balgowlahgolfclub.com.au/",
+  },
 };

@@ -51,19 +51,33 @@ export default async function CoursePage(props: PageProps<"/courses/[course]">) 
     ...(c.par ? [["Par", String(c.par)]] : []),
   ];
 
+  const sameRegion = courses.filter((x) => x.slug !== c.slug && regionOf(x) === regionOf(c)).slice(0, 6);
+  const nineNear = courses.filter((x) => x.slug !== c.slug && x.holes === 9 && regionOf(x) === regionOf(c)).slice(0, 4);
+  const sameSuburb = nearby.filter((k) => k.suburb === c.suburb);
   const faq: [string, string][] = [];
   if (c.holes) faq.push([`How many holes is ${c.name}?`, `${c.name} has ${c.holes} holes${c.par ? ` and is par ${c.par}` : ""}.`]);
   else if (c.par) faq.push([`What is the par at ${c.name}?`, `${c.name} is listed as par ${c.par}.`]);
   if (bookingHref) faq.push([`How do I book a tee time at ${c.name}?`, `Book directly with the club through its own site. Tee times, fees and hours are set by the club, so check them there before you travel.`]);
   if (d?.bar || d?.social) faq.push([`Is there food and drink at ${c.name}?`, [d?.bar, d?.social].filter(Boolean).join(". ") + "."]);
   if (d?.nearestTrain || d?.nearestBus || d?.parking) faq.push([`How do I get to ${c.name}?`, [d?.nearestTrain && `Train: ${d.nearestTrain}`, d?.nearestBus && `Bus: ${d.nearestBus}`, d?.parking && `Parking: ${d.parking}`].filter(Boolean).join(". ") + "."]);
+  if (d?.highlights?.length) faq.push([`What should I know before playing ${c.name}?`, d.highlights.join(". ") + "."]);
+  if (c.holes === 9)
+    faq.push([
+      `Are there other nine hole courses near ${c.name}?`,
+      nineNear.length > 0
+        ? `In the ${regionOf(c)} region, other nine hole courses include ${nineNear.map((x) => x.name).join(", ")}. See every nine hole course we have confirmed on our nine hole courses page.`
+        : `See every nine hole course we have confirmed on our nine hole courses page.`,
+    ]);
+  if (sameRegion.length > 0)
+    faq.push([`What other golf courses are in the ${regionOf(c)} region?`, `Other courses in the ${regionOf(c)} region include ${sameRegion.map((x) => x.name).join(", ")}.`]);
   faq.push([
     `Can I get golf lessons near ${c.name}?`,
-    nearby.length > 0
+    sameSuburb.length > 0
+      ? `Yes. ${sameSuburb.map((k) => `${k.name}${k.title ? ` (${k.title})` : ""}`).join(" and ")} teach${sameSuburb.length === 1 ? "es" : ""} in ${c.suburb}. Compare prices and reviews, then book online.`
+      : nearby.length > 0
       ? `Yes. ${nearby.length === 1 ? "A coach" : `${nearby.length} coaches`} on Golf Me teach${nearby.length === 1 ? "es" : ""} near ${c.suburb}. Compare prices and reviews, then book online.`
       : `We are signing up coaches near ${c.suburb}. Browse every coach on Golf Me to compare prices and book online.`,
   ]);
-  const sameRegion = courses.filter((x) => x.slug !== c.slug && regionOf(x) === regionOf(c)).slice(0, 6);
   const faqLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -117,9 +131,9 @@ export default async function CoursePage(props: PageProps<"/courses/[course]">) 
         Course details from club, council and Golf Australia pages and Fairway Finders, checked 23 October 2026. Contact the course for fees, hours and tee times.
       </p>
 
-      <section className="mt-8 grid gap-5 lg:grid-cols-[1.15fr_1fr]">
+      <h2 className="font-display mt-8 text-[clamp(1.5rem,5vw,2rem)]">Course map</h2>
+      <section className="mt-3 grid gap-5 lg:grid-cols-[1.15fr_1fr]">
         <div>
-          <h2 className="font-display text-[clamp(1.5rem,5vw,2rem)]">Course map</h2>
           <CourseMap name={c.name} interactive holeData={d?.holeData} scorecardUrl={bookingHref} />
         </div>
         <div className="grid content-start gap-4">

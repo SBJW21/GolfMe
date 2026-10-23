@@ -88,7 +88,7 @@ export const courses: Course[] = [
   { slug: "richmond-golf-club", name: "Richmond Golf Club", suburb: "Richmond", holes: 18, par: 70 },
   { slug: "canterbury-public-golf-course", name: "Canterbury Public Golf Course", suburb: "Beverly Hills", holes: 9 },
   { slug: "avalon-golf-course", name: "Avalon Golf Course", suburb: "Avalon Beach", holes: 9, website: "http://www.avalongolfcourse.com.au" },
-  { slug: "balgowlah-golf-club", name: "Balgowlah Golf Club", suburb: "Balgowlah" },
+  { slug: "balgowlah-golf-club", name: "Balgowlah Golf Club", suburb: "Balgowlah", holes: 9, website: "http://www.balgowlahgolfclub.com.au/" },
   { slug: "colonial-golf-and-footgolf-course", name: "Colonial Golf and Footgolf Course", suburb: "Werrington" },
   { slug: "windsor-golf-club", name: "Windsor Golf Club", suburb: "South Windsor" },
   { slug: "pittwater-golf-centre", name: "Pittwater Golf Centre", suburb: "Warriewood" },

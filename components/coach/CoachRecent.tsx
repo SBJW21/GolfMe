@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { hubReports, hubStudents } from "@/lib/coachHub";
+import { hubReports } from "@/lib/coachHub";
 
 const LINES = [
   "So today we worked on the slice.",
@@ -17,7 +17,8 @@ function fmt(s: number) {
 }
 
 export default function CoachRecent() {
-  const [who, setWho] = useState(hubStudents[0].name);
+  const [waiting, setWaiting] = useState(hubReports);
+  const [who, setWho] = useState<string | null>(hubReports[0]?.student ?? null);
   const [live, setLive] = useState(false);
   const [secs, setSecs] = useState(0);
   const [lines, setLines] = useState(0);
@@ -66,38 +67,13 @@ export default function CoachRecent() {
     setNote("");
   }
 
-  const first = who.split(" ")[0];
+  const first = (who ?? "your student").split(" ")[0];
 
   return (
     <div className="grid gap-4">
-      {/* Reports waiting */}
-      <div className="glass rounded-2xl p-4 sm:p-5">
-        <p className="font-bold">Reports waiting</p>
-        <ul className="mt-2 divide-y divide-white/10">
-          {hubReports.map((r) => (
-            <li key={r.id} className="flex flex-wrap items-center justify-between gap-2 py-2.5 text-sm">
-              <span>
-                <span className="font-semibold">{r.student}</span>
-                <span className="text-white/60"> &middot; {r.focus} &middot; {r.when}</span>
-              </span>
-              <button
-                type="button"
-                onClick={() => {
-                  setWho(r.student);
-                  heroRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-                }}
-                className="rounded-full bg-lime px-3.5 py-1 font-semibold text-black"
-              >
-                Dictate
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-
       {/* Dictation hero */}
-      <div ref={heroRef} className="relative overflow-hidden rounded-3xl border border-lime/60 bg-[radial-gradient(circle_at_20%_0%,#27340f,#0b0d08_70%)] p-5 sm:p-8">
+      <div ref={heroRef} className="relative grid gap-6 overflow-hidden rounded-3xl border border-lime/60 bg-[radial-gradient(circle_at_20%_0%,#27340f,#0b0d08_70%)] p-5 sm:p-8 lg:grid-cols-[1fr_20rem]">
+        <div className="min-w-0">
         <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-lime">New for coaches</p>
         <h3 className="font-display mt-2 text-[clamp(1.8rem,6vw,3rem)] leading-[1.02]">
           Dictate your lesson report
@@ -123,7 +99,8 @@ export default function CoachRecent() {
             type="button"
             onClick={toggle}
             aria-label={live ? "Stop dictation" : "Start dictation"}
-            className={`relative flex h-28 w-28 shrink-0 items-center justify-center rounded-full border-2 border-lime transition ${
+            disabled={!who}
+            className={`relative flex h-28 w-28 shrink-0 items-center justify-center rounded-full border-2 border-lime transition disabled:opacity-40 ${
               live ? "bg-lime text-black" : "bg-black/60 text-lime hover:bg-lime hover:text-black"
             }`}
           >
@@ -135,7 +112,7 @@ export default function CoachRecent() {
           <div className="min-w-[160px]">
             <p className="font-display text-4xl">{fmt(secs)}</p>
             <p className="text-sm text-white/75">
-              {live ? "Listening. Tap to finish" : drafting ? "Writing your report..." : ready ? "Draft ready below" : "Tap the mic to start"}
+              {live ? "Listening. Tap to finish" : drafting ? "Writing your report..." : ready ? "Draft ready below" : who ? `Report for ${who}. Tap the mic to start` : "No reports waiting"}
             </p>
             {live && (
               <div className="mt-2 flex h-9 items-center gap-1" aria-hidden="true">
@@ -145,18 +122,6 @@ export default function CoachRecent() {
               </div>
             )}
           </div>
-          <label className="ml-auto text-sm text-white/75">
-            Student
-            <select
-              value={who}
-              onChange={(e) => setWho(e.target.value)}
-              className="mt-1 block rounded-xl border border-white/20 bg-black/70 px-3 py-2.5 text-white"
-            >
-              {hubStudents.map((s) => (
-                <option key={s.id}>{s.name}</option>
-              ))}
-            </select>
-          </label>
         </div>
 
         {(lines > 0 || live) && (
@@ -203,7 +168,14 @@ export default function CoachRecent() {
               </div>
             </div>
             <div className="mt-4 flex flex-wrap gap-2 text-sm font-semibold">
-              <button type="button" onClick={() => setNote(`Preview only. In the live version this goes to ${who}.`)} className="btn">
+              <button type="button" onClick={() => {
+                  setNote(`Preview only. In the live version this goes to ${who}.`);
+                  const rest = waiting.filter((r) => r.student !== who);
+                  setWaiting(rest);
+                  setWho(rest[0]?.student ?? null);
+                }}
+                className="btn"
+              >
                 Send to {first}
               </button>
               <button type="button" onClick={reset} className="rounded-xl border border-white/40 px-4 py-2.5">
@@ -213,6 +185,35 @@ export default function CoachRecent() {
             {note && <p className="mt-3 text-sm text-lime">{note}</p>}
           </div>
         )}
+        </div>
+
+        <aside className="rounded-2xl border border-white/15 bg-black/40 p-4 lg:self-start">
+          <p className="font-bold">Reports waiting</p>
+          {waiting.length === 0 ? (
+            <p className="mt-2 text-sm text-white/65">All caught up. Students appear here when their report is due.</p>
+          ) : (
+            <ul className="mt-2 divide-y divide-white/10">
+              {waiting.map((r) => (
+                <li key={r.id} className="flex flex-wrap items-center justify-between gap-2 py-2.5 text-sm">
+                  <span>
+                    <span className="block font-semibold">{r.student}</span>
+                    <span className="block text-white/60">{r.focus} &middot; {r.when}</span>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setWho(r.student);
+                      reset();
+                    }}
+                    className={`rounded-full px-3.5 py-1 font-semibold ${who === r.student ? "bg-lime text-black" : "border border-lime/70 text-lime"}`}
+                  >
+                    {who === r.student ? "Selected" : "Dictate"}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </aside>
       </div>
 
     </div>

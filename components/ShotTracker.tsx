@@ -2,7 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { courses } from "@/lib/courses";
-import { CLUBS, demoNext, loadRounds, project, saveRounds, shotsOf, toYards, type Mark, type ShotRound } from "@/lib/shots";
+import { courseDetails } from "@/lib/courseDetails";
+import CourseMap, { findCourse } from "@/components/CourseMap";
+import { CLUBS, demoRoute, loadRounds, saveRounds, shotsOf, toYards, type Mark, type ShotRound } from "@/lib/shots";
 
 const today = () => new Date().toLocaleDateString("en-CA", { timeZone: "Australia/Sydney" });
 const newRound = (course: string): ShotRound => ({ id: `s${Date.now()}`, course, date: today(), holes: [] });
@@ -60,7 +62,14 @@ export default function ShotTracker() {
     setMsg("");
     const withClub = { club };
     if (demo) {
-      addMark({ ...demoNext(marks[marks.length - 1], marks.length + hole * 7 + rounds.length), ...withClub });
+      const next = demoMarks[marks.length];
+      if (!next) {
+        setMsg("That hole is finished. Pick the next hole above.");
+        return;
+      }
+      const k = marks.length;
+      const demoClub = k >= Math.max(1, demoPar - 2) ? "Putter" : k === 0 && demoPar > 3 ? "Driver" : "7 iron";
+      addMark({ ...next, club: demoClub });
       return;
     }
     if (!("geolocation" in navigator)) {
@@ -92,18 +101,17 @@ export default function ShotTracker() {
     if (activeId === id) setActiveId(null);
   }
 
-  // Map geometry
-  const W = 320, H = 240, PAD = 30;
-  const P = project(marks);
-  const xs = P.map((p) => p.x), ys = P.map((p) => p.y);
-  const spanX = Math.max(40, Math.max(0, ...xs) - Math.min(0, ...xs));
-  const spanY = Math.max(40, Math.max(0, ...ys) - Math.min(0, ...ys));
-  const scale = Math.min((W - PAD * 2) / spanX, (H - PAD * 2) / spanY);
-  const cx = (Math.max(0, ...xs) + Math.min(0, ...xs)) / 2;
-  const cy = (Math.max(0, ...ys) + Math.min(0, ...ys)) / 2;
-  const sx = (x: number) => W / 2 + (x - cx) * scale;
-  const sy = (y: number) => H / 2 + (y - cy) * scale;
-  const barM = [10, 20, 50, 100, 200].find((b) => b * scale >= 40) ?? 200;
+  // Hole facts: only used when the course card is verified. Otherwise the map scales to your own marks.
+  const cm = round ? findCourse(round.course) : undefined;
+  const info = cm ? courseDetails[cm.slug]?.holeData?.find((h) => h.n === hole) : undefined;
+  const knownM = info?.metres;
+  const demoLen = knownM ?? 340;
+  const demoPar = info?.par ?? 4;
+  const demoMarks = demoRoute(demoLen, demoPar, hole * 11 + (round?.id.length ?? 0));
+
+  // Progress along the hole: how far each shot took you, against the hole length when it is verified
+  const along = shots.reduce<number[]>((acc, x) => [...acc, (acc[acc.length - 1] ?? 0) + x.metres], []);
+  const reach = Math.max(knownM ?? 0, along[along.length - 1] ?? 0, 1);
 
   const clubAvg = useMemo(() => {
     const map = new Map<string, number[]>();
@@ -164,39 +172,26 @@ export default function ShotTracker() {
             })}
           </div>
 
-          <div className="mt-4 overflow-hidden rounded-xl border border-white/15 bg-[#0d2a14]">
-            <svg viewBox={`0 0 ${W} ${H}`} className="block w-full" role="img" aria-label={`Your shots on hole ${hole}`}>
-              <rect width={W} height={H} fill="#12361b" />
-              {marks.length === 0 && (
-                <text x={W / 2} y={H / 2} textAnchor="middle" fontSize="11" fill="#ffffff" opacity=".6">
-                  Stand on the tee and tap Mark shot
-                </text>
-              )}
-              {P.length > 1 && (
-                <polyline points={P.map((p) => `${sx(p.x).toFixed(1)},${sy(p.y).toFixed(1)}`).join(" ")} fill="none" stroke="#c6ff3d" strokeWidth="2" strokeDasharray="5 4" strokeLinecap="round" />
-              )}
-              {P.slice(1).map((p, i) => {
-                const a = P[i];
-                const mx = (sx(a.x) + sx(p.x)) / 2, my = (sy(a.y) + sy(p.y)) / 2;
-                return (
-                  <text key={i} x={mx} y={my - 6} textAnchor="middle" fontSize="10" fontWeight="700" fill="#fff" stroke="#000" strokeWidth="3" paintOrder="stroke">
-                    {fmt(shots[i].metres)} {unit}
-                  </text>
-                );
-              })}
-              {P.map((p, i) => (
-                <g key={i}>
-                  <circle cx={sx(p.x)} cy={sy(p.y)} r="8" fill={i === 0 ? "#c6ff3d" : "#0a0a0a"} stroke="#c6ff3d" />
-                  <text x={sx(p.x)} y={sy(p.y) + 3} textAnchor="middle" fontSize="9" fontWeight="700" fill={i === 0 ? "#000" : "#c6ff3d"}>{i === 0 ? "T" : i}</text>
-                </g>
+          <div className="mt-4">
+            <CourseMap name={round.course} holeData={cm ? courseDetails[cm.slug]?.holeData : undefined} selected={hole} />
+          </div>
+          <div className="mt-3 rounded-xl border border-white/15 px-4 py-3">
+            <p className="text-sm font-semibold">
+              Hole {hole}
+              {info?.par ? ` · Par ${info.par}` : ""}
+              {knownM ? ` · ${fmt(knownM)} ${unit}` : ""}
+            </p>
+            <div className="relative mt-3 h-3 rounded-full bg-white/10" aria-hidden="true">
+              <span className="absolute inset-y-0 left-0 rounded-full bg-lime/40" style={{ width: `${Math.min(100, ((along[along.length - 1] ?? 0) / reach) * 100)}%` }} />
+              {along.map((m, i) => (
+                <span key={i} className="absolute top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border border-lime bg-black" style={{ left: `${Math.min(100, (m / reach) * 100)}%` }} />
               ))}
-              {marks.length > 0 && (
-                <g>
-                  <line x1="14" y1={H - 14} x2={14 + barM * scale} y2={H - 14} stroke="#fff" strokeWidth="2" />
-                  <text x="14" y={H - 20} fontSize="9" fill="#fff">{fmt(barM)} {unit}</text>
-                </g>
-              )}
-            </svg>
+            </div>
+            <p className="mt-2 text-xs text-white/60">
+              {marks.length === 0
+                ? "Stand on the tee and tap Mark tee."
+                : `${fmt(along[along.length - 1] ?? 0)} ${unit} covered${knownM ? ` of ${fmt(knownM)} ${unit}` : ""}. Distances are real GPS.`}
+            </p>
           </div>
 
           <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto_auto] sm:items-end">

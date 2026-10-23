@@ -11,9 +11,9 @@ export default function MyReviews() {
       .then((r) => setItems(r.sort((a, b) => b.createdAt - a.createdAt)))
       .catch(() => {});
   }, []);
-  if (!items.length) return null;
+  if (!items.length) return <p className="text-sm text-white/60">Reviews from your coach, with their drawings and voiceover, appear here.</p>;
   return (
-    <div className="mb-3 grid gap-3 sm:grid-cols-2">
+    <div className="grid gap-3 sm:grid-cols-2">
       {items.map((r) => (
         <div key={r.id} className="glass rounded-2xl p-4">
           <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-lime">

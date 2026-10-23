@@ -266,7 +266,7 @@ export default function RoundsTracker() {
           </label>
           {course && (
             <div className="sm:col-span-2 sm:-mt-1">
-              <CourseMap name={course} />
+              <div className="mt-3"><CourseMap name={course} /></div>
             </div>
           )}
           <label className="text-sm font-semibold">

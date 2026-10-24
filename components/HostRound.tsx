@@ -61,7 +61,7 @@ export default function HostRound() {
 
       <section className="grid gap-4 lg:grid-cols-[1fr_1.1fr]">
         <form onSubmit={create} className="glass grid content-start gap-3 rounded-2xl p-5 sm:grid-cols-2">
-          <h2 className="font-display text-2xl sm:col-span-2">Host a round</h2>
+          <h2 className="font-display text-2xl sm:col-span-2">Get started</h2>
           <label className="text-sm font-semibold sm:col-span-2">
             Course
             <input list="host-courses" value={course} onChange={(e) => setCourse(e.target.value)} placeholder="Start typing a course" className="field-input mt-1" />
@@ -133,7 +133,7 @@ export default function HostRound() {
 
       <section>
         <h2 className="font-display text-[clamp(1.5rem,5vw,2rem)]">The 19th hole</h2>
-        <p className="mt-1 max-w-xl text-sm text-white/70">After the round, everyone adds their score and the group sees the board. Only people in that round can see it.</p>
+        <p className="mt-1 max-w-xl text-sm text-white/70">After the round, everyone adds their score and the group sees the board.<br />Only people in that round can see it.</p>
         {past && (
           <div className="glass mt-3 rounded-2xl p-5">
             <p className="font-bold">{past.course} <span className="font-normal text-white/65">&middot; {past.when}</span></p>

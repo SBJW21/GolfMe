@@ -84,9 +84,9 @@ export default function MyGolfPage() {
               <dd className="mt-0.5 text-base">{s.goal}</dd>
             </div>
           </dl>
-          <span className="pill-arrow mt-5 self-start rounded-lg border border-white/40 px-3 py-1.5 text-sm font-semibold lg:mt-auto">Edit details</span>
+          <span className="pill-arrow mt-5 self-end rounded-lg border border-white/40 px-3 py-1.5 text-sm font-semibold lg:mt-auto">Edit details</span>
         </div>
-        <div className="grid content-start gap-3">
+        <div className="grid grid-rows-[auto_1fr] gap-3">
           {coach && (
             <Link href={`/coaches/${coach.slug}`} className="glass flex items-center gap-3 rounded-2xl p-4 hover:!border-lime/70">
               <CoachPhoto slug={coach.slug} name={coach.name} photo={coach.photo} className="h-16 w-16 shrink-0" />
@@ -98,9 +98,9 @@ export default function MyGolfPage() {
               <span className={pill}>Rebook</span>
             </Link>
           )}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 grid-rows-2 gap-3">
             {stats.map((x) => (
-              <div key={x.label} className="glass rounded-2xl px-4 py-3">
+              <div key={x.label} className="glass flex flex-col justify-center rounded-2xl px-4 py-3">
                 <p className="font-display text-2xl leading-none text-lime">{x.value}</p>
                 <p className="mt-1 text-xs text-white/75">{x.label}</p>
               </div>
@@ -113,7 +113,7 @@ export default function MyGolfPage() {
       <section className="mt-10 grid grid-cols-[minmax(0,1fr)] gap-6">
         <Group>Lessons</Group>
         <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-3">
-          <Sub action={<Link href="/coaches" className="text-sm font-semibold text-lime underline-offset-4 hover:underline">Book lesson</Link>}>My lessons</Sub>
+          <Sub action={<Link href="/coaches" className={pill}>Book lesson</Link>}>Upcoming</Sub>
           <AppointmentSlider items={sampleAppointments()} />
         </div>
         <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-3">

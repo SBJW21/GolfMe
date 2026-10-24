@@ -22,9 +22,16 @@ export default function CoachHubPage() {
         <h1 className="font-display text-[clamp(2.2rem,7vw,3.4rem)]">Coach hub</h1>
       </div>
 
+      <section className="mt-6">
+        <Heading>Upcoming</Heading>
+        <div className="mt-4">
+          <CoachCalendar weeks={hubWeeks()} />
+        </div>
+      </section>
+
       <Link
         href="/coach/swing-analysis"
-        className="glass mt-6 flex items-center justify-between gap-4 rounded-2xl p-5 hover:!border-lime/70"
+        className="glass mt-12 flex items-center justify-between gap-4 rounded-2xl p-5 hover:!border-lime/70"
       >
         <div>
           <p className="font-display text-2xl text-lime">Swing analysis</p>
@@ -33,14 +40,7 @@ export default function CoachHubPage() {
         <span className="text-2xl text-lime" aria-hidden="true">&rarr;</span>
       </Link>
 
-      <section className="mt-8">
-        <Heading>Upcoming</Heading>
-        <div className="mt-4">
-          <CoachCalendar weeks={hubWeeks()} />
-        </div>
-      </section>
-
-      <section className="mt-12">
+      <section className="mt-6">
         <Heading>Recent</Heading>
         <div className="mt-4">
           <CoachRecent />

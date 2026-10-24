@@ -4,6 +4,7 @@ import HowItWorks from "@/components/HowItWorks";
 import SampleNotice from "@/components/SampleNotice";
 import FocusPicker from "@/components/FocusPicker";
 import AreaPicker from "@/components/AreaPicker";
+import BackToSearch from "@/components/BackToSearch";
 import { areaCounts } from "@/lib/areas";
 import { loadCoaches } from "@/lib/repo";
 
@@ -112,6 +113,9 @@ export default async function Home() {
               <CoachCard coach={c} />
             </div>
           ))}
+        </div>
+        <div className="mt-10 flex justify-center">
+          <BackToSearch />
         </div>
       </section>
     </main>

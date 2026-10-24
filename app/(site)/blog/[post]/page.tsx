@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import BlogChart from "@/components/BlogChart";
+import CourseMap from "@/components/CourseMap";
 import { getPost, posts } from "@/lib/blog";
+import { courseDetails } from "@/lib/courseDetails";
+import { getCourse } from "@/lib/courses";
 import { SITE_URL } from "@/lib/suburbs";
 
 export function generateStaticParams() {
@@ -52,6 +56,27 @@ export default async function BlogPost(props: PageProps<"/blog/[post]">) {
             {b.p.map((t, j) => (
               <p key={j}>{t}</p>
             ))}
+            {b.charts?.map((c) => (
+              <BlogChart key={c.title} spec={c} />
+            ))}
+            {b.maps && (
+              <div className={`grid gap-4 ${b.maps.length > 1 ? "sm:grid-cols-2" : ""}`}>
+                {b.maps.map((slug) => {
+                  const c = getCourse(slug);
+                  if (!c) return null;
+                  return (
+                    <div key={slug}>
+                      <CourseMap name={c.name} holeData={courseDetails[slug]?.holeData} />
+                      <p className="mt-1.5 text-sm">
+                        <Link href={`/courses/${slug}`} className="font-semibold text-lime underline-offset-4 hover:underline">
+                          {c.name} course guide
+                        </Link>
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </section>
         ))}
       </article>

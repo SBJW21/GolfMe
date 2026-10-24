@@ -5,7 +5,8 @@ import RoundsTracker from "@/components/RoundsTracker";
 export const metadata: Metadata = { title: "My rounds" };
 export const dynamic = "force-dynamic";
 
-export default function RoundsPage() {
+export default async function RoundsPage(props: PageProps<"/my-golf/rounds">) {
+  const { mode } = await props.searchParams;
   return (
     <main className="mx-auto max-w-6xl px-4 py-10">
       <Link href="/my-golf" className="text-sm text-lime">
@@ -17,7 +18,7 @@ export default function RoundsPage() {
         Log every round, keep your weekly streak alive and see how your friends are going.
       </p>
       <div className="mt-8">
-        <RoundsTracker />
+        <RoundsTracker initialMode={mode === "holes" ? "holes" : "total"} />
       </div>
     </main>
   );

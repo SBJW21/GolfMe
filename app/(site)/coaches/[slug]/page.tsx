@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import CoachAreaMap from "@/components/CoachAreaMap";
 import CoachPhoto from "@/components/CoachPhoto";
 import SampleNotice from "@/components/SampleNotice";
 import Stars from "@/components/Stars";
@@ -47,12 +48,30 @@ export default async function CoachPage(props: PageProps<"/coaches/[slug]">) {
               photo={coach.photo}
               className="h-20 w-20 shrink-0 sm:h-28 sm:w-28"
             />
-            <h1 className="font-display text-[clamp(2.2rem,7vw,3.4rem)]">
-              {coach.name}
-            </h1>
+            <div className="min-w-0">
+              <h1 className="font-display text-[clamp(2.2rem,7vw,3.4rem)] leading-none">
+                {coach.name}
+              </h1>
+              {coach.title && (
+                <p className="mt-1 text-sm font-semibold uppercase tracking-[0.14em] text-white/70">
+                  {coach.title}
+                </p>
+              )}
+              {coach.badges && coach.badges.length > 0 && (
+                <ul className="mt-2 flex flex-wrap gap-1.5">
+                  {coach.badges.map((b) => (
+                    <li
+                      key={b}
+                      className="rounded-full border border-lime/50 px-2.5 py-0.5 text-xs font-semibold text-lime sm:text-sm"
+                    >
+                      {b}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </div>
-          <p className="mt-2 text-white/80">
-            {coach.title ? `${coach.title}, ` : ""}
+          <p className="mt-3 text-white/80">
             {coach.suburb}
             {coach.yearsCoaching > 0 && <> &middot; {coach.yearsCoaching} years coaching</>}
           </p>
@@ -62,19 +81,6 @@ export default async function CoachPage(props: PageProps<"/coaches/[slug]">) {
 
           <p className="mt-6 text-xl font-semibold">{coach.headline}</p>
           <p className="mt-3 text-white/85">{coach.bio}</p>
-
-          {coach.badges && coach.badges.length > 0 && (
-            <ul className="mt-5 flex flex-wrap gap-2">
-              {coach.badges.map((b) => (
-                <li
-                  key={b}
-                  className="rounded-full border border-lime/50 px-3 py-1 text-sm font-semibold text-lime"
-                >
-                  {b}
-                </li>
-              ))}
-            </ul>
-          )}
 
           <div className="mt-5 flex flex-wrap gap-1.5">
             {coach.focus.map((f) => (
@@ -114,6 +120,8 @@ export default async function CoachPage(props: PageProps<"/coaches/[slug]">) {
               ))}
             </ul>
           )}
+
+          <CoachAreaMap suburb={coach.suburb} />
         </div>
 
         <aside className="glass h-fit rounded-2xl p-5 lg:sticky lg:top-20">

@@ -1,4 +1,7 @@
-export type Block = { h?: string; p: string[] };
+import type { ChartSpec } from "@/components/BlogChart";
+
+/** A section of a post. `charts` and `maps` (course slugs) are drawn after the paragraphs. */
+export type Block = { h?: string; p: string[]; charts?: ChartSpec[]; maps?: string[] };
 export type Post = {
   slug: string;
   title: string;
@@ -27,6 +30,42 @@ export const posts: Post[] = [
         p: [
           "Moore Park Golf lists a private 30-minute lesson at $88 and a private one-hour lesson at $166. A one-hour shared lesson is $191 for two people. An on-course private lesson starts at $285 for an hour and a half.",
           "Precision Golf at Cromer lists an adult 30-minute lesson at $100 and a one-hour lesson at $150, both with a PGA coach and TrackMan. A junior one-hour lesson is $110 and a 90-minute short game lesson is $225.",
+        ],
+        charts: [
+          {
+            title: "What each type of lesson costs",
+            caption: "Published prices from Moore Park Golf and Precision Golf Cromer, checked 22 October 2026. A bar shows both providers' prices for the same lesson. A dot means only one lists it. Shared is per person ($191 for two). On-course is the starting price.",
+            prefix: "$",
+            axis: [0, 300],
+            ticks: [0, 100, 200, 300],
+            kind: "range",
+            rows: [
+              { label: "Private, 30 minutes", min: 88, max: 100 },
+              { label: "Shared, 1 hour (per person)", min: 95.5 },
+              { label: "Junior, 1 hour", min: 110 },
+              { label: "Private, 1 hour", min: 150, max: 166 },
+              { label: "Short game, 90 minutes", min: 225 },
+              { label: "On the course, 90 minutes (from)", min: 285 },
+            ],
+          },
+          {
+            title: "Price for every 30 minutes",
+            caption: "Our own sums from the same published prices: lesson price divided by the number of half hours (and by two for the shared lesson). Longer lessons usually cost less per half hour.",
+            prefix: "$",
+            axis: [0, 100],
+            ticks: [0, 25, 50, 75, 100],
+            kind: "bar",
+            rows: [
+              { label: "Moore Park, shared 1 hour (per person)", min: 47.75 },
+              { label: "Precision, junior 1 hour", min: 55 },
+              { label: "Precision, private 1 hour", min: 75 },
+              { label: "Precision, short game 90 minutes", min: 75 },
+              { label: "Moore Park, private 1 hour", min: 83 },
+              { label: "Moore Park, private 30 minutes", min: 88 },
+              { label: "Moore Park, on the course 90 minutes", min: 95 },
+              { label: "Precision, private 30 minutes", min: 100 },
+            ],
+          },
         ],
       },
       {
@@ -70,6 +109,7 @@ export const posts: Post[] = [
           "Moore Park Golf is an 18-hole, par 70 course close to the city. Its own site lists 10-hole rounds, which suit a first game or a lunch break. Online bookings were listed at $39 on weekdays and $46 on Fridays to Sundays when we checked on 22 October 2026.",
           "Our take: a 10-hole round is the easiest way to try golf without giving up half a day. Book a lesson first and use the round to practise what you learn.",
         ],
+        maps: ["moore-park-golf"],
       },
       {
         h: "Want a gentler layout: Bardwell Valley",
@@ -77,6 +117,7 @@ export const posts: Post[] = [
           "Bardwell Valley Golf Club at Bardwell Park is 18 holes, but the par is 62. That is ten shots lower than a standard par 72 course, which usually means shorter holes.",
           "Our take: a shorter course tends to be quicker to play and kinder to beginners. We have not played it, so check the course for hole lengths before you go.",
         ],
+        maps: ["bardwell-valley-golf-club"],
       },
       {
         h: "Want a full test: Mona Vale",
@@ -84,12 +125,34 @@ export const posts: Post[] = [
           "Mona Vale Golf Club on the Northern Beaches is listed as 18 holes, par 73, which is the highest par of the courses we have details for. We have not yet confirmed this with the club. Par is only a rough guide to difficulty, but it points to a longer round.",
           "Our take: a good target once you can hit the ball forward with some control. Pair it with a driving lesson beforehand.",
         ],
+        maps: ["mona-vale-golf-club"],
       },
       {
         h: "Other 18-hole courses with published details",
         p: [
           "Long Reef Golf Course at Collaroy is 18 holes, par 71. Wakehurst Golf Club at Allambie Heights is listed as 18 holes, par 72. St Michael's Golf Club at Little Bay is 18 holes, par 72. Stonecutters Ridge at Colebee is 18 holes, par 71. Lynwood Golf and Country Club at Pitt Town and Brighton Lakes at Moorebank are listed at par 72 and par 70, both 18 holes, and we are still confirming those with the clubs.",
         ],
+        charts: [
+          {
+            title: "Par by course",
+            caption: "Par as listed by Fairway Finders, checked 22 October 2026. Par is a rough guide to length, not a rating of difficulty. Mona Vale, Lynwood and Brighton Lakes are not yet confirmed with the clubs.",
+            axis: [60, 75],
+            ticks: [60, 65, 70, 75],
+            kind: "range",
+            rows: [
+              { label: "Bardwell Valley", min: 62 },
+              { label: "Moore Park Golf", min: 70 },
+              { label: "Brighton Lakes", min: 70 },
+              { label: "Long Reef", min: 71 },
+              { label: "Stonecutters Ridge", min: 71 },
+              { label: "Wakehurst", min: 72 },
+              { label: "St Michael's", min: 72 },
+              { label: "Lynwood", min: 72 },
+              { label: "Mona Vale", min: 73 },
+            ],
+          },
+        ],
+        maps: ["long-reef-golf-course", "wakehurst-golf-club", "st-michael-s-golf-club", "stonecutters-ridge-golf-club", "lynwood-golf-and-country-club", "brighton-lakes-recreation-and-golf-club"],
       },
       {
         h: "Match the course to your lesson",
@@ -126,6 +189,21 @@ export const posts: Post[] = [
           "Balls. Buy cheap and durable. Most beginners lose a few. A dozen is plenty to start.",
           "A bag, tees and a glove. A stand bag suits walking and a cart bag suits riding. Tees come in wood or plastic, and plastic lasts longer. A snug glove helps your grip and stops blisters. Keep a spare in case one gets wet.",
           "Clothing. Check the course's dress code first. Most expect a collared top. Add a hat, sunglasses and water for a Sydney summer.",
+        ],
+        charts: [
+          {
+            title: "How many clubs you need",
+            caption: "Ranges from two beginner gear guides (listed in our sources). A full set is the 14-club maximum allowed in a round.",
+            suffix: " clubs",
+            axis: [0, 14],
+            ticks: [0, 7, 14],
+            kind: "range",
+            rows: [
+              { label: "One guide's starter range", min: 5, max: 7 },
+              { label: "Another guide's range", min: 8, max: 10 },
+              { label: "A full set", min: 14 },
+            ],
+          },
         ],
       },
       {

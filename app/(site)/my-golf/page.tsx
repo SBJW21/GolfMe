@@ -54,43 +54,59 @@ export default function MyGolfPage() {
           <p className="text-xs uppercase tracking-[0.16em] text-white/45">Sample student profile</p>
           <h1 className="font-display mt-1 text-[clamp(2rem,6vw,2.8rem)] leading-none">My Golf</h1>
         </div>
-        <div className="flex gap-2">
-          <Link href="/my-golf/rounds" className={pill}>Mark a round</Link>
-          <Link href="/coaches" className={pill}>Book lesson</Link>
+        <div className="flex flex-wrap gap-2">
+          <Link href="/my-golf/rounds?mode=holes#log" className={pill}>Live Scorecard</Link>
+          <Link href="/my-golf/rounds?mode=total#log" className={pill}>Mark last round</Link>
         </div>
       </div>
 
       {/* Headline stats */}
-      <section className="mt-5 grid gap-3 lg:grid-cols-[1.5fr_1fr]">
-        <div className="glass flex flex-wrap items-center gap-x-5 gap-y-3 rounded-2xl p-4">
-          <span className="font-display flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-lime text-2xl text-black">CA</span>
-          <div className="min-w-[10rem] flex-1">
-            <p className="text-lg font-bold leading-tight">{s.name}</p>
-            <p className="text-sm text-white/70">Member since {s.memberSince}</p>
-            <p className="text-sm text-white/70">HCP {s.handicap} &middot; {s.suburb}</p>
-          </div>
-          <p className="basis-full text-sm sm:basis-auto sm:max-w-[14rem]"><span className="text-xs uppercase tracking-[0.14em] text-white/50">Goal</span><br />{s.goal}</p>
-          <span className="pill-arrow rounded-lg border border-white/40 px-3 py-1.5 text-sm font-semibold">Edit details</span>
-        </div>
-        {coach && (
-          <Link href={`/coaches/${coach.slug}`} className="glass flex items-center gap-3 rounded-2xl p-4 hover:!border-lime/70">
-            <CoachPhoto slug={coach.slug} name={coach.name} photo={coach.photo} className="h-16 w-16 shrink-0" />
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/50">My coach</p>
-              <p className="font-bold leading-tight">{coach.name}</p>
-              <p className="text-sm text-white/70">{coach.lessons} lessons together</p>
+      <section className="mt-5 grid gap-3 lg:grid-cols-[1.4fr_1fr]">
+        <div className="glass flex flex-col rounded-2xl p-5 sm:p-6">
+          <div className="flex items-center gap-4">
+            <span className="font-display flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-lime text-3xl text-black">CA</span>
+            <div className="min-w-0">
+              <p className="text-xl font-bold leading-tight">{s.name}</p>
+              <p className="text-sm text-white/70">Member since {s.memberSince}</p>
             </div>
-            <span className={pill}>Rebook</span>
-          </Link>
-        )}
-      </section>
-      <section className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {stats.map((x) => (
-          <div key={x.label} className="glass rounded-2xl px-4 py-3">
-            <p className="font-display text-2xl leading-none text-lime">{x.value}</p>
-            <p className="mt-1 text-xs text-white/75">{x.label}</p>
           </div>
-        ))}
+          <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-4 border-t border-white/10 pt-5 text-sm">
+            <div>
+              <dt className="text-xs uppercase tracking-[0.14em] text-white/50">Handicap</dt>
+              <dd className="mt-0.5 text-lg font-semibold">{s.handicap}</dd>
+            </div>
+            <div>
+              <dt className="text-xs uppercase tracking-[0.14em] text-white/50">Home area</dt>
+              <dd className="mt-0.5 text-lg font-semibold">{s.suburb}</dd>
+            </div>
+            <div className="col-span-2">
+              <dt className="text-xs uppercase tracking-[0.14em] text-white/50">Goal</dt>
+              <dd className="mt-0.5 text-base">{s.goal}</dd>
+            </div>
+          </dl>
+          <span className="pill-arrow mt-5 self-start rounded-lg border border-white/40 px-3 py-1.5 text-sm font-semibold lg:mt-auto">Edit details</span>
+        </div>
+        <div className="grid content-start gap-3">
+          {coach && (
+            <Link href={`/coaches/${coach.slug}`} className="glass flex items-center gap-3 rounded-2xl p-4 hover:!border-lime/70">
+              <CoachPhoto slug={coach.slug} name={coach.name} photo={coach.photo} className="h-16 w-16 shrink-0" />
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/50">My coach</p>
+                <p className="font-bold leading-tight">{coach.name}</p>
+                <p className="text-sm text-white/70">{coach.lessons} lessons together</p>
+              </div>
+              <span className={pill}>Rebook</span>
+            </Link>
+          )}
+          <div className="grid grid-cols-2 gap-3">
+            {stats.map((x) => (
+              <div key={x.label} className="glass rounded-2xl px-4 py-3">
+                <p className="font-display text-2xl leading-none text-lime">{x.value}</p>
+                <p className="mt-1 text-xs text-white/75">{x.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* Lessons, feedback, videos, reports */}
@@ -106,7 +122,7 @@ export default function MyGolfPage() {
         </div>
         <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-3">
           <Sub>Videos</Sub>
-          <div className="-mx-4 flex snap-x gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 lg:grid-cols-4">
+          <div className="-mx-4 flex snap-x scroll-px-4 gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 lg:grid-cols-4">
             {sampleMyVideos.map((v) => (
               <div key={v.id} className="w-[68%] shrink-0 snap-start sm:w-auto">
                 <VideoPlaceholder title={v.title} meta={`${v.date} \u00b7 ${v.length}`} label="Sample" tag={v.tag} />
@@ -133,7 +149,10 @@ export default function MyGolfPage() {
 
       {/* Tracking: scorecard, shots, friends */}
       <section className="mt-10 grid gap-4">
-        <Group>Play a round</Group>
+        <div className="flex items-center justify-between gap-3">
+          <Group>Play a round</Group>
+          <Link href="/my-golf/host" className={pill}>Host a round</Link>
+        </div>
         <div className="grid gap-3 md:grid-cols-3">
           <Link href="/my-golf/rounds" className="glass flex flex-col gap-3 rounded-2xl p-4 hover:!border-lime/70">
             <Sub>Scorecard</Sub>
@@ -152,7 +171,7 @@ export default function MyGolfPage() {
               ))}
             </div>
             <p className="text-sm text-white/70">Last round: {last.course}, {last.score}</p>
-            <span className={`${pill} mt-auto self-start`}>Mark a round</span>
+            <span className={`${pill} mt-auto self-start`}>Score a round</span>
           </Link>
 
           <Link href="/my-golf/shots" className="glass flex flex-col gap-3 rounded-2xl p-4 hover:!border-lime/70">

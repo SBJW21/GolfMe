@@ -7,14 +7,14 @@ import { courses as allCourses } from "@/lib/courses";
 import Flame from "./Flame";
 import { defaultPars, defaultStrokeIndex, holePoints, milestoneProgress, milestones, sampleCourses, sampleFriends, sampleRounds, streakInfo, todayIso, type Round } from "@/lib/rounds";
 
-export default function RoundsTracker() {
+export default function RoundsTracker({ initialMode = "total" }: { initialMode?: "total" | "holes" }) {
   const [rounds, setRounds] = useState<Round[]>(() => sampleRounds());
   const [course, setCourse] = useState("");
   const [date, setDate] = useState(todayIso());
   const [score, setScore] = useState("");
   const [par, setPar] = useState("72");
   const [picked, setPicked] = useState<Record<string, string>>({});
-  const [mode, setMode] = useState<"total" | "holes">("total");
+  const [mode, setMode] = useState<"total" | "holes">(initialMode);
   const [holes, setHoles] = useState<string[]>(Array(18).fill(""));
   const [putts, setPutts] = useState("");
   const [hcp, setHcp] = useState("24.6");
@@ -252,7 +252,7 @@ export default function RoundsTracker() {
       </section>
 
       {/* Log a round */}
-      <section>
+      <section id="log" className="scroll-mt-20">
         <h2 className="font-display text-[clamp(1.7rem,5vw,2.3rem)]">Log a round</h2>
         <form onSubmit={addRound} className="glass mt-4 grid gap-3 rounded-2xl p-5 sm:grid-cols-2">
           <label className="text-sm font-semibold">

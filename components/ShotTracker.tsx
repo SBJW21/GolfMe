@@ -17,7 +17,7 @@ export default function ShotTracker() {
   const [club, setClub] = useState("Driver");
   const [yards, setYards] = useState(false);
   const [demo, setDemo] = useState(false);
-  const [course, setCourse] = useState("");
+  const [course, setCourse] = useState("Mona Vale Golf Club");
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState(false);
 

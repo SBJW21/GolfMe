@@ -3,7 +3,11 @@ export type Mark = {
   lat: number;
   lon: number;
   acc?: number; // GPS accuracy in metres
-  club?: string; // club used for the shot that starts here
+  club?: string; // club used for the shot that ended here (blank if the player skipped it)
+  /** The shot that ended here was a putt */
+  putt?: boolean;
+  /** The ball went in the cup on this mark */
+  holed?: boolean;
   ts: number;
   demo?: boolean;
   /** Added without GPS: by typing a distance or tapping the hole map */
@@ -28,9 +32,9 @@ export function distM(a: { lat: number; lon: number }, b: { lat: number; lon: nu
   return 2 * R * Math.asin(Math.min(1, Math.sqrt(h)));
 }
 
-/** Shots are the gaps between consecutive marks. The club belongs to the mark the shot starts from. */
+/** Shots are the gaps between consecutive marks. The club and putt flag belong to the mark the shot ends on. */
 export function shotsOf(marks: Mark[]) {
-  return marks.slice(1).map((m, i) => ({ n: i + 1, from: marks[i], to: m, metres: m.manual && m.m !== undefined ? m.m : distM(marks[i], m), club: marks[i].club }));
+  return marks.slice(1).map((m, i) => ({ n: i + 1, from: marks[i], to: m, metres: m.manual && m.m !== undefined ? m.m : distM(marks[i], m), club: m.club, putt: !!m.putt || m.club === "Putter" }));
 }
 
 const KEY = "golfme-shots-v1";

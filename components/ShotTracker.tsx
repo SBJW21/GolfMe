@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { courses } from "@/lib/courses";
 import { courseDetails } from "@/lib/courseDetails";
 import CourseMap, { findCourse } from "@/components/CourseMap";
@@ -16,14 +16,13 @@ export default function ShotTracker() {
   const [ready, setReady] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [hole, setHole] = useState(1);
-  const [club, setClub] = useState("Driver");
+  const [club, setClub] = useState("");
   const [yards, setYards] = useState(false);
   const [demo, setDemo] = useState(false);
   const [course, setCourse] = useState("Mona Vale Golf Club");
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState(false);
   const [walk, setWalk] = useState(0); // metres since the last mark, for the map
-  const [entry, setEntry] = useState("");
 
   useEffect(() => {
     // Browser storage can only be read after mount, so this one-off load is intentional.
@@ -40,6 +39,7 @@ export default function ShotTracker() {
   const round = rounds.find((r) => r.id === activeId) ?? null;
   const marks = round?.holes.find((h) => h.hole === hole)?.marks ?? [];
   const shots = shotsOf(marks);
+  const holed = marks.length > 0 && !!marks[marks.length - 1].holed;
   const unit = yards ? "yd" : "m";
   const fmt = (m: number) => Math.round(yards ? toYards(m) : m);
 
@@ -51,6 +51,7 @@ export default function ShotTracker() {
     setMsg("");
   }
   function addMark(m: Mark) {
+    setClub("");
     setRounds((all) =>
       all.map((r) => {
         if (r.id !== activeId) return r;
@@ -62,9 +63,14 @@ export default function ShotTracker() {
       }),
     );
   }
-  function mark() {
+  function mark(kind: "shot" | "putt" = "shot") {
     setMsg("");
-    const withClub = { club };
+    if (holed) {
+      setMsg("This hole is finished. Pick the next hole above, or go back to this hole and Undo.");
+      return;
+    }
+    const isPutt = kind === "putt" && marks.length > 0;
+    const withClub = marks.length === 0 ? {} : isPutt ? { club: "Putter", putt: true } : club ? { club } : {};
     if (demo) {
       const next = demoMarks[marks.length];
       if (!next) {
@@ -72,8 +78,8 @@ export default function ShotTracker() {
         return;
       }
       const k = marks.length;
-      const demoClub = k >= Math.max(1, demoPar - 2) ? "Putter" : k === 0 && demoPar > 3 ? "Driver" : "7 iron";
-      addMark({ ...next, club: demoClub });
+      const isDemoPutt = k > Math.max(1, demoPar - 2);
+      addMark({ ...next, ...(k === 0 ? {} : isDemoPutt ? { club: "Putter", putt: true } : { club: k === 1 && demoPar > 3 ? "Driver" : "7 iron" }) });
       return;
     }
     if (marks.length && marks[marks.length - 1].manual) {
@@ -99,8 +105,12 @@ export default function ShotTracker() {
     );
   }
   const factor = yards ? 1.0936133 : 1;
-  function addManual(metres: number, pos?: [number, number]) {
+  function addManual(metres: number, pos?: [number, number], putt = false) {
     if (!round) return;
+    if (holed) {
+      setMsg("This hole is finished. Pick the next hole above, or go back to this hole and Undo.");
+      return;
+    }
     if (marks.length === 0) {
       setMsg("Mark the tee first.");
       return;
@@ -110,17 +120,12 @@ export default function ShotTracker() {
       return;
     }
     setMsg("");
-    addMark({ lat: 0, lon: 0, manual: true, m: metres, pos, ts: Date.now(), club });
+    addMark({ lat: 0, lon: 0, manual: true, m: metres, pos, ts: Date.now(), ...(putt ? { club: "Putter", putt: true } : club ? { club } : {}) });
     setWalk(0);
-    setEntry("");
   }
   function markTeeManual() {
     setMsg("");
-    addMark({ lat: 0, lon: 0, manual: true, m: 0, pos: mapData?.tp, ts: Date.now(), club });
-  }
-  function addTyped() {
-    const v = Number(entry.replace(",", "."));
-    addManual(v / factor);
+    addMark({ lat: 0, lon: 0, manual: true, m: 0, pos: mapData?.tp, ts: Date.now() });
   }
   function gpsWalked() {
     const last = marks[marks.length - 1];
@@ -146,11 +151,56 @@ export default function ShotTracker() {
       { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 },
     );
   }
+  // Putts without GPS: the ball stays put on the map, the distance is the slider or a typical 2 m
+  function puttManual() {
+    const last = marks[marks.length - 1];
+    if (!last) {
+      setMsg("Mark the tee first.");
+      return;
+    }
+    if (!last.manual) {
+      setMsg("Use Record putt with GPS from a GPS position, or finish the hole with In the cup.");
+      return;
+    }
+    addManual(walk > 0 ? walk : 2, last.pos, true);
+  }
+  // Rough distance from the last recorded ball position to the pin
+  function toPin() {
+    const last = marks[marks.length - 1];
+    if (!last) return 0;
+    if (mapData && last.pos) {
+      let len = 0;
+      for (let i = 1; i < mapData.cl.length; i++) len += Math.hypot(mapData.cl[i][0] - mapData.cl[i - 1][0], mapData.cl[i][1] - mapData.cl[i - 1][1]);
+      const k = mapData.m / len;
+      return Math.hypot(last.pos[0] - mapData.gp[0], last.pos[1] - mapData.gp[1]) * k;
+    }
+    const holeLen = knownM ?? mapData?.m ?? (demo ? demoLen : 0);
+    if (holeLen > 0) return holeLen - (along[along.length - 1] ?? 0);
+    return 2;
+  }
+  function inTheCup() {
+    if (!round) return;
+    if (marks.length === 0) {
+      setMsg("Mark the tee first.");
+      return;
+    }
+    if (holed) return;
+    const d = Math.max(1, Math.min(300, toPin()));
+    const estimated = !(knownM ?? mapData?.m);
+    const lastClub = club;
+    const isPutt = lastClub === "Putter" || !!marks[marks.length - 1].putt || (!lastClub && d <= 15);
+    setMsg("");
+    addMark({ lat: 0, lon: 0, manual: true, m: Math.round(d * 10) / 10, pos: mapData?.gp, ts: Date.now(), holed: true, ...(isPutt ? { club: "Putter", putt: true } : lastClub ? { club: lastClub } : {}) });
+    setWalk(0);
+    const n = marks.length; // shots after this one is added
+    const putts = shots.filter((s) => s.putt).length + (isPutt ? 1 : 0);
+    setMsg(`In the cup! ${n} ${n === 1 ? "shot" : "shots"}${putts ? `, ${putts} ${putts === 1 ? "putt" : "putts"}` : ""}.${estimated ? " Last distance is a guess because this course has no hole length yet." : ""}${hole < 18 ? ` On to hole ${hole + 1}.` : " That is your round."}`);
+    if (hole < 18) {
+      setHole(hole + 1);
+    }
+  }
   function undo() {
     setRounds((all) => all.map((r) => (r.id === activeId ? { ...r, holes: r.holes.map((h) => (h.hole === hole ? { ...h, marks: h.marks.slice(0, -1) } : h)) } : r)));
-  }
-  function clearHole() {
-    setRounds((all) => all.map((r) => (r.id === activeId ? { ...r, holes: r.holes.filter((h) => h.hole !== hole) } : r)));
   }
   function remove(id: string) {
     setRounds((all) => all.filter((r) => r.id !== id));
@@ -171,16 +221,14 @@ export default function ShotTracker() {
   const hmMarks = marks.map((m, i) => ({ pos: m.pos, cum: i === 0 ? 0 : along[i - 1] ?? 0 }));
   const reach = Math.max(knownM ?? 0, along[along.length - 1] ?? 0, 1);
 
-  const clubAvg = useMemo(() => {
-    const map = new Map<string, number[]>();
-    for (const r of rounds) for (const h of r.holes) for (const s of shotsOf(h.marks)) if (s.club && s.club !== "Putter") map.set(s.club, [...(map.get(s.club) ?? []), s.metres]);
-    return CLUBS.filter((c) => map.has(c)).map((c) => {
-      const v = map.get(c)!;
-      return { club: c, n: v.length, avg: v.reduce((a, b) => a + b, 0) / v.length, best: Math.max(...v) };
-    });
-  }, [rounds]);
-
   const holeTotal = (h: { marks: Mark[] }) => shotsOf(h.marks).reduce((a, s) => a + s.metres, 0);
+
+  const unitToggle = () => (
+    <div className="inline-flex overflow-hidden rounded-full border border-white/25 text-xs font-semibold" role="group" aria-label="Distance units">
+      <button type="button" aria-pressed={!yards} onClick={() => setYards(false)} className={`px-3 py-1.5 ${!yards ? "bg-lime text-black" : "text-white/85"}`}>Metres</button>
+      <button type="button" aria-pressed={yards} onClick={() => setYards(true)} className={`px-3 py-1.5 ${yards ? "bg-lime text-black" : "text-white/85"}`}>Yards</button>
+    </div>
+  );
 
   return (
     <div className="grid gap-8">
@@ -215,7 +263,7 @@ export default function ShotTracker() {
         <section className="glass rounded-2xl p-5">
           <div className="flex flex-wrap gap-1.5" role="group" aria-label="Hole">
             {Array.from({ length: 18 }, (_, i) => i + 1).map((n) => {
-              const done = round.holes.some((h) => h.hole === n && h.marks.length > 1);
+              const done = round.holes.some((h) => h.hole === n && h.marks.some((m) => m.holed));
               return (
                 <button
                   key={n}
@@ -247,7 +295,7 @@ export default function ShotTracker() {
             </div>
             <p className="mt-2 text-xs text-white/60">
               {marks.length === 0
-                ? "Stand on the tee and tap Mark tee."
+                ? "Stand on the tee and tap Mark tee, or start without GPS."
                 : `${fmt(along[along.length - 1] ?? 0)} ${unit} covered${knownM ? ` of ${fmt(knownM)} ${unit}` : ""}. Distances come from GPS or from what you entered.`}
             </p>
           </div>
@@ -258,75 +306,72 @@ export default function ShotTracker() {
               <p className="mt-2 text-xs text-white/60">Tee is at the bottom and the green at the top. Layout redrawn for Golf Me and not to survey accuracy.</p>
             </div>
           )}
-          <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto_auto] sm:items-end">
-            <label className="text-sm font-semibold">
-              Club you are about to hit
-              <select value={club} onChange={(e) => setClub(e.target.value)} className="field-input mt-1">
-                {CLUBS.map((c) => (
-                  <option key={c}>{c}</option>
-                ))}
-              </select>
-            </label>
-            <button type="button" className="btn !px-6 !py-2.5 !text-sm disabled:opacity-60" disabled={busy} onClick={mark}>
-              {busy ? "Finding GPS..." : marks.length === 0 ? "Mark tee" : "Mark ball here"}
-            </button>
-            <div className="flex gap-2">
-              <button type="button" className="rounded-full border border-white/25 px-4 py-2 text-sm font-semibold hover:border-lime disabled:opacity-40" disabled={!marks.length} onClick={undo}>Undo</button>
-              <button type="button" className="rounded-full border border-white/25 px-4 py-2 text-sm font-semibold hover:border-lime disabled:opacity-40" disabled={!marks.length} onClick={clearHole}>Clear hole</button>
+          {marks.length === 0 && (
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
+              <button type="button" className="rounded-full border border-lime/70 px-4 py-2 text-sm font-semibold text-lime hover:bg-lime hover:text-black" onClick={markTeeManual}>Start this hole without GPS</button>
+              {unitToggle()}
             </div>
-          </div>
-          <p className="mt-2 text-sm text-white/65">
-            Mark the tee, hit, walk to your ball and mark it. Each gap becomes a shot. Mark the hole last so the final putt counts. Pick the club before you hit. No GPS? Type each shot distance or tap the map below.
-          </p>
+          )}
+          {marks.length > 0 && (
+            <div className="mt-4 rounded-xl border border-white/15 p-4">
+              <label className="block text-sm font-semibold" htmlFor="walk">
+                Slide to how far you walked: {Math.round(walk * factor)} {unit}
+              </label>
+              <input id="walk" type="range" min={0} max={Math.round(500 * factor)} value={Math.round(walk * factor)} onChange={(e) => setWalk(Number(e.target.value) / factor)} className="mt-2 w-full accent-[#c6ff3d]" />
+              <p className="mt-1 text-xs text-white/65">{mapData ? "The map zooms in with a landing area. Tap it where your ball is." : "No hole map for this course yet. Slide, then add the shot."}</p>
+              {!mapData && <button type="button" className="mt-2 rounded-full border border-lime/70 px-4 py-1.5 text-xs font-semibold text-lime hover:bg-lime hover:text-black disabled:opacity-40" disabled={walk <= 0} onClick={() => { addManual(walk); setWalk(0); }}>Add shot</button>}
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <button type="button" className="rounded-full border border-white/25 px-3 py-1.5 text-xs font-semibold hover:border-lime disabled:opacity-40" disabled={busy} onClick={gpsWalked}>Use GPS distance</button>
+                {unitToggle()}
+              </div>
+            </div>
+          )}
+          <label className="mt-4 block text-sm font-semibold">
+            Club for this shot (optional)
+            <select value={club} onChange={(e) => setClub(e.target.value)} className="field-input mt-1">
+              <option value="">No club, just record it</option>
+              {CLUBS.filter((c) => c !== "Putter").map((c) => (
+                <option key={c}>{c}</option>
+              ))}
+            </select>
+          </label>
+          {marks.length === 0 ? (
+            <div className="mt-3">
+              <button type="button" className="btn w-full !px-4 !py-3 !text-sm disabled:opacity-60" disabled={busy} onClick={() => mark("shot")}>
+                {busy ? "Finding GPS..." : "Mark tee"}
+              </button>
+            </div>
+          ) : (
+            <div className="mt-3 grid gap-2">
+              <div className="grid grid-cols-2 gap-2">
+                <button type="button" className="btn whitespace-nowrap !px-3 !py-3 !text-[0.8rem] disabled:opacity-60" disabled={busy || holed} onClick={() => mark("shot")}>
+                  {busy ? "Finding GPS..." : "Record shot"}
+                </button>
+                <button type="button" className="rounded-full border border-lime px-3 py-3 text-[0.8rem] font-extrabold uppercase tracking-wide text-lime hover:bg-lime hover:text-black disabled:opacity-40" disabled={busy || holed} onClick={() => (marks[marks.length - 1].manual ? puttManual() : mark("putt"))}>
+                  Record putt
+                </button>
+              </div>
+              <div className="grid grid-cols-[1fr_auto] gap-2">
+                <button type="button" className="rounded-full border border-lime px-4 py-3 text-sm font-extrabold uppercase tracking-wide text-lime hover:bg-lime hover:text-black disabled:opacity-40" disabled={holed} onClick={inTheCup}>
+                  In the cup!
+                </button>
+                <button type="button" className="rounded-full border border-white/25 px-5 py-3 text-sm font-semibold hover:border-lime" onClick={undo}>Undo</button>
+              </div>
+            </div>
+          )}
+          <p className="mt-2 text-xs text-white/65">Record each shot where your ball ends up, then putts on the green. When it drops, tap In the cup and Golf Me works out the last distance from your previous ball position.</p>
           {msg && <p className="mt-2 text-sm text-[#ffd23d]" role="status">{msg}</p>}
-
-          <div className="mt-4 rounded-xl border border-white/15 p-4">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="text-sm font-semibold">No GPS, or want to place the ball yourself?</p>
-              <div className="inline-flex overflow-hidden rounded-full border border-white/25 text-xs font-semibold" role="group" aria-label="Distance units">
-                <button type="button" aria-pressed={!yards} onClick={() => setYards(false)} className={`px-3 py-1.5 ${!yards ? "bg-lime text-black" : "text-white/85"}`}>Metres</button>
-                <button type="button" aria-pressed={yards} onClick={() => setYards(true)} className={`px-3 py-1.5 ${yards ? "bg-lime text-black" : "text-white/85"}`}>Yards</button>
-              </div>
-            </div>
-            {marks.length === 0 ? (
-              <div className="mt-3">
-                <button type="button" className="rounded-full border border-lime/70 px-4 py-2 text-sm font-semibold text-lime hover:bg-lime hover:text-black" onClick={markTeeManual}>Start this hole without GPS</button>
-              </div>
-            ) : (
-              <div className="mt-3 grid gap-4">
-                <div className="flex flex-wrap items-end gap-2">
-                  <label className="text-sm font-semibold">
-                    Type the shot distance ({unit})
-                    <input type="number" inputMode="decimal" min={1} max={yards ? 700 : 600} value={entry} onChange={(e) => setEntry(e.target.value)} className="field-input mt-1 w-40" placeholder={yards ? "e.g. 220" : "e.g. 200"} />
-                  </label>
-                  <button type="button" className="btn !px-5 !py-2 !text-sm" onClick={addTyped}>Add shot</button>
-                </div>
-                {mapData && (
-                  <div>
-                    <label className="block text-sm font-semibold" htmlFor="walk">
-                      Or slide to how far you walked: {walk > 0 ? `${Math.round(walk * factor)} ${unit}` : `0 ${unit}`}
-                    </label>
-                    <input id="walk" type="range" min={0} max={Math.round(500 * factor)} value={Math.round(walk * factor)} onChange={(e) => setWalk(Number(e.target.value) / factor)} className="mt-2 w-full accent-[#c6ff3d]" />
-                    <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-white/65">
-                      <span>The map zooms in with a landing area. Tap it where your ball is. The area allows 10 m out of bounds.</span>
-                      <button type="button" className="rounded-full border border-white/25 px-3 py-1 font-semibold hover:border-lime disabled:opacity-40" disabled={busy} onClick={gpsWalked}>Use GPS distance</button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
 
           {shots.length > 0 && (
             <ol className="mt-4 divide-y divide-white/10 rounded-xl border border-white/15 text-sm">
               {shots.map((s) => (
                 <li key={s.n} className="flex items-center justify-between px-4 py-2">
-                  <span>Shot {s.n}{s.club ? ` · ${s.club}` : ""}</span>
+                  <span>{s.putt ? "Putt" : `Shot ${s.n}`}{!s.putt && s.club ? ` · ${s.club}` : ""}{s.to.holed ? " · in the cup" : ""}</span>
                   <span className="font-display text-xl text-lime">{fmt(s.metres)} <span className="text-sm normal-case">{unit}</span></span>
                 </li>
               ))}
               <li className="flex items-center justify-between px-4 py-2 text-white/70">
-                <span>Hole {hole} total</span>
+                <span>Hole {hole}: {shots.length} {shots.length === 1 ? "shot" : "shots"}, {shots.filter((x) => x.putt).length} {shots.filter((x) => x.putt).length === 1 ? "putt" : "putts"}</span>
                 <span>{fmt(holeTotal({ marks }))} {unit}</span>
               </li>
             </ol>
@@ -336,26 +381,6 @@ export default function ShotTracker() {
             <label className="flex items-center gap-2">
               <input type="checkbox" checked={demo} onChange={(e) => setDemo(e.target.checked)} /> Demo mode (made-up positions, no GPS)
             </label>
-          </div>
-        </section>
-      )}
-
-      {clubAvg.length > 0 && (
-        <section>
-          <h2 className="font-display text-[clamp(1.5rem,5vw,2rem)]">Your distances by club</h2>
-          <div className="glass mt-3 overflow-x-auto rounded-2xl p-2">
-            <table className="w-full text-left text-sm">
-              <thead className="text-xs uppercase tracking-[0.14em] text-white/50">
-                <tr><th className="p-3">Club</th><th className="p-3">Shots</th><th className="p-3">Average</th><th className="p-3">Longest</th></tr>
-              </thead>
-              <tbody>
-                {clubAvg.map((c) => (
-                  <tr key={c.club} className="border-t border-white/10">
-                    <td className="p-3 font-semibold">{c.club}</td><td className="p-3">{c.n}</td><td className="p-3">{fmt(c.avg)} {unit}</td><td className="p-3">{fmt(c.best)} {unit}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
           </div>
         </section>
       )}
@@ -381,7 +406,7 @@ export default function ShotTracker() {
       )}
 
       <p className="text-xs text-white/50">
-        Your positions are only read when you tap Mark and stay on this device in this version. GPS in a phone is usually good to 3 to 10 metres in the open, so treat distances as a guide.
+        Your positions are only read when you tap Record shot or Mark tee and stay on this device in this version. GPS in a phone is usually good to 3 to 10 metres in the open, so treat distances as a guide.
       </p>
     </div>
   );

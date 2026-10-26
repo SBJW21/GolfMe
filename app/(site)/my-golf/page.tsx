@@ -149,13 +149,17 @@ export default function MyGolfPage() {
 
       {/* Tracking: scorecard, shots, friends */}
       <section className="mt-10 grid gap-4">
-        <div className="flex items-center justify-between gap-3">
-          <Group>Play a round</Group>
-          <Link href="/my-golf/host" className={pill}>Host a round</Link>
-        </div>
+        <Group>Round tracking</Group>
         <div className="grid gap-3 md:grid-cols-3">
+          <Link href="/my-golf/shots" className="glass flex flex-col gap-3 rounded-2xl p-4 hover:!border-lime/70">
+            <Sub>1. Live round</Sub>
+            <p className="font-display text-xl leading-none text-lime">Scorecard and shot tracker</p>
+            <p className="text-sm text-white/75">Mark each shot with or without GPS and keep the round you are playing in one place.</p>
+            <span className={`${pill} mt-auto self-start`}>Start a round</span>
+          </Link>
+
           <Link href="/my-golf/rounds" className="glass flex flex-col gap-3 rounded-2xl p-4 hover:!border-lime/70">
-            <Sub>Scorecard</Sub>
+            <Sub>2. Past rounds</Sub>
             <div className="flex items-center gap-3">
               <Flame lit={streak.current > 0} className="h-12 w-9 shrink-0" />
               <div>
@@ -171,18 +175,11 @@ export default function MyGolfPage() {
               ))}
             </div>
             <p className="text-sm text-white/70">Last round: {last.course}, {last.score}</p>
-            <span className={`${pill} mt-auto self-start`}>Score a round</span>
+            <span className={`${pill} mt-auto self-start`}>See past scorecards</span>
           </Link>
 
-          <Link href="/my-golf/shots" className="glass flex flex-col gap-3 rounded-2xl p-4 hover:!border-lime/70">
-            <Sub>Shots</Sub>
-            <p className="font-display text-xl leading-none text-lime">Shot tracker</p>
-            <p className="text-sm text-white/75">Mark each shot with GPS and see your distance for every club.</p>
-            <span className={`${pill} mt-auto self-start`}>Open</span>
-          </Link>
-
-          <Link href="/my-golf/rounds" className="glass flex flex-col gap-3 rounded-2xl p-4 hover:!border-lime/70">
-            <Sub>Friends</Sub>
+          <div className="glass flex flex-col gap-3 rounded-2xl p-4">
+            <Sub>3. Friends</Sub>
             <ul className="grid gap-1.5 text-sm">
               {sampleFriends.map((f) => (
                 <li key={f.id} className="flex items-center justify-between gap-2">
@@ -191,8 +188,11 @@ export default function MyGolfPage() {
                 </li>
               ))}
             </ul>
-            <span className={`${pill} mt-auto self-start`}>See friends</span>
-          </Link>
+            <div className="mt-auto flex flex-wrap gap-2">
+              <Link href="/my-golf/rounds" className={pill}>See friends</Link>
+              <Link href="/my-golf/host" className={pill}>Host a round</Link>
+            </div>
+          </div>
         </div>
       </section>
 

@@ -122,7 +122,7 @@ export const posts: Post[] = [
       {
         h: "Want a full test: Mona Vale",
         p: [
-          "Mona Vale Golf Club on the Northern Beaches is listed as 18 holes, par 73, which is the highest par of the courses we have details for. We have not yet confirmed this with the club. Par is only a rough guide to difficulty, but it points to a longer round.",
+          "Mona Vale Golf Club on the Northern Beaches is 18 holes. The club's own hole pages show par 72 from the men's tees and par 73 from the ladies' tees. Its five par 5s run from 458 to 505 metres from the men's tees, so expect a longer round. Par is only a rough guide to difficulty.",
           "Our take: a good target once you can hit the ball forward with some control. Pair it with a driving lesson beforehand.",
         ],
         maps: ["mona-vale-golf-club"],
@@ -135,7 +135,7 @@ export const posts: Post[] = [
         charts: [
           {
             title: "Par by course",
-            caption: "Par as listed by Fairway Finders, checked 22 October 2026. Par is a rough guide to length, not a rating of difficulty. Mona Vale, Lynwood and Brighton Lakes are not yet confirmed with the clubs.",
+            caption: "Par as listed by Fairway Finders, checked 22 October 2026. Par is a rough guide to length, not a rating of difficulty. Lynwood and Brighton Lakes are not yet confirmed with the clubs. Mona Vale is the men's par from the club.",
             axis: [60, 75],
             ticks: [60, 65, 70, 75],
             kind: "range",
@@ -148,7 +148,7 @@ export const posts: Post[] = [
               { label: "Wakehurst", min: 72 },
               { label: "St Michael's", min: 72 },
               { label: "Lynwood", min: 72 },
-              { label: "Mona Vale", min: 73 },
+              { label: "Mona Vale", min: 72 },
             ],
           },
         ],

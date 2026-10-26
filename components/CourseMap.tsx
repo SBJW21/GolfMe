@@ -78,6 +78,63 @@ function scenery(slug: string, pts: Pt[]) {
   return { bunkers: out, water };
 }
 
+function Scorecard({ holes, holeData, sel, pick }: { holes: number; holeData: HoleInfo[]; sel: number | null; pick: (n: number) => void }) {
+  const get = (n: number) => holeData.find((h) => h.n === n);
+  const halves = holes > 9 ? [[1, 9], [10, holes]] : [[1, holes]];
+  const hasM = holeData.some((h) => h.metres);
+  return (
+    <div className="border-t border-white/10 px-3 py-3">
+      <p className="mb-2 text-xs text-white/60">
+        Bigger rings are par 5s and smaller rings are par 3s. Lengths are metres from the tees named in the course notes.
+      </p>
+      <div className="grid gap-3">
+        {halves.map(([a, b], i) => {
+          const list = Array.from({ length: b - a + 1 }, (_, k) => a + k);
+          const par = list.reduce((t, n) => t + (get(n)?.par ?? 0), 0);
+          const m = list.reduce((t, n) => t + (get(n)?.metres ?? 0), 0);
+          const complete = list.every((n) => get(n)?.par);
+          const completeM = list.every((n) => get(n)?.metres);
+          return (
+            <div key={i} className="overflow-x-auto">
+              <table className="w-full min-w-[22rem] border-collapse text-center text-xs">
+                <thead>
+                  <tr className="text-white/55">
+                    <th className="py-1 pr-2 text-left font-semibold">Hole</th>
+                    {list.map((n) => (
+                      <th key={n} className="p-0">
+                        <button type="button" onClick={() => pick(n)} className={`h-6 w-full font-semibold ${sel === n ? "text-lime" : ""}`}>{n}</button>
+                      </th>
+                    ))}
+                    <th className="pl-2 text-lime">{holes > 9 ? (i === 0 ? "Out" : "In") : "Total"}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-t border-white/10">
+                    <td className="py-1 pr-2 text-left text-white/55">Par</td>
+                    {list.map((n) => (
+                      <td key={n} className={sel === n ? "font-bold text-lime" : ""}>{get(n)?.par ?? "-"}</td>
+                    ))}
+                    <td className="pl-2 font-bold">{complete ? par : "-"}</td>
+                  </tr>
+                  {hasM && (
+                    <tr className="border-t border-white/10">
+                      <td className="py-1 pr-2 text-left text-white/55">Metres</td>
+                      {list.map((n) => (
+                        <td key={n} className={sel === n ? "font-bold text-lime" : ""}>{get(n)?.metres ?? "-"}</td>
+                      ))}
+                      <td className="pl-2 font-bold">{completeM ? m : "-"}</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 /** Stylised, illustrative layout (not a surveyed map). Hole positions are neat rows, not the real routing. */
 export default function CourseMap({ name, interactive = false, holeData, scorecardUrl, selected }: Props) {
   const [own, setOwn] = useState<number | null>(null);
@@ -147,9 +204,11 @@ export default function CourseMap({ name, interactive = false, holeData, scoreca
                 },
               }
             : {};
+          const hp = holeData?.find((h) => h.n === n)?.par;
+          const base = hp === 3 ? 5.6 : hp === 5 ? 8 : 6.8;
           return (
             <g key={n} {...props}>
-              <circle cx={p.x} cy={p.y} r={on ? 9 : 6.5} fill={on ? "#c6ff3d" : "#0a0a0a"} stroke="#c6ff3d" strokeWidth="1" />
+              <circle cx={p.x} cy={p.y} r={on ? base + 2.6 : base} fill={on ? "#c6ff3d" : "#0a0a0a"} stroke="#c6ff3d" strokeWidth={hp === 5 ? 1.8 : 1} />
               <text x={p.x} y={p.y + 2.6} textAnchor="middle" fontSize={on ? 8.5 : 7.5} fontWeight="700" fill={on ? "#000" : "#c6ff3d"}>
                 {n}
               </text>
@@ -173,6 +232,11 @@ export default function CourseMap({ name, interactive = false, holeData, scoreca
               </button>
             ))}
           </div>
+          {sel !== null && selected === undefined && (
+            <button type="button" onClick={() => setOwn(null)} className="mt-3 rounded-full border border-lime/70 px-4 py-1.5 text-sm font-semibold text-lime hover:bg-lime hover:text-black">
+              View whole course
+            </button>
+          )}
           <div className="mt-3 min-h-[3.25rem] text-sm" aria-live="polite">
             {sel === null ? (
               <p className="text-white/65">Tap a hole to see its details.</p>
@@ -204,6 +268,8 @@ export default function CourseMap({ name, interactive = false, holeData, scoreca
           </div>
         </div>
       )}
+
+      {interactive && holes && holeData && holeData.length > 0 && <Scorecard holes={holes} holeData={holeData} sel={sel} pick={pick} />}
 
       <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-3 py-2 text-xs text-white/75">
         <span className="font-semibold text-white">{c.name}</span>

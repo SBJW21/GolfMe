@@ -55,7 +55,7 @@ export default function MyGolfPage() {
           <h1 className="font-display mt-1 text-[clamp(2rem,6vw,2.8rem)] leading-none">My Golf</h1>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Link href="/my-golf/rounds?mode=holes#log" className={pill}>Live Scorecard</Link>
+          <Link href="/my-golf/shots" className={pill}>Live Scorecard</Link>
           <Link href="/my-golf/rounds?mode=total#log" className={pill}>Mark last round</Link>
         </div>
       </div>

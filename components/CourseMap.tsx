@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import HoleMap from "@/components/HoleMap";
+import { getHoleMap } from "@/lib/holeMaps";
 import { courses, regionOf } from "@/lib/courses";
 import type { HoleInfo } from "@/lib/courseDetails";
 
@@ -26,6 +28,8 @@ type Props = {
   scorecardUrl?: string;
   /** Highlight a hole from outside (for example the hole being played). */
   selected?: number | null;
+  /** Show the redrawn hole layout under the hole details when we have one. */
+  showHoleMap?: boolean;
 };
 
 type Pt = { x: number; y: number };
@@ -136,7 +140,7 @@ function Scorecard({ holes, holeData, sel, pick }: { holes: number; holeData: Ho
 }
 
 /** Stylised, illustrative layout (not a surveyed map). Hole positions are neat rows, not the real routing. */
-export default function CourseMap({ name, interactive = false, holeData, scorecardUrl, selected }: Props) {
+export default function CourseMap({ name, interactive = false, holeData, scorecardUrl, selected, showHoleMap = false }: Props) {
   const [own, setOwn] = useState<number | null>(null);
   const c = findCourse(name);
   if (!c) return null;
@@ -236,6 +240,12 @@ export default function CourseMap({ name, interactive = false, holeData, scoreca
             <button type="button" onClick={() => setOwn(null)} className="mt-3 rounded-full border border-lime/70 px-4 py-1.5 text-sm font-semibold text-lime hover:bg-lime hover:text-black">
               View whole course
             </button>
+          )}
+          {showHoleMap && sel !== null && getHoleMap(c.slug, sel) && (
+            <div className="mt-3">
+              <HoleMap data={getHoleMap(c.slug, sel)!} className="h-[56vh] max-h-[520px] min-h-[320px]" />
+              <p className="mt-1 text-xs text-white/55">Layout redrawn for Golf Me, tee at the bottom. Not to survey accuracy.</p>
+            </div>
           )}
           <div className="mt-3 min-h-[3.25rem] text-sm" aria-live="polite">
             {sel === null ? (

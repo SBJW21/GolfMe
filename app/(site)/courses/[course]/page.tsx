@@ -134,7 +134,7 @@ export default async function CoursePage(props: PageProps<"/courses/[course]">) 
       <h2 className="font-display mt-8 text-[clamp(1.5rem,5vw,2rem)]">Course map</h2>
       <section className="mt-3 grid gap-5 lg:grid-cols-[1.15fr_1fr]">
         <div>
-          <CourseMap name={c.name} interactive holeData={d?.holeData} scorecardUrl={bookingHref} />
+          <CourseMap name={c.name} interactive showHoleMap holeData={d?.holeData} scorecardUrl={bookingHref} />
         </div>
         <div className="grid content-start gap-4">
           <div className="glass rounded-2xl p-5">

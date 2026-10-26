@@ -6,6 +6,12 @@ export type Mark = {
   club?: string; // club used for the shot that starts here
   ts: number;
   demo?: boolean;
+  /** Added without GPS: by typing a distance or tapping the hole map */
+  manual?: boolean;
+  /** Manual marks: shot distance in metres from the previous mark */
+  m?: number;
+  /** Manual marks on a hole map: where the ball was placed (map units) */
+  pos?: [number, number];
 };
 export type HoleShots = { hole: number; marks: Mark[] };
 export type ShotRound = { id: string; course: string; date: string; holes: HoleShots[] };
@@ -24,7 +30,7 @@ export function distM(a: { lat: number; lon: number }, b: { lat: number; lon: nu
 
 /** Shots are the gaps between consecutive marks. The club belongs to the mark the shot starts from. */
 export function shotsOf(marks: Mark[]) {
-  return marks.slice(1).map((m, i) => ({ n: i + 1, from: marks[i], to: m, metres: distM(marks[i], m), club: marks[i].club }));
+  return marks.slice(1).map((m, i) => ({ n: i + 1, from: marks[i], to: m, metres: m.manual && m.m !== undefined ? m.m : distM(marks[i], m), club: marks[i].club }));
 }
 
 const KEY = "golfme-shots-v1";

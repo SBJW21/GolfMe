@@ -18,7 +18,32 @@ export type Mark = {
   pos?: [number, number];
 };
 export type HoleShots = { hole: number; marks: Mark[] };
-export type ShotRound = { id: string; course: string; date: string; holes: HoleShots[] };
+export type ShotRound = {
+  id: string;
+  course: string;
+  date: string;
+  holes: HoleShots[];
+  /** Right or left handed, set when the round starts */
+  hand?: "R" | "L";
+  /** Finished rounds are locked and feed the shot report */
+  finished?: boolean;
+};
+
+const HAND_KEY = "golfme-hand";
+export function loadHand(): "R" | "L" {
+  try {
+    return window.localStorage.getItem(HAND_KEY) === "L" ? "L" : "R";
+  } catch {
+    return "R";
+  }
+}
+export function saveHand(h: "R" | "L") {
+  try {
+    window.localStorage.setItem(HAND_KEY, h);
+  } catch {
+    /* storage blocked */
+  }
+}
 
 export const CLUBS = ["Driver", "3 wood", "5 wood", "Hybrid", "4 iron", "5 iron", "6 iron", "7 iron", "8 iron", "9 iron", "Pitching wedge", "Sand wedge", "Lob wedge", "Putter"];
 

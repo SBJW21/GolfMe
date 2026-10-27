@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import CoachCard from "@/components/CoachCard";
 import CoachPhoto from "@/components/CoachPhoto";
 import CourseMap from "@/components/CourseMap";
-import CourseWeather from "@/components/CourseWeather";
 import { formatAud } from "@/lib/pricing";
 import { areaOfSuburb } from "@/lib/areas";
 import { courseSuburbSlug, courses, getCourse, regionOf } from "@/lib/courses";
@@ -13,6 +11,8 @@ import { loadCoaches } from "@/lib/repo";
 import { SITE_URL } from "@/lib/suburbs";
 
 export const revalidate = 3600;
+
+const cta = "btn !px-5 !py-2.5 !text-sm";
 
 export function generateStaticParams() {
   return courses.map((c) => ({ course: c.slug }));
@@ -101,184 +101,130 @@ export default async function CoursePage(props: PageProps<"/courses/[course]">) 
   };
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-10">
+    <main className="mx-auto max-w-6xl px-4 py-8">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbLd) }} />
       <nav aria-label="Breadcrumb" className="text-sm text-white/60">
         <Link href="/courses" className="hover:text-lime">
-          Golf courses
+          Find a course
         </Link>{" "}
         / {c.name}
       </nav>
-      <h1 className="font-display mt-3 text-[clamp(2.2rem,7vw,3.6rem)]">
+      <h1 className="font-display mt-2 text-[clamp(2.2rem,7vw,3.6rem)]">
         {c.name}, <span className="text-lime">{c.suburb}</span>
       </h1>
-      <p className="mt-3 max-w-2xl text-lg text-white/85">
-        {c.name} is a golf course in {c.suburb}, in Sydney&apos;s {regionOf(c)}. Before your next round there, a lesson with a
-        local coach can take shots off your score.
-      </p>
-
-      <dl className="mt-6 flex flex-wrap gap-3">
+      <ul className="mt-3 flex flex-wrap gap-2 text-sm font-semibold">
         {facts.map(([k, v]) => (
-          <div key={k} className="glass rounded-2xl px-5 py-3">
-            <dt className="text-xs uppercase tracking-[0.14em] text-white/50">{k}</dt>
-            <dd className="font-display text-2xl text-lime">{v}</dd>
-          </div>
+          <li key={k} className="rounded-full border border-white/20 px-3 py-1">
+            {k === "Holes" ? `${v} holes` : k === "Par" ? `Par ${v}` : v}
+          </li>
         ))}
-      </dl>
-      <p className="mt-3 text-xs text-white/50">
-        Course details from club, council and Golf Australia pages and Fairway Finders, checked 23 October 2026. Contact the course for fees, hours and tee times.
-      </p>
+      </ul>
+      <div className="mt-5 flex flex-wrap gap-3">
+        {bookingHref && (
+          <a href={bookingHref} target="_blank" rel="noopener" className={cta}>
+            Book a tee time
+          </a>
+        )}
+        <a href="#coaches" className={cta}>
+          Find a coach nearby
+        </a>
+      </div>
 
-      <h2 className="font-display mt-8 text-[clamp(1.5rem,5vw,2rem)]">Course map</h2>
-      <section className="mt-3 grid gap-5 lg:grid-cols-[1.15fr_1fr]">
-        <div>
-          <CourseMap name={c.name} interactive showHoleMap holeData={d?.holeData} scorecardUrl={bookingHref} />
-        </div>
-        <div className="grid content-start gap-4">
-          <div className="glass rounded-2xl p-5">
-            <h2 className="font-display text-2xl">Ready to tee off?</h2>
-            {bookingHref ? (
+      <section className="mt-8">
+        <CourseMap name={c.name} interactive viewer showHoleMap holeData={d?.holeData} scorecardUrl={bookingHref} />
+      </section>
+
+      <section className="mt-10 grid items-start gap-4 lg:grid-cols-2">
+        <div className="glass rounded-2xl p-5">
+          <h2 className="font-display text-2xl">Good to know</h2>
+          {d?.howItPlays && <p className="mt-3 text-white/90">{d.howItPlays}</p>}
+          {d?.highlights && d.highlights.length > 0 && (
+            <ul className="mt-3 grid gap-2.5">
+              {d.highlights.map((h) => (
+                <li key={h} className="flex items-start gap-3 text-[0.95rem]">
+                  <span aria-hidden="true" className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-lime" />
+                  {h}
+                </li>
+              ))}
+            </ul>
+          )}
+          {shown.length > 0 && (
+            <dl className="mt-4 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 border-t border-white/10 pt-4 text-sm">
+              {shown.map(([k, v]) => (
+                <div key={k} className="contents">
+                  <dt className="text-white/55">{k}</dt>
+                  <dd className="font-semibold">{v}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
+          <p className="mt-3 text-xs text-white/50">
+            Checked {d?.checked ?? "23 October 2026"}.
+            {d?.source && (
               <>
-                <p className="mt-1 text-sm text-white/75">Book your round directly with the club. It opens the club&apos;s own site.</p>
-                <a href={bookingHref} target="_blank" rel="noopener" className="btn mt-4 inline-block">
-                  Book a tee time
+                {" "}
+                <a href={d.source} target="_blank" rel="noopener" className="underline-offset-4 hover:underline">
+                  Source
                 </a>
+                .
               </>
-            ) : (
-              <p className="mt-1 text-sm text-white/75">Contact {c.name} directly for tee times, fees and hours.</p>
-            )}
-          </div>
-          <div className="glass rounded-2xl p-5">
-            <h2 className="font-display text-2xl">Want to lower your score first?</h2>
-            <p className="mt-1 text-sm text-white/75">Meet our coaches near {c.suburb}.</p>
-            {nearby.length > 0 ? (
-              <ul className="mt-3 grid gap-2">
-                {nearby.slice(0, 3).map((k) => (
-                  <li key={k.slug}>
-                    <Link
-                      href={`/coaches/${k.slug}`}
-                      className="flex items-center gap-3 rounded-xl border border-white/10 p-2 hover:border-lime/60"
-                    >
-                      <CoachPhoto slug={k.slug} name={k.name} photo={k.photo} className="h-12 w-12 shrink-0" />
-                      <span className="min-w-0 flex-1">
-                        <span className="block truncate font-bold">{k.name}</span>
-                        <span className="block truncate text-xs text-white/65">
-                          {k.title ? `${k.title}, ` : ""}
-                          {k.suburb}
-                        </span>
-                      </span>
-                      <span className="shrink-0 text-right text-sm font-bold">
-                        {formatAud(k.priceCents)}
-                        <span className="block text-[0.65rem] font-normal text-white/55">per hour</span>
-                      </span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="mt-3 text-sm text-white/75">We are signing up coaches across Sydney.</p>
-            )}
-            <Link href="/coaches" className="btn mt-4 inline-block !text-base">
-              Find a coach
-            </Link>
+            )}{" "}
+            Contact the course for fees, hours and tee times.
+          </p>
+        </div>
+        <div className="glass rounded-2xl p-5">
+          <h2 className="font-display text-2xl">Questions</h2>
+          <div className="mt-2 divide-y divide-white/10">
+            {faq.slice(0, 6).map(([q, a], i) => (
+              <details key={q} open={i === 0} className="py-3">
+                <summary className="cursor-pointer font-bold">{q}</summary>
+                <p className="mt-2 text-sm text-white/80">{a}</p>
+              </details>
+            ))}
           </div>
         </div>
       </section>
 
-      {d?.howItPlays && (
-        <section className="mt-10">
-          <h2 className="font-display text-[clamp(1.5rem,5vw,2rem)]">How it plays</h2>
-          <div className="glass mt-4 rounded-2xl p-5">
-            <p className="text-white/90">{d.howItPlays}</p>
-            {d.howItPlaysBy && <p className="mt-3 text-sm text-white/60">By {d.howItPlaysBy}, Golf Me coach</p>}
-          </div>
-        </section>
-      )}
-
-      {d?.highlights && d.highlights.length > 0 && (
-        <section className="mt-10">
-          <h2 className="font-display text-[clamp(1.5rem,5vw,2rem)]">Good to know</h2>
-          <ul className="glass mt-4 grid gap-3 rounded-2xl p-5">
-            {d.highlights.map((h) => (
-              <li key={h} className="flex items-start gap-3">
-                <span aria-hidden="true" className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-lime" />
-                {h}
+      <section id="coaches" className="mt-10 scroll-mt-20">
+        <h2 className="font-display text-[clamp(1.5rem,5vw,2rem)]">Lower your score first</h2>
+        {nearby.length > 0 ? (
+          <ul className="mt-3 grid gap-3 md:grid-cols-3">
+            {nearby.slice(0, 3).map((k) => (
+              <li key={k.slug}>
+                <Link href={`/coaches/${k.slug}`} className="glass flex items-center gap-3 rounded-2xl p-3 hover:!border-lime/70">
+                  <CoachPhoto slug={k.slug} name={k.name} photo={k.photo} className="h-12 w-12 shrink-0" />
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate font-bold">{k.name}</span>
+                    <span className="block truncate text-xs text-white/65">
+                      {k.title ? `${k.title}, ` : ""}
+                      {k.suburb}
+                    </span>
+                  </span>
+                  <span className="shrink-0 text-right text-sm font-bold">
+                    {formatAud(k.priceCents)}
+                    <span className="block text-[0.65rem] font-normal text-white/55">per hour</span>
+                  </span>
+                </Link>
               </li>
             ))}
           </ul>
-        </section>
-      )}
-
-      <CourseWeather suburb={c.suburb} />
-
-      {shown.length > 0 && (
-        <section className="mt-10">
-          <h2 className="font-display text-[clamp(1.5rem,5vw,2rem)]">Facilities and getting there</h2>
-          <dl className="glass mt-4 grid gap-x-8 gap-y-4 rounded-2xl p-5 sm:grid-cols-2">
-            {shown.map(([k, v]) => (
-              <div key={k}>
-                <dt className="text-xs uppercase tracking-[0.14em] text-white/50">{k}</dt>
-                <dd className="mt-0.5 font-semibold">{v}</dd>
-              </div>
-            ))}
-          </dl>
-          {d?.source && (
-            <p className="mt-2 text-xs text-white/50">
-              Checked {d.checked ?? "recently"}.{" "}
-              <a href={d.source} target="_blank" rel="noopener" className="underline-offset-4 hover:underline">
-                Source
-              </a>
-            </p>
-          )}
-        </section>
-      )}
-
-      <section className="mt-10">
-        <h2 className="font-display text-[clamp(1.5rem,5vw,2rem)]">Questions about {c.name}</h2>
-        <div className="mt-4 grid gap-3">
-          {faq.map(([q, a]) => (
-            <details key={q} className="glass rounded-2xl p-4">
-              <summary className="cursor-pointer font-bold">{q}</summary>
-              <p className="mt-2 text-white/85">{a}</p>
-            </details>
-          ))}
-        </div>
-      </section>
-
-      <section className="mt-12">
-        <h2 className="font-display text-[clamp(1.5rem,5vw,2rem)]">Golf lessons near {c.name}</h2>
-        {nearby.length > 0 ? (
-          <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {nearby.map((k) => (
-              <CoachCard key={k.slug} coach={k} />
-            ))}
-          </div>
         ) : (
-          <div className="glass mt-4 rounded-2xl p-6">
-            <p className="font-bold">No coaches listed near {c.suburb} yet</p>
-            <p className="mt-1 text-white/80">We are signing up coaches across Sydney. See everyone available now.</p>
-            <Link href="/coaches" className="btn mt-4 inline-block">
-              Find a coach
-            </Link>
-          </div>
+          <p className="mt-3 text-white/75">We are signing up coaches near {c.suburb}. See everyone available now.</p>
         )}
-        {suburbSlug && (
-          <p className="mt-4 text-sm text-white/70">
-            More on{" "}
-            <Link href={`/golf-lessons/${suburbSlug}`} className="text-lime underline-offset-4 hover:underline">
-              golf lessons in {c.suburb}
+        <div className="mt-4">
+          <Link href="/coaches" className={cta}>
+            See all coaches
+          </Link>
+          {suburbSlug && (
+            <Link href={`/golf-lessons/${suburbSlug}`} className="ml-4 text-sm text-lime underline-offset-4 hover:underline">
+              Golf lessons in {c.suburb}
             </Link>
-            .
-          </p>
-        )}
-      </section>
-
-      {sameRegion.length > 0 && (
-        <section className="mt-12">
-          <h2 className="font-display text-[clamp(1.5rem,5vw,2rem)]">More courses in {regionOf(c)}</h2>
-          <ul className="mt-4 flex flex-wrap gap-2 text-sm font-semibold">
+          )}
+        </div>
+        {sameRegion.length > 0 && (
+          <ul className="mt-5 flex flex-wrap gap-2 text-sm font-semibold">
             {sameRegion.map((x) => (
               <li key={x.slug}>
                 <Link href={`/courses/${x.slug}`} className="inline-block rounded-full border border-white/20 px-3 py-1.5 hover:border-lime hover:text-lime">
@@ -287,8 +233,8 @@ export default async function CoursePage(props: PageProps<"/courses/[course]">) 
               </li>
             ))}
           </ul>
-        </section>
-      )}
+        )}
+      </section>
     </main>
   );
 }

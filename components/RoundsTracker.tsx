@@ -18,6 +18,9 @@ export default function RoundsTracker({ initialMode = "total" }: { initialMode?:
   const [holes, setHoles] = useState<string[]>(Array(18).fill(""));
   const [putts, setPutts] = useState("");
   const [hcp, setHcp] = useState("24.6");
+  const [friends, setFriends] = useState(() => sampleFriends);
+  const [manage, setManage] = useState(false);
+  const [newFriend, setNewFriend] = useState("");
   const [copied, setCopied] = useState(false);
   const [burst, setBurst] = useState<{ id: number; weeks: number; bits: { dx: number; dy: number; rot: number; c: string }[] } | null>(null);
 
@@ -96,12 +99,12 @@ export default function RoundsTracker({ initialMode = "total" }: { initialMode?:
     }
   }
 
-  const ranking = [{ id: "me", name: "You", weeks: info.current }, ...sampleFriends].sort((a, b) => b.weeks - a.weeks);
+  const ranking = [{ id: "me", name: "You", weeks: info.current }, ...friends].sort((a, b) => b.weeks - a.weeks);
 
   return (
-    <div className="grid gap-10">
+    <div className="grid gap-8">
       {/* Streak */}
-      <section className="glass relative overflow-hidden rounded-3xl p-5 sm:p-8">
+      <section className="glass relative overflow-hidden rounded-3xl p-4 sm:p-6">
         {burst && (
           <div className="pointer-events-none absolute inset-0 z-10 flex items-end justify-center" aria-hidden="true">
             {burst.bits.map((b, i) => (
@@ -138,7 +141,7 @@ export default function RoundsTracker({ initialMode = "total" }: { initialMode?:
           </div>
         </div>
 
-        <div className="mt-6">
+        <div className="mt-4">
           <div className="flex items-end justify-between gap-3 text-sm">
             <p className="font-bold">
               {prog.earned.length > 0 ? prog.earned[prog.earned.length - 1].name : "Just starting"}
@@ -152,23 +155,23 @@ export default function RoundsTracker({ initialMode = "total" }: { initialMode?:
           </div>
         </div>
 
-        <ul className="mt-5 grid grid-cols-3 gap-2 sm:grid-cols-6">
+        <ul className="mt-3 grid grid-cols-3 gap-1.5 sm:grid-cols-6">
           {milestones.map((m) => {
             const on = info.current >= m.weeks;
             return (
-              <li key={m.weeks} className={`rounded-xl border px-2 py-2 text-center ${on ? "border-lime bg-lime/10" : "border-white/10 opacity-50"}`}>
-                <p className={`font-display text-xl ${on ? "text-lime" : ""}`}>{on ? "\u2713" : "\ud83d\udd12"} {m.weeks}w</p>
+              <li key={m.weeks} className={`rounded-xl border px-2 py-1.5 text-center ${on ? "border-lime bg-lime/10" : "border-white/10 opacity-50"}`}>
+                <p className={`font-display text-lg leading-tight ${on ? "text-lime" : ""}`}>{on ? "\u2713" : "\ud83d\udd12"} {m.weeks}w</p>
                 <p className="text-[0.7rem] font-semibold leading-tight">{m.name}</p>
               </li>
             );
           })}
         </ul>
 
-        <div className="mt-6 grid grid-cols-12 gap-1.5 sm:gap-2" aria-label="Last 12 weeks">
+        <div className="mt-3 grid grid-cols-12 gap-1 sm:gap-1.5" aria-label="Last 12 weeks">
           {info.tiles.map((t) => (
             <div
               key={t.idx}
-              className={`grid aspect-square place-items-center rounded-md text-xs font-extrabold text-black sm:rounded-lg sm:text-sm ${
+              className={`grid h-7 place-items-center rounded-md text-xs font-extrabold text-black sm:h-8 ${
                 t.played ? "bg-lime" : "border border-white/20 bg-white/5"
               } ${t.current ? "ring-2 ring-white ring-offset-2 ring-offset-black" : ""} ${t.current && !t.played ? "animate-pulse" : ""}`}
             >
@@ -176,79 +179,37 @@ export default function RoundsTracker({ initialMode = "total" }: { initialMode?:
             </div>
           ))}
         </div>
-        <p className="mt-2 flex justify-between text-xs text-white/50">
+        <p className="mt-1 flex justify-between text-xs text-white/50">
           <span>12 weeks ago</span>
           <span>This week</span>
         </p>
-      </section>
 
-      {/* Stats */}
-      <section className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        {[
-          ["Rounds logged", String(rounds.length)],
-          ["Average score", String(avg)],
-          ["Best score", String(Math.min(...scores))],
-          ["Courses played", String(courses.length)],
-        ].map(([k, v]) => (
-          <div key={k} className="glass rounded-2xl p-5">
-            <p className="font-display text-3xl text-lime">{v}</p>
-            <p className="mt-1 text-sm text-white/75">{k}</p>
+        <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 border-t border-white/10 pt-4 sm:grid-cols-4">
+          {[
+            ["Rounds logged", String(rounds.length)],
+            ["Average score", String(avg)],
+            ["Best score", String(Math.min(...scores))],
+            ["Courses played", String(courses.length)],
+          ].map(([k, v]) => (
+            <div key={k}>
+              <dd className="font-display text-2xl leading-none text-lime">{v}</dd>
+              <dt className="mt-0.5 text-xs text-white/70">{k}</dt>
+            </div>
+          ))}
+        </dl>
+        {avgPutts > 0 && (
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-4">
+            <div>
+              <p className="font-display text-2xl leading-none text-lime">{avgPutts} putts a round</p>
+              <p className="mt-1 text-sm text-white/75">
+                {avgPutts >= 34 ? "Putting is where you can save the most shots. A short lesson can cut this fast." : "Solid putting. Keep it sharp with a short game lesson."}
+              </p>
+            </div>
+            <a href={`/coaches?focus=${avgPutts >= 34 ? "Putting" : "Chipping"}`} className="btn !px-5 !py-2 !text-sm">
+              {avgPutts >= 34 ? "Find a putting coach" : "Find a short game coach"}
+            </a>
           </div>
-        ))}
-      </section>
-
-      {/* Putting insight */}
-      {avgPutts > 0 && (
-        <section className="glass flex flex-wrap items-center justify-between gap-4 rounded-2xl p-5">
-          <div>
-            <p className="font-display text-3xl text-lime">{avgPutts} putts a round</p>
-            <p className="text-sm text-white/75">
-              {avgPutts >= 34
-                ? "Putting is where you can save the most shots. A short lesson can cut this fast."
-                : "Solid putting. Keep it sharp with a short game lesson."}
-            </p>
-          </div>
-          <a href={`/coaches?focus=${avgPutts >= 34 ? "Putting" : "Chipping"}`} className="btn !px-5 !py-2 !text-sm">
-            {avgPutts >= 34 ? "Find a putting coach" : "Find a short game coach"}
-          </a>
-        </section>
-      )}
-
-      {/* Round results */}
-      <section>
-        <h2 className="font-display text-[clamp(1.7rem,5vw,2.3rem)]">Round results</h2>
-        <div className="relative mt-4">
-        <div className="grid max-h-[24rem] gap-3 overflow-y-auto pb-10 lg:max-h-none lg:grid-cols-2 lg:pb-0">
-          {[...rounds]
-            .filter((r) => r.friendScores && Object.keys(r.friendScores).length > 0)
-            .sort((a, b) => (a.date < b.date ? 1 : -1))
-            .slice(0, 8)
-            .map((r) => {
-              const board = [{ name: "You", score: r.score }, ...Object.entries(r.friendScores ?? {}).map(([name, score]) => ({ name, score }))].sort((a, b) => a.score - b.score);
-              return (
-                <div key={r.id} className="glass rounded-2xl p-4">
-                  <p className="font-bold">{r.course}</p>
-                  <p className="text-xs text-white/60">
-                    {r.date}
-                    {r.putts ? ` \u00b7 ${r.putts} putts` : ""}
-                    {r.points ? ` \u00b7 ${r.points} pts` : ""}
-                  </p>
-                  <ol className="mt-3 grid gap-1.5">
-                    {board.map((b, i) => (
-                      <li key={b.name} className="flex items-center gap-3 text-sm">
-                        <span className="font-display w-5 text-lg text-white/50">{i + 1}</span>
-                        <span className={`flex-1 font-semibold ${b.name === "You" ? "text-lime" : ""}`}>{b.name}</span>
-                        {i === 0 && <span aria-hidden="true">{"\ud83c\udfc6"}</span>}
-                        <span className="font-display text-xl">{b.score}</span>
-                      </li>
-                    ))}
-                  </ol>
-                </div>
-              );
-            })}
-        </div>
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-black to-transparent lg:hidden" aria-hidden="true" />
-        </div>
+        )}
       </section>
 
       {/* Log a round */}
@@ -340,7 +301,7 @@ export default function RoundsTracker({ initialMode = "total" }: { initialMode?:
           <fieldset className="sm:col-span-2">
             <legend className="text-sm font-semibold">Who did you play with? They can log their own card too</legend>
             <div className="mt-2 flex flex-wrap gap-2">
-              {sampleFriends.map((f) => {
+              {friends.map((f) => {
                 const on = f.name in picked;
                 return (
                   <label key={f.id} className={`flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-semibold ${on ? "border-lime bg-lime text-black" : "border-white/25"}`}>
@@ -386,26 +347,29 @@ export default function RoundsTracker({ initialMode = "total" }: { initialMode?:
         </form>
       </section>
 
-      {/* Course tracker */}
+      {/* Rounds and courses */}
       <section>
-        <h2 className="font-display text-[clamp(1.7rem,5vw,2.3rem)]">Course tracker</h2>
+        <h2 className="font-display text-[clamp(1.7rem,5vw,2.3rem)]">Rounds and courses</h2>
         <p className="mt-1 text-white/75">{courses.length} courses played. Tick off more.</p>
         <div className="mt-3 grid gap-2 sm:grid-cols-2 sm:gap-3 lg:grid-cols-3">
-          {courses.map(([name, c]) => (
-            <div key={name} className="glass flex items-center justify-between gap-3 rounded-xl px-3 py-2.5">
-              <p className="min-w-0 flex-1 text-sm font-bold">{name}</p>
-              <div className="shrink-0 text-right">
-                <div className="flex justify-end gap-1" aria-label={`${c.played} rounds`}>
-                  {Array.from({ length: Math.min(c.played, 8) }, (_, i) => (
-                    <span key={i} className="h-2 w-2 rounded-full bg-lime" />
-                  ))}
+          {courses.map(([name, c]) => {
+            const mine = rounds.filter((r) => r.course === name).sort((a, b) => (a.date < b.date ? 1 : -1));
+            return (
+              <div key={name} className="glass rounded-xl px-3 py-2.5">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="min-w-0 flex-1 text-sm font-bold">{name}</p>
+                  <div className="flex shrink-0 justify-end gap-1" aria-label={`${c.played} rounds`}>
+                    {Array.from({ length: Math.min(c.played, 8) }, (_, i) => (
+                      <span key={i} className="h-2 w-2 rounded-full bg-lime" />
+                    ))}
+                  </div>
                 </div>
                 <p className="mt-1 text-xs text-white/75">
-                  {c.played} {c.played === 1 ? "round" : "rounds"} &middot; Best {c.best}
+                  {c.played} {c.played === 1 ? "round" : "rounds"} &middot; Best {c.best} &middot; Last {mine[0]?.date} ({mine[0]?.score})
                 </p>
               </div>
-            </div>
-          ))}
+            );
+          })}
           {sampleCourses
             .filter((n) => !courses.some(([c]) => c === n))
             .slice(0, 3)
@@ -416,11 +380,68 @@ export default function RoundsTracker({ initialMode = "total" }: { initialMode?:
               </div>
             ))}
         </div>
+        <h3 className="mt-6 text-xs font-bold uppercase tracking-[0.16em] text-white/55">Results against friends</h3>
+        <div className="relative mt-3">
+        <div className="grid max-h-[24rem] gap-3 overflow-y-auto pb-10 lg:max-h-none lg:grid-cols-2 lg:pb-0">
+          {[...rounds]
+            .filter((r) => r.friendScores && Object.keys(r.friendScores).length > 0)
+            .sort((a, b) => (a.date < b.date ? 1 : -1))
+            .slice(0, 8)
+            .map((r) => {
+              const board = [{ name: "You", score: r.score }, ...Object.entries(r.friendScores ?? {}).map(([name, score]) => ({ name, score }))].sort((a, b) => a.score - b.score);
+              return (
+                <div key={r.id} className="glass rounded-2xl p-4">
+                  <p className="font-bold">{r.course}</p>
+                  <p className="text-xs text-white/60">
+                    {r.date}
+                    {r.putts ? ` \u00b7 ${r.putts} putts` : ""}
+                    {r.points ? ` \u00b7 ${r.points} pts` : ""}
+                  </p>
+                  <ol className="mt-3 grid gap-1.5">
+                    {board.map((b, i) => (
+                      <li key={b.name} className="flex items-center gap-3 text-sm">
+                        <span className="font-display w-5 text-lg text-white/50">{i + 1}</span>
+                        <span className={`flex-1 font-semibold ${b.name === "You" ? "text-lime" : ""}`}>{b.name}</span>
+                        {i === 0 && <span aria-hidden="true">{"\ud83c\udfc6"}</span>}
+                        <span className="font-display text-xl">{b.score}</span>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              );
+            })}
+        </div>
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-black to-transparent lg:hidden" aria-hidden="true" />
+        </div>
       </section>
 
+
       {/* Friends */}
-      <section>
-        <h2 className="font-display text-[clamp(1.7rem,5vw,2.3rem)]">Friends</h2>
+      <section id="friends" className="scroll-mt-20">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-display text-[clamp(1.7rem,5vw,2.3rem)]">Friends</h2>
+          <button type="button" onClick={() => setManage((m) => !m)} aria-pressed={manage} className="pill-arrow rounded-full bg-lime px-3 py-1.5 text-xs font-extrabold uppercase tracking-[0.14em] text-black hover:brightness-110">
+            {manage ? "Done" : "Manage friends"}
+          </button>
+        </div>
+        {manage && (
+          <form
+            className="glass mt-4 flex flex-wrap items-end gap-3 rounded-2xl p-4"
+            onSubmit={(e) => {
+              e.preventDefault();
+              const n = newFriend.trim();
+              if (!n || friends.some((f) => f.name.toLowerCase() === n.toLowerCase())) return;
+              setFriends((f) => [...f, { id: `f${Date.now()}`, name: n, weeks: 0 } as (typeof f)[number]]);
+              setNewFriend("");
+            }}
+          >
+            <label className="min-w-0 flex-1 text-sm font-semibold">
+              Add a friend by name
+              <input value={newFriend} onChange={(e) => setNewFriend(e.target.value)} placeholder="Name" className="field-input mt-1" />
+            </label>
+            <button type="submit" className="pill-arrow rounded-full bg-lime px-4 py-2.5 text-xs font-extrabold uppercase tracking-[0.14em] text-black">Add friend</button>
+          </form>
+        )}
         <div className="mt-4 grid gap-4 lg:grid-cols-[1.2fr_1fr]">
           <ol className="glass divide-y divide-white/10 rounded-2xl">
             {ranking.map((f, i) => (
@@ -437,7 +458,13 @@ export default function RoundsTracker({ initialMode = "total" }: { initialMode?:
                     </p>
                   )}
                 </div>
-                <p className="font-display text-xl text-lime">{f.weeks}w</p>
+                {manage && f.id !== "me" ? (
+                  <button type="button" onClick={() => setFriends((x) => x.filter((y) => y.id !== f.id))} className="rounded-full border border-white/30 px-3 py-1 text-xs font-semibold hover:border-lime hover:text-lime" aria-label={`Remove ${f.name}`}>
+                    Remove
+                  </button>
+                ) : (
+                  <p className="font-display text-xl text-lime">{f.weeks}w</p>
+                )}
               </li>
             ))}
           </ol>

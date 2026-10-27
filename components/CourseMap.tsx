@@ -30,6 +30,8 @@ type Props = {
   selected?: number | null;
   /** Show the redrawn hole layout under the hole details when we have one. */
   showHoleMap?: boolean;
+  /** Course page viewer: hole pills above, one map that swaps between the whole course and the chosen hole. */
+  viewer?: boolean;
 };
 
 type Pt = { x: number; y: number };
@@ -140,7 +142,7 @@ function Scorecard({ holes, holeData, sel, pick }: { holes: number; holeData: Ho
 }
 
 /** Stylised, illustrative layout (not a surveyed map). Hole positions are neat rows, not the real routing. */
-export default function CourseMap({ name, interactive = false, holeData, scorecardUrl, selected, showHoleMap = false }: Props) {
+export default function CourseMap({ name, interactive = false, holeData, scorecardUrl, selected, showHoleMap = false, viewer = false }: Props) {
   const [own, setOwn] = useState<number | null>(null);
   const c = findCourse(name);
   if (!c) return null;
@@ -161,10 +163,30 @@ export default function CourseMap({ name, interactive = false, holeData, scoreca
       }, "")
     : "";
   const info = sel ? holeData?.find((h) => h.n === sel) : undefined;
+  const holeMapNow = viewer && sel !== null && c.slug ? getHoleMap(c.slug, sel) : undefined;
   const pick = (n: number) => setOwn(n);
 
   return (
-    <div className="overflow-hidden rounded-xl border border-white/15 bg-[#0d2a14]">
+    <div className={viewer ? "" : "overflow-hidden rounded-xl border border-white/15 bg-[#0d2a14]"}>
+      {viewer && holes && (
+        <div className="mb-3 flex flex-wrap gap-1.5" role="group" aria-label="Holes">
+          <button type="button" onClick={() => setOwn(null)} aria-pressed={sel === null} className={`h-9 rounded-full border px-4 text-xs font-bold ${sel === null ? "border-lime bg-lime text-black" : "border-white/25 text-white/85 hover:border-lime"}`}>
+            Whole course
+          </button>
+          {Array.from({ length: holes }, (_, i) => i + 1).map((n) => (
+            <button key={n} type="button" onClick={() => pick(n)} aria-pressed={sel === n} className={`h-9 w-9 rounded-full border text-xs font-bold ${sel === n ? "border-lime bg-lime text-black" : "border-white/25 text-white/85 hover:border-lime"}`}>
+              {n}
+            </button>
+          ))}
+        </div>
+      )}
+      {holeMapNow && (
+        <div>
+          <HoleMap data={holeMapNow} className="h-[62vh] max-h-[560px] min-h-[340px]" />
+          <p className="mt-2 text-xs text-white/60">Tee at the bottom, green at the top. Layout redrawn for Golf Me and not to survey accuracy.</p>
+        </div>
+      )}
+      <div className={viewer ? "overflow-hidden rounded-xl border border-white/15 bg-[#0d2a14]" : ""} hidden={!!holeMapNow}>
       <svg viewBox={`0 0 ${W} ${H}`} className="block w-full" role="img" aria-label={`Illustrative layout of ${c.name}`}>
         <rect width={W} height={H} fill="#12361b" />
         {water && <ellipse cx={water.x} cy={water.y} rx={water.rx} ry={water.ry} fill="#1e6a8f" opacity=".8" />}
@@ -220,8 +242,22 @@ export default function CourseMap({ name, interactive = false, holeData, scoreca
           );
         })}
       </svg>
+      </div>
 
-      {interactive && holes && (
+      {viewer && (
+        <div className="mt-3 text-sm" aria-live="polite">
+          {sel === null ? (
+            <p className="text-white/70">Tap a hole to see it up close.</p>
+          ) : (
+            <p>
+              <span className="font-display text-xl text-lime">Hole {sel}</span>
+              {info && (info.par || info.metres) ? <span className="ml-2 text-white/85">{info.par ? `Par ${info.par}` : ""}{info.par && info.metres ? " · " : ""}{info.metres ? `${info.metres} m` : ""}{info.note ? ` · ${info.note}` : ""}</span> : null}
+            </p>
+          )}
+        </div>
+      )}
+
+      {!viewer && interactive && holes && (
         <div className="border-t border-white/10 px-3 py-3">
           <div className="flex flex-wrap gap-1.5" role="group" aria-label="Holes">
             {Array.from({ length: holes }, (_, i) => i + 1).map((n) => (
@@ -279,8 +315,9 @@ export default function CourseMap({ name, interactive = false, holeData, scoreca
         </div>
       )}
 
-      {interactive && holes && holeData && holeData.length > 0 && <Scorecard holes={holes} holeData={holeData} sel={sel} pick={pick} />}
+      {!viewer && interactive && holes && holeData && holeData.length > 0 && <Scorecard holes={holes} holeData={holeData} sel={sel} pick={pick} />}
 
+      {!viewer && (
       <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-3 py-2 text-xs text-white/75">
         <span className="font-semibold text-white">{c.name}</span>
         <span>
@@ -290,6 +327,7 @@ export default function CourseMap({ name, interactive = false, holeData, scoreca
         </span>
         <span className="text-white/45">Illustrative layout, not to scale</span>
       </div>
+      )}
     </div>
   );
 }

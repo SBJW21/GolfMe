@@ -6,10 +6,12 @@ import { courseDetails } from "@/lib/courseDetails";
 import CourseMap, { findCourse } from "@/components/CourseMap";
 import HoleMap, { type TapResult } from "@/components/HoleMap";
 import { getHoleMap } from "@/lib/holeMaps";
-import { CLUBS, demoRoute, distM, loadRounds, saveRounds, shotsOf, toYards, type Mark, type ShotRound } from "@/lib/shots";
+import { CLUBS, demoRoute, distM, loadHand, loadRounds, saveHand, saveRounds, shotsOf, toYards, type Mark, type ShotRound } from "@/lib/shots";
+import { eligibleRounds, ROUNDS_TO_UNLOCK } from "@/lib/insights";
+import Link from "next/link";
 
 const today = () => new Date().toLocaleDateString("en-CA", { timeZone: "Australia/Sydney" });
-const newRound = (course: string): ShotRound => ({ id: `s${Date.now()}`, course, date: today(), holes: [] });
+const newRound = (course: string, hand: "R" | "L"): ShotRound => ({ id: `s${Date.now()}`, course, date: today(), holes: [], hand });
 
 export default function ShotTracker() {
   const [rounds, setRounds] = useState<ShotRound[]>([]);
@@ -22,6 +24,7 @@ export default function ShotTracker() {
   const [course, setCourse] = useState("Mona Vale Golf Club");
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState(false);
+  const [hand, setHand] = useState<"R" | "L">("R");
   const [walk, setWalk] = useState(0); // metres since the last mark, for the map
 
   useEffect(() => {
@@ -29,6 +32,8 @@ export default function ShotTracker() {
     const r = loadRounds();
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setRounds(r);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setHand(loadHand());
     if (r[0]) setActiveId(r[0].id);
     setReady(true);
   }, []);
@@ -40,11 +45,15 @@ export default function ShotTracker() {
   const marks = round?.holes.find((h) => h.hole === hole)?.marks ?? [];
   const shots = shotsOf(marks);
   const holed = marks.length > 0 && !!marks[marks.length - 1].holed;
+  const locked = !!round?.finished;
+  const doneRounds = eligibleRounds(rounds).length;
+  const holesHoled = round ? round.holes.filter((h) => h.marks.some((m) => m.holed)).length : 0;
   const unit = yards ? "yd" : "m";
   const fmt = (m: number) => Math.round(yards ? toYards(m) : m);
 
   function start() {
-    const r = newRound(course.trim() || "Practice round");
+    saveHand(hand);
+    const r = newRound(course.trim() || "Practice round", hand);
     setRounds((x) => [r, ...x]);
     setActiveId(r.id);
     setHole(1);
@@ -65,6 +74,10 @@ export default function ShotTracker() {
   }
   function mark(kind: "shot" | "putt" = "shot") {
     setMsg("");
+    if (locked) {
+      setMsg("This round is finished and locked.");
+      return;
+    }
     if (holed) {
       setMsg("This hole is finished. Pick the next hole above, or go back to this hole and Undo.");
       return;
@@ -107,6 +120,10 @@ export default function ShotTracker() {
   const factor = yards ? 1.0936133 : 1;
   function addManual(metres: number, pos?: [number, number], putt = false) {
     if (!round) return;
+    if (locked) {
+      setMsg("This round is finished and locked.");
+      return;
+    }
     if (holed) {
       setMsg("This hole is finished. Pick the next hole above, or go back to this hole and Undo.");
       return;
@@ -125,6 +142,7 @@ export default function ShotTracker() {
   }
   function markTeeManual() {
     setMsg("");
+    if (locked) return;
     addMark({ lat: 0, lon: 0, manual: true, m: 0, pos: mapData?.tp, ts: Date.now() });
   }
   function gpsWalked() {
@@ -179,7 +197,7 @@ export default function ShotTracker() {
     return 2;
   }
   function inTheCup() {
-    if (!round) return;
+    if (!round || locked) return;
     if (marks.length === 0) {
       setMsg("Mark the tee first.");
       return;
@@ -200,7 +218,13 @@ export default function ShotTracker() {
     }
   }
   function undo() {
+    if (locked) return;
     setRounds((all) => all.map((r) => (r.id === activeId ? { ...r, holes: r.holes.map((h) => (h.hole === hole ? { ...h, marks: h.marks.slice(0, -1) } : h)) } : r)));
+  }
+  function finishRound() {
+    if (!round) return;
+    setRounds((all) => all.map((r) => (r.id === round.id ? { ...r, finished: true } : r)));
+    setMsg("Round finished and locked in.");
   }
   function remove(id: string) {
     setRounds((all) => all.filter((r) => r.id !== id));
@@ -234,27 +258,60 @@ export default function ShotTracker() {
     <div className="grid gap-8">
       <section className="glass rounded-2xl p-5">
         {!round ? (
-          <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
-            <label className="text-sm font-semibold">
-              Course
-              <input list="shot-courses" value={course} onChange={(e) => setCourse(e.target.value)} placeholder="Start typing a course" className="field-input mt-1" />
-              <datalist id="shot-courses">
-                {courses.map((c) => (
-                  <option key={c.slug} value={c.name} />
-                ))}
-              </datalist>
-            </label>
-            <button type="button" className="btn !px-6 !py-2.5 !text-sm" onClick={start}>Start tracking</button>
+          <div className="grid gap-4">
+            <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
+              <label className="text-sm font-semibold">
+                Course
+                <input list="shot-courses" value={course} onChange={(e) => setCourse(e.target.value)} placeholder="Start typing a course" className="field-input mt-1" />
+                <datalist id="shot-courses">
+                  {courses.map((c) => (
+                    <option key={c.slug} value={c.name} />
+                  ))}
+                </datalist>
+              </label>
+              <button type="button" className="btn !px-6 !py-2.5 !text-sm" onClick={start}>Start tracking</button>
+            </div>
+            <div className="flex flex-wrap items-center gap-3 text-sm">
+              <span className="font-semibold">You play</span>
+              <div className="inline-flex overflow-hidden rounded-full border border-white/25 text-xs font-semibold" role="group" aria-label="Handedness">
+                <button type="button" aria-pressed={hand === "R"} onClick={() => setHand("R")} className={`px-4 py-1.5 ${hand === "R" ? "bg-lime text-black" : "text-white/85"}`}>Right handed</button>
+                <button type="button" aria-pressed={hand === "L"} onClick={() => setHand("L")} className={`px-4 py-1.5 ${hand === "L" ? "bg-lime text-black" : "text-white/85"}`}>Left handed</button>
+              </div>
+              <span className="text-xs text-white/60">Used to tell a slice from a hook in your report</span>
+            </div>
           </div>
         ) : (
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <p className="font-display text-2xl">{round.course}</p>
-              <p className="text-sm text-white/60">{round.date}</p>
+          <div className="grid gap-3">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="font-display text-2xl">{round.course}</p>
+                <p className="text-sm text-white/60">{round.date} · {round.hand === "L" ? "Left" : "Right"} handed{locked ? " · Finished and locked" : ""}</p>
+              </div>
+              <div className="flex gap-2">
+                {!locked && holesHoled > 0 && (
+                  <button type="button" className="rounded-full border border-lime px-4 py-1.5 text-sm font-semibold text-lime hover:bg-lime hover:text-black" onClick={finishRound}>
+                    Finish round
+                  </button>
+                )}
+                <button type="button" className="rounded-full border border-white/25 px-4 py-1.5 text-sm font-semibold hover:border-lime" onClick={() => setActiveId(null)}>
+                  New round
+                </button>
+              </div>
             </div>
-            <button type="button" className="rounded-full border border-white/25 px-4 py-1.5 text-sm font-semibold hover:border-lime" onClick={() => setActiveId(null)}>
-              New round
-            </button>
+            {doneRounds >= ROUNDS_TO_UNLOCK ? (
+              <Link href="/my-golf/shots/report" className="btn self-start !px-5 !py-2 !text-sm">See your shot report</Link>
+            ) : (
+              <div>
+                <p className="text-sm text-white/75">
+                  {doneRounds} of {ROUNDS_TO_UNLOCK} finished rounds. Finish {ROUNDS_TO_UNLOCK - doneRounds} more to unlock your shot report. A round counts once nine holes are holed out.
+                </p>
+                <div className="mt-2 grid grid-cols-3 gap-1.5" aria-hidden="true">
+                  {Array.from({ length: ROUNDS_TO_UNLOCK }, (_, i) => (
+                    <span key={i} className={`h-2 rounded-full ${i < doneRounds ? "bg-lime" : "bg-white/15"}`} />
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </section>
@@ -308,7 +365,7 @@ export default function ShotTracker() {
           )}
           {marks.length === 0 && (
             <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
-              <button type="button" className="rounded-full border border-lime/70 px-4 py-2 text-sm font-semibold text-lime hover:bg-lime hover:text-black" onClick={markTeeManual}>Start this hole without GPS</button>
+              <button type="button" className="rounded-full border border-lime/70 px-4 py-2 text-sm font-semibold text-lime hover:bg-lime hover:text-black" disabled={locked} onClick={markTeeManual}>Start this hole without GPS</button>
               {unitToggle()}
             </div>
           )}
@@ -337,25 +394,25 @@ export default function ShotTracker() {
           </label>
           {marks.length === 0 ? (
             <div className="mt-3">
-              <button type="button" className="btn w-full !px-4 !py-3 !text-sm disabled:opacity-60" disabled={busy} onClick={() => mark("shot")}>
+              <button type="button" className="btn w-full !px-4 !py-3 !text-sm disabled:opacity-60" disabled={busy || locked} onClick={() => mark("shot")}>
                 {busy ? "Finding GPS..." : "Mark tee"}
               </button>
             </div>
           ) : (
             <div className="mt-3 grid gap-2">
               <div className="grid grid-cols-2 gap-2">
-                <button type="button" className="btn whitespace-nowrap !px-3 !py-3 !text-[0.8rem] disabled:opacity-60" disabled={busy || holed} onClick={() => mark("shot")}>
+                <button type="button" className="btn whitespace-nowrap !px-3 !py-3 !text-[0.8rem] disabled:opacity-60" disabled={busy || holed || locked} onClick={() => mark("shot")}>
                   {busy ? "Finding GPS..." : "Record shot"}
                 </button>
-                <button type="button" className="rounded-full border border-lime px-3 py-3 text-[0.8rem] font-extrabold uppercase tracking-wide text-lime hover:bg-lime hover:text-black disabled:opacity-40" disabled={busy || holed} onClick={() => (marks[marks.length - 1].manual ? puttManual() : mark("putt"))}>
+                <button type="button" className="rounded-full border border-lime px-3 py-3 text-[0.8rem] font-extrabold uppercase tracking-wide text-lime hover:bg-lime hover:text-black disabled:opacity-40" disabled={busy || holed || locked} onClick={() => (marks[marks.length - 1].manual ? puttManual() : mark("putt"))}>
                   Record putt
                 </button>
               </div>
               <div className="grid grid-cols-[1fr_auto] gap-2">
-                <button type="button" className="rounded-full border border-lime px-4 py-3 text-sm font-extrabold uppercase tracking-wide text-lime hover:bg-lime hover:text-black disabled:opacity-40" disabled={holed} onClick={inTheCup}>
+                <button type="button" className="rounded-full border border-lime px-4 py-3 text-sm font-extrabold uppercase tracking-wide text-lime hover:bg-lime hover:text-black disabled:opacity-40" disabled={holed || locked} onClick={inTheCup}>
                   In the cup!
                 </button>
-                <button type="button" className="rounded-full border border-white/25 px-5 py-3 text-sm font-semibold hover:border-lime" onClick={undo}>Undo</button>
+                <button type="button" className="rounded-full border border-white/25 px-5 py-3 text-sm font-semibold hover:border-lime disabled:opacity-40" disabled={locked} onClick={undo}>Undo</button>
               </div>
             </div>
           )}

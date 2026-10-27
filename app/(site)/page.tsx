@@ -1,5 +1,6 @@
 import Link from "next/link";
 import CoachCard from "@/components/CoachCard";
+import FeatureShowcase from "@/components/FeatureShowcase";
 import HowItWorks from "@/components/HowItWorks";
 import SampleNotice from "@/components/SampleNotice";
 import FocusPicker from "@/components/FocusPicker";
@@ -69,24 +70,9 @@ export default async function Home() {
           How it works
         </h2>
         <HowItWorks steps={steps} />
-        <p className="mb-3 mt-10 text-xs font-bold uppercase tracking-[0.16em] text-white/50">Also in Golf Me</p>
-        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {[
-            { href: "/coach/swing-analysis", title: "Swing analysis", text: "Draw on the swing, trace the ball flight and compare before and after", cta: "See it" },
-            { href: "/my-golf/shots", title: "Shot tracker", text: "Mark each shot with GPS and see your distance for every club", cta: "Try it" },
-            { href: "/courses", title: "Course guides", text: "Hole maps, how it plays and a 7 day forecast for Sydney courses", cta: "Browse" },
-            { href: "/my-golf/rounds", title: "Rounds and streaks", text: "Log your scorecard and keep your weekly golf streak alive", cta: "Open" },
-          ].map((f) => (
-            <li key={f.title}>
-              <Link href={f.href} className="glass flex h-full flex-col gap-1 rounded-2xl border-lime/30 p-4 transition hover:!border-lime/70 md:hover:-translate-y-0.5">
-                <span className="font-display text-xl text-lime">{f.title}</span>
-                <span className="text-sm text-white/80">{f.text}</span>
-                <span className="pill-arrow mt-auto self-start rounded-full border border-lime/60 px-3 py-1 text-xs font-extrabold uppercase tracking-[0.14em] text-lime">{f.cta}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
       </section>
+
+      <FeatureShowcase />
 
       <section className="mx-auto max-w-6xl px-4 pb-16">
         <div className="mb-6 flex items-end justify-between gap-4">

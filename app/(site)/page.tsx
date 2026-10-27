@@ -5,7 +5,6 @@ import HowItWorks from "@/components/HowItWorks";
 import SampleNotice from "@/components/SampleNotice";
 import FocusPicker from "@/components/FocusPicker";
 import AreaPicker from "@/components/AreaPicker";
-import BackToSearch from "@/components/BackToSearch";
 import { areaCounts } from "@/lib/areas";
 import { loadCoaches } from "@/lib/repo";
 
@@ -79,9 +78,6 @@ export default async function Home() {
           <h2 className="font-display text-[clamp(1.7rem,5vw,2.3rem)]">
             Featured coaches
           </h2>
-          <Link href="/coaches" className="text-sm font-semibold text-lime">
-            See all
-          </Link>
         </div>
         <div className="mb-4">
           <SampleNotice show={isSample} />
@@ -101,7 +97,9 @@ export default async function Home() {
           ))}
         </div>
         <div className="mt-10 flex justify-center">
-          <BackToSearch />
+          <Link href="/coaches" className="btn">
+            Find a coach
+          </Link>
         </div>
       </section>
     </main>

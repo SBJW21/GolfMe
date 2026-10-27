@@ -20,8 +20,8 @@
 .showcase .gm-section{position:relative;background:linear-gradient(90deg,rgba(3,8,5,.96),rgba(3,8,5,.79) 55%,rgba(3,8,5,.64)),var(--gm-photo) center/cover;padding:34px 28px 42px}
 .showcase h2{font-family:'Barlow Condensed',Impact,sans-serif;font-style:italic;font-weight:800;font-size:49px}
 .showcase .gm-grid{grid-template-columns:minmax(0,1fr) minmax(0,1.08fr);gap:18px}
-.showcase .gm-stage{padding:14px 8px 40px;min-width:0;background:radial-gradient(ellipse at 50% 65%,#b3fa2729,transparent 68%)}
-.showcase .gm-phone{width:246px;min-height:495px;max-width:100%;padding:12px 12px 15px;border:5px solid #72796e;border-radius:38px;background:linear-gradient(180deg,#04100655,#06100bf2 85%),url("/features/golf-phone.jpg") 70% center/cover;box-shadow:inset 0 0 0 1px #e6f4dc55,0 25px 55px #000c,12px 0 35px #c6ff3d12;overflow:visible}
+.showcase .gm-stage{padding:14px 8px 40px;min-width:0;background:none}
+.showcase .gm-phone{width:246px;min-height:495px;max-width:100%;padding:12px 12px 15px;border:5px solid #72796e;border-radius:38px;background:linear-gradient(180deg,#04100655,#06100bf2 85%),url("/features/golf-phone.jpg") 70% center/cover;box-shadow:inset 0 0 0 1px #e6f4dc55,0 18px 35px -8px #000c,0 0 35px #c6ff3d12;overflow:visible}
 .showcase .gm-brand{display:flex;gap:7px;align-items:center;color:#f2f2ee;margin:20px 0 22px;font-family:'Barlow Condensed',Impact,sans-serif;font-weight:800;font-style:italic;text-transform:uppercase;font-size:30px;line-height:1}
 .showcase .gm-brand img{width:25px;height:31px}.showcase .gm-brand em{color:#c6ff3d;font-style:inherit}
 .showcase .gm-screen-title{font-family:'Barlow Condensed',sans-serif;font-size:29px;font-style:italic;text-transform:uppercase;font-weight:800;text-shadow:0 2px 12px #000}
